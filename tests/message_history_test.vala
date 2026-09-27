@@ -16,17 +16,17 @@ private void test_find_id () {
     assert (MessageHistory.find_id (ids, 99) == -1);
 }
 
-private void test_earlier_batches_stop_at_target () {
-    assert (MessageHistory.earlier_batch_start (350, 25) == 250);
-    assert (MessageHistory.earlier_batch_start (250, 25) == 150);
-    assert (MessageHistory.earlier_batch_start (150, 25) == 50);
-    assert (MessageHistory.earlier_batch_start (50, 25) == 25);
-}
-
-private void test_nearby_target_avoids_overfetch () {
-    assert (MessageHistory.earlier_batch_start (350, 280) == 280);
-    assert (MessageHistory.earlier_batch_start (30, 0) == 0);
-    assert (MessageHistory.earlier_batch_start (30, 30) == 30);
+private void test_distant_context () {
+    var ids = new Json.Array ();
+    for (int i = 0; i < 10000; i++) ids.add_int_element (i + 10);
+    foreach (uint target in new uint[] { 0, 1, 30, 5000, 9999 }) {
+        uint start, end;
+        MessageHistory.context_range (ids, target, out start, out end);
+        assert (start <= target && target < end);
+        assert (end <= ids.get_length () && end - start <= 61);
+        assert (target - start == uint.min (target, 30));
+        assert (end - target == uint.min (10000 - target, 31));
+    }
 }
 
 private void test_initial_unread_batch () {
@@ -46,9 +46,6 @@ public int main (string[] args) {
     Test.init (ref args);
     Test.add_func ("/message-history/find-id", test_find_id);
     Test.add_func ("/message-history/initial-unread-batch", test_initial_unread_batch);
-    Test.add_func ("/message-history/earlier-batches-stop-at-target",
-                   test_earlier_batches_stop_at_target);
-    Test.add_func ("/message-history/nearby-target-avoids-overfetch",
-                   test_nearby_target_avoids_overfetch);
+    Test.add_func ("/message-history/distant-context", test_distant_context);
     return Test.run ();
 }

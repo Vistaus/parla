@@ -112,6 +112,8 @@ sources = files(
   'src/rpc_installer.vala',
   'src/models.vala',
   'src/message_history.vala',
+  'src/message_search.vala',
+  'src/search_results_view.vala',
   'src/message_deletion.vala',
   'src/chat_actions.vala',
   'src/chat_row.vala',
@@ -473,7 +475,8 @@ test('rpc-transport', rpc_transport_test, timeout: 30)
 core_compat_test = executable(
   'core-compat-test',
   files('tests/core_compat_test.vala', 'tests/unread_ui_test.vala',
-        'tests/message_retry_test.vala'),
+        'tests/message_retry_test.vala', 'tests/message_search_test.vala',
+        'tests/search_ui_test.vala'),
   sources, config_file, appdata_vala, resources,
   dependencies: deps,
   include_directories: src_inc,

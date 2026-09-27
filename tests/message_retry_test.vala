@@ -14,7 +14,8 @@ public int run_fake_retry_server () {
         var args = request.get_array_member ("params");
         var result = new Json.Node (Json.NodeType.NULL);
         string? failure = null;
-        if (method == "get_message" || method == "resend_messages")
+        if (method == "get_message" || method == "resend_messages"
+                || method == "search_messages" || method == "message_ids_to_search_results")
             calls.add_object_element (request);
         if (method == fail) {
             fail = "";
@@ -59,6 +60,20 @@ public int run_fake_retry_server () {
                 break;
             case "test_calls":
                 result.init_array (calls);
+                break;
+            case "search_messages":
+                var matches = new Json.Array ();
+                if (args.get_string_element (1) != "empty") {
+                    matches.add_int_element (args.get_int_element (0) * 100);
+                    matches.add_int_element (args.get_int_element (0) * 100 + 1);
+                }
+                result.init_array (matches);
+                break;
+            case "message_ids_to_search_results":
+                var search_results = new Json.Object ();
+                search_results.set_object_member ("100", object_from_json (
+                    "{\"id\":100,\"chatId\":10,\"chatName\":\"Archive\",\"message\":\"<literal>\",\"timestamp\":1}"));
+                result.init_object (search_results);
                 break;
             case "get_message":
                 var msg = messages.lookup ((int) args.get_int_element (1));

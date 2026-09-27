@@ -2,6 +2,12 @@ namespace Dc {
 
     public class MessageHistory : Object {
 
+        public static void context_range (Json.Array ids, uint target,
+                                           out uint start, out uint end) {
+            start = target > 30 ? target - 30 : 0;
+            end = uint.min (target + 31, ids.get_length ());
+        }
+
         public static uint initial_batch_start (Json.Array ids, int first_unread,
                                                 uint batch_size = 30) {
             uint start = ids.get_length () > batch_size
@@ -20,13 +26,5 @@ namespace Dc {
             return -1;
         }
 
-        public static uint earlier_batch_start (uint loaded_start,
-                                                 uint target_index,
-                                                 uint batch_size = 100) {
-            if (target_index >= loaded_start) return loaded_start;
-            uint start = loaded_start > batch_size
-                ? loaded_start - batch_size : 0;
-            return uint.max (start, target_index);
-        }
     }
 }

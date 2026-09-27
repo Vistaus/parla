@@ -341,6 +341,8 @@ private void test_unread_calls () {
 public int main (string[] args) {
     if (args.length > 1 && args[1] == "--fake-retry")
         return run_fake_retry_server ();
+    if (args.length > 1 && args[1] == "--search-ui")
+        return run_search_ui_test ();
     if (args.length > 1 && args[1] == "--retry-ui")
         return run_retry_ui_test ();
     if (args.length > 1 && args[1] == "--unread-ui")
@@ -357,5 +359,6 @@ public int main (string[] args) {
     Test.add_func ("/core-compat/onboarding", test_onboarding);
     Test.add_func ("/core-compat/unread-calls", test_unread_calls);
     Test.add_func ("/core-compat/message-retry", test_message_retry);
+    Test.add_func ("/core-compat/message-search", test_message_search);
     return Test.run ();
 }

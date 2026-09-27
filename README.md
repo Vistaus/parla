@@ -55,7 +55,8 @@ Want to build it yourself? See [Build](#build) below.
 - **Sticker packs** — send stickers, collect received ones, and manage your own local packs.
 - **Voice-message transcription** — transcribe downloaded voice messages locally with the Whisper command-line tool when it is installed; results stay in memory and are not sent or saved with the message.
 - **Optional Markdown rendering** — **bold**, *italic*, ~~strikethrough~~, `inline code`, fenced code blocks, headings, tables, and auto-linkified URLs.
-- **In-chat search** (Ctrl+F, Command+F on macOS) with real-time filtering and highlight.
+- **In-chat search** (Ctrl+F, Command+F on macOS) across the full history, with previous/next matches and scroll restoration.
+- **Sidebar search** finds chats and messages together, including archived conversations, in the selected profile.
 - **Save attachments** to disk from the message context menu.
 
 ### Chats
@@ -98,6 +99,7 @@ Want to build it yourself? See [Build](#build) below.
 | Focus next chat (Enter to open) | `Ctrl+Page Down` | `Command+Page Down` |
 | Focus previous chat (Enter to open) | `Ctrl+Page Up` | `Command+Page Up` |
 | Search in conversation | `Ctrl+F` | `Command+F` |
+| Search chats and messages | `Ctrl+Shift+F` | `Command+Shift+F` |
 | Open chat info | `Ctrl+I` | `Command+I` |
 | Open the chat focused in the list | `Enter` | `Enter` |
 | Run the configured message action (Reply by default) | `Enter` | `Enter` |

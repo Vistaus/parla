@@ -74,8 +74,6 @@ namespace Dc {
         private int64 focus_jump_until_us = 0;
         private Gtk.ScrolledWindow message_scroll;
         private GLib.ListStore message_store;
-        private Gtk.FilterListModel filtered_message_store;
-        private Gtk.CustomFilter message_filter;
         private ComposeBar compose_bar;
         private Gtk.Box selection_bar;
         private Gtk.Button selection_delete_btn;
@@ -91,7 +89,16 @@ namespace Dc {
         private Gtk.Spinner loading_more_spinner;
         private Gtk.Revealer message_search_revealer;
         private Gtk.SearchEntry message_search_entry;
-        private bool search_toggling;
+        private MessageSearch message_search;
+        private Gtk.Label search_position;
+        private Gtk.Button search_previous;
+        private Gtk.Button search_next;
+        private int search_index = -1;
+        private int search_return_id = 0;
+        private double search_return_top = 0;
+        private bool search_return_bottom = false;
+        private int restore_message_id = 0;
+        private double restore_message_top = 0;
         private FileDropTarget? file_drop_target;
         private ConversationMediaBar media_bar;
         private ulong playback_message_handler = 0;
@@ -125,6 +132,8 @@ namespace Dc {
             direct_hash, direct_equal);
         private Json.Array? all_msg_ids = null;
         private uint loaded_start_index = 0;
+        private uint loaded_end_index = 0;
+        private uint history_generation = 0;
         private bool loading_more = false;
         private int pending_scroll_message_id = 0;
         private int pending_voice_direction = 0;
@@ -292,6 +301,7 @@ namespace Dc {
 
         private void build_ui () {
             message_scroll = new Gtk.ScrolledWindow ();
+            message_scroll.name = "conversation-scroll";
             message_scroll.hexpand = true;
             message_scroll.vexpand = true;
             message_scroll.halign = Gtk.Align.FILL;
@@ -319,8 +329,11 @@ namespace Dc {
                     ? ViewportGoal.BOTTOM : ViewportGoal.FREE;
                 scroll_down_btn.visible = goal != ViewportGoal.BOTTOM;
                 update_date_pill ();
-                if (is_near_top () && !loading_more && loaded_start_index > 0) {
-                    load_earlier_messages.begin ();
+                if (!loading_messages && pending_scroll_message_id == 0) {
+                    if (is_near_top () && !loading_more && loaded_start_index > 0)
+                        load_earlier_messages.begin ();
+                    else if (at_loaded_bottom () && has_later_messages () && !loading_more)
+                        load_later_messages.begin ();
                 }
             }));
 
@@ -345,23 +358,21 @@ namespace Dc {
             }));
             message_scroll.get_vscrollbar ().add_controller (scrollbar_press);
 
-            /* Connected before the filter model exists so it runs before
+            /* Connected before the selection model exists so it runs before
                the list view learns of the change (see keep_focus_after_removal). */
             track_signal (message_store, message_store.items_changed.connect ((pos, removed, added) => {
                 if (removed > 0) keep_focus_after_removal ();
             }));
-            message_filter = create_message_filter (this);
-            filtered_message_store = new Gtk.FilterListModel (message_store, message_filter);
 
             var factory = new Gtk.SignalListItemFactory ();
             track_signal (factory, factory.bind.connect ((obj) => {
                 var li = (Gtk.ListItem) obj;
                 var msg = (Message) li.item;
-                bool unread_start = msg.id == first_unread_message_id && !search_filter_active ();
+                bool unread_start = msg.id == first_unread_message_id;
                 Message? prev = null;
                 uint pos = li.position;
                 if (pos > 0) {
-                    prev = (Message) filtered_message_store.get_item (pos - 1);
+                    prev = (Message) message_store.get_item (pos - 1);
                 }
 
                 bool is_img_continuation;
@@ -379,10 +390,8 @@ namespace Dc {
                 }
                 if (unread_start) container.append (MessageRow.build_unread_separator ());
 
-                /* While search narrows the list, adjacent rows are not
-                   adjacent messages — disable sender-grouping then. */
                 var row = new MessageRow (
-                    msg, search_filter_active () || unread_start ? null : prev,
+                    msg, unread_start ? null : prev,
                     trailing, is_img_continuation,
                     settings.bubble_avatar_display,
                     bubble_avatars_apply_to_this_chat (),
@@ -433,8 +442,9 @@ namespace Dc {
                is recycled so widgets, textures, and messages can finalize. */
             factory.unbind.connect (unbind_message_list_item);
 
-            var selection = new Gtk.NoSelection (filtered_message_store);
+            var selection = new Gtk.NoSelection (message_store);
             message_listview = new Gtk.ListView (selection, factory);
+            message_listview.name = "conversation-messages";
             message_listview.hexpand = true;
             message_listview.vexpand = true;
             message_listview.halign = Gtk.Align.FILL;
@@ -509,10 +519,10 @@ namespace Dc {
                 var row = focused_message_row ();
                 if (row == null) return false;
                 if (check_focus && (keyval == Gdk.Key.Up || keyval == Gdk.Key.Down)) {
-                    int pos = find_message_index (filtered_message_store, row.message_id);
+                    int pos = find_message_index (message_store, row.message_id);
                     if (pos < 0) return false;
                     pos += keyval == Gdk.Key.Up ? -1 : 1;
-                    if (pos >= 0 && pos < filtered_message_store.get_n_items ()) {
+                    if (pos >= 0 && pos < message_store.get_n_items ()) {
                         focus_jump_until_us = get_monotonic_time () + 1000 * 1000;
                         message_listview.scroll_to (pos, Gtk.ListScrollFlags.FOCUS, null);
                     }
@@ -641,12 +651,52 @@ namespace Dc {
             message_search_entry.margin_end = 8;
             message_search_entry.margin_top = 4;
             message_search_entry.margin_bottom = 4;
-            track_signal (message_search_entry,
-                message_search_entry.search_changed.connect (() => {
-                message_filter.changed (Gtk.FilterChange.DIFFERENT);
+            message_search = new MessageSearch (rpc);
+            search_position = new Gtk.Label ("");
+            search_previous = new Gtk.Button.from_icon_name ("go-up-symbolic");
+            search_previous.tooltip_text = "Previous match (Shift+Enter)";
+            search_next = new Gtk.Button.from_icon_name ("go-down-symbolic");
+            search_next.tooltip_text = "Next match (Enter)";
+            var close_search = new Gtk.Button.from_icon_name ("window-close-symbolic");
+            close_search.tooltip_text = "Close search (Escape)";
+            track_signal (close_search, close_search.clicked.connect (() => { close_search_if_active (); }));
+            track_signal (search_previous, search_previous.clicked.connect (() => { navigate_search (-1); }));
+            track_signal (search_next, search_next.clicked.connect (() => { navigate_search (1); }));
+            track_signal (message_search_entry, message_search_entry.changed.connect (() => {
+                if (!message_search_revealer.reveal_child) return;
+                pending_scroll_message_id = 0;
+                history_generation++;
+                goal_generation++;
+                if (goal == ViewportGoal.ANCHOR) goal = ViewportGoal.FREE;
+                message_search.submit (message_search_entry.text, chat_id);
             }));
+            track_signal (message_search, message_search.changed.connect (() => {
+                search_index = -1;
+                update_search_position ();
+                if (!message_search.busy && message_search.ids.length > 0
+                        && window.current_chat_id == chat_id) {
+                    search_index = message_search.ids.length - 1;
+                    open_search_match.begin ();
+                }
+            }));
+            var search_keys = new Gtk.EventControllerKey ();
+            search_keys.propagation_phase = Gtk.PropagationPhase.CAPTURE;
+            track_signal (search_keys, search_keys.key_pressed.connect ((key, code, state) => {
+                if (key == Gdk.Key.Return || key == Gdk.Key.KP_Enter) {
+                    navigate_search ((state & Gdk.ModifierType.SHIFT_MASK) != 0 ? -1 : 1);
+                    return true;
+                }
+                return false;
+            }));
+            message_search_entry.add_controller (search_keys);
+            var search_bar = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 4);
+            search_bar.append (message_search_entry);
+            search_bar.append (search_position);
+            search_bar.append (search_previous);
+            search_bar.append (search_next);
+            search_bar.append (close_search);
             message_search_revealer = new Gtk.Revealer ();
-            message_search_revealer.child = message_search_entry;
+            message_search_revealer.child = search_bar;
             message_search_revealer.reveal_child = false;
             message_search_revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
 
@@ -775,23 +825,6 @@ namespace Dc {
                 view.msg_actions.edit_message.begin (msg_id, new_text);
         }
 
-        private static Gtk.CustomFilter create_message_filter (
-                ConversationView target) {
-            WeakRef view_ref = WeakRef (target);
-            return new Gtk.CustomFilter ((item) => {
-                var view = view_ref.get () as ConversationView;
-                return view == null || view.closed || view.filter_message (item);
-            });
-        }
-
-        private bool filter_message (GLib.Object item) {
-            if (!message_search_revealer.reveal_child) return true;
-            string query = message_search_entry.text.strip ().down ();
-            if (query.length == 0) return true;
-            var msg = (Message) item;
-            return msg.text != null && msg.text.down ().contains (query);
-        }
-
         private static void unbind_message_list_item (Object obj) {
             var item = (Gtk.ListItem) obj;
             item.child = null;
@@ -803,7 +836,10 @@ namespace Dc {
             if (current_item == null
                     || current_item.message_id != current_msg_id) return;
             var next = find_adjacent_voice_message (current_msg_id, 1);
-            if (next == null) return;
+            if (next == null) {
+                if (has_later_messages ()) play_adjacent_voice_message.begin (1);
+                return;
+            }
             Idle.add (() => {
                 if (!playback.playing && playback.current_item == current_item)
                     playback.play_message (next, rpc.account_id);
@@ -835,8 +871,9 @@ namespace Dc {
                 playback.play_message (msg, rpc.account_id);
                 return;
             }
-            if (direction >= 0 || loading_more || all_msg_ids == null
-                    || loaded_start_index == 0) return;
+            if (direction == 0 || loading_messages || loading_more || all_msg_ids == null
+                    || (direction < 0 ? loaded_start_index == 0 : !has_later_messages ())) return;
+            uint history = history_generation;
 
             int current_id = current_item.message_id;
             double anchor_top;
@@ -849,32 +886,39 @@ namespace Dc {
             if (goal == ViewportGoal.BOTTOM) goal = ViewportGoal.FREE;
 
             try {
-                while (loaded_start_index > 0
+                while ((direction < 0 ? loaded_start_index > 0 : has_later_messages ())
                         && playback.current_item == current_item) {
-                    uint new_start = loaded_start_index > 100
-                        ? loaded_start_index - 100 : 0;
-                    var messages = yield fetch_messages_batch (
-                        new_start, loaded_start_index);
-                    prepend_batch (messages, new_start);
-
-                    msg = find_adjacent_voice_message (current_id, -1);
+                    uint start = direction < 0
+                        ? (loaded_start_index > 100 ? loaded_start_index - 100 : 0)
+                        : loaded_end_index;
+                    uint end = direction < 0 ? loaded_start_index
+                        : uint.min (loaded_end_index + 100, all_msg_ids.get_length ());
+                    var messages = yield fetch_messages_batch (start, end);
+                    if (closed || history != history_generation) break;
+                    if (direction < 0) prepend_batch (messages, start);
+                    else {
+                        message_store.splice (message_store.get_n_items (), 0, pinned_message_batch (messages));
+                        loaded_end_index = end;
+                    }
+                    msg = find_adjacent_voice_message (current_id, direction);
                     if (msg != null) break;
                 }
 
-                if (msg != null && playback.current_item == current_item)
+                if (!closed && history == history_generation
+                        && msg != null && playback.current_item == current_item)
                     playback.play_message (msg, rpc.account_id);
 
                 int anchor_pos = anchor_id != 0
-                    ? find_message_index (filtered_message_store, anchor_id)
+                    ? find_message_index (message_store, anchor_id)
                     : -1;
-                if (anchor_pos >= 0) {
+                if (!closed && history == history_generation && anchor_pos >= 0) {
                     anchor_message (anchor_id, (uint) anchor_pos, anchor_top);
                 }
                 finish_loading_earlier ();
             } catch (Error e) {
-                finish_loading_earlier (false);
-                window.show_toast (
-                    "Failed to load previous voice message: " + e.message);
+                finish_loading_earlier ();
+                if (!closed && history == history_generation)
+                    window.show_toast ("Failed to load voice message: " + e.message);
             }
         }
 
@@ -889,7 +933,7 @@ namespace Dc {
             playback.set_navigation (
                 find_adjacent_voice_message (current_id, -1) != null
                     || loaded_start_index > 0,
-                find_adjacent_voice_message (current_id, 1) != null);
+                find_adjacent_voice_message (current_id, 1) != null || has_later_messages ());
         }
 
         /* Workspace-style hover action bar: dispatch a button press to the
@@ -964,9 +1008,9 @@ namespace Dc {
             }
 
             var trailing = new GLib.GenericArray<Message> ();
-            for (uint i = pos + 1, n = filtered_message_store.get_n_items ();
+            for (uint i = pos + 1, n = message_store.get_n_items ();
                     i < n && trailing.length < 5; i++) {
-                var next = (Message) filtered_message_store.get_item (i);
+                var next = (Message) message_store.get_item (i);
                 if (next == null || !next.is_image_only ||
                     next.id == first_unread_message_id ||
                     !MessageRow.same_sender (msg, next)) break;
@@ -1225,6 +1269,8 @@ namespace Dc {
 
         public void on_activated (bool focus_compose = true) {
             activation_generation++;
+            if (message_search_revealer.reveal_child)
+                message_search.submit (message_search_entry.text, chat_id);
             unread_snapshot_pending = true;
             unread_scroll_cancelled = false;
             load_messages.begin (messages_loaded);
@@ -1291,6 +1337,10 @@ namespace Dc {
 
         public async bool handle_incoming_msg (int msg_id) {
             try {
+                if (has_later_messages ()) {
+                    mark_messages_stale ();
+                    return false;
+                }
                 if (find_message (message_store, msg_id) != null) {
                     flush_pending_seen ();
                     return true;
@@ -1395,16 +1445,55 @@ namespace Dc {
         }
 
         public void toggle_search () {
-            if (search_toggling) return;
-            search_toggling = true;
-            bool was_active = message_search_revealer.reveal_child;
-            message_search_revealer.reveal_child = !was_active;
-            if (was_active) message_search_entry.text = "";
-            Idle.add (() => {
-                if (!was_active) message_search_entry.grab_focus ();
-                search_toggling = false;
-                return Source.REMOVE;
-            });
+            if (close_search_if_active ()) return;
+            search_return_bottom = is_near_bottom ();
+            double top;
+            var row = find_message_row (message_listview, 0, out top);
+            search_return_id = row != null ? row.message_id : 0;
+            search_return_top = top;
+            message_search_revealer.reveal_child = true;
+            message_search.submit (message_search_entry.text, chat_id);
+            message_search_entry.grab_focus ();
+        }
+
+        public void suspend_search () {
+            message_search.cancel ();
+            pending_scroll_message_id = 0;
+            history_generation++;
+        }
+
+        private void update_search_position () {
+            if (message_search.busy) search_position.label = "Searching…";
+            else if (message_search.error_message != null) search_position.label = "Search failed";
+            else if (message_search.query == "") search_position.label = "";
+            else if (message_search.ids.length == 0) search_position.label = "No matches";
+            else search_position.label = "%d of %d".printf (search_index + 1, message_search.ids.length);
+            search_position.tooltip_text = message_search.error_message;
+            search_previous.sensitive = search_next.sensitive = search_index >= 0;
+        }
+
+        private void navigate_search (int direction) {
+            int count = message_search.ids.length;
+            if (count == 0 || message_search.busy) return;
+            search_index = (search_index + direction + count) % count;
+            open_search_match.begin ();
+        }
+
+        private async void open_search_match () {
+            update_search_position ();
+            int id = message_search.ids[search_index];
+            uint token = message_search.generation;
+            uint history = ++history_generation;
+            pending_scroll_message_id = 0;
+            try {
+                var msg = yield rpc.fetch_message_for (message_search.account_id, id);
+                if (closed || !message_search.is_current (token) || history != history_generation) return;
+                if (msg == null || msg.chat_id != chat_id) unavailable_search_match (id);
+                else jump_to_message (id);
+            } catch (Error e) {
+                if (!closed && message_search.is_current (token) && history == history_generation)
+                    unavailable_search_match (id);
+            }
         }
 
         /**
@@ -1635,34 +1724,38 @@ namespace Dc {
         public bool close_search_if_active () {
             if (!message_search_revealer.reveal_child) return false;
             message_search_revealer.reveal_child = false;
+            message_search.cancel ();
             message_search_entry.text = "";
+            pending_scroll_message_id = 0;
+            history_generation++;
+            goal_generation++;
+            goal = ViewportGoal.FREE;
+            if (search_return_bottom) scroll_to_bottom ();
+            else if (search_return_id > 0) {
+                restore_message_id = search_return_id;
+                restore_message_top = search_return_top;
+                jump_to_message (search_return_id);
+            }
             return true;
         }
 
         public void scroll_to_message (int msg_id) {
             if (msg_id <= 0) return;
+            close_search_if_active ();
+            restore_message_id = 0;
+            jump_to_message (msg_id);
+        }
 
-            /* A filtered-out message has no ListView position. Close search
-               first and let the filter model expose every message again. */
-            if (close_search_if_active ()) {
-                Idle.add (() => {
-                    scroll_to_message (msg_id);
-                    return Source.REMOVE;
-                });
-                return;
-            }
-
+        private void jump_to_message (int msg_id) {
+            pending_scroll_message_id = msg_id;
+            history_generation++;
+            goal_generation++;
+            goal = ViewportGoal.FREE;
+            if (loading_messages) return;
             if (scroll_to_loaded_message (msg_id)) {
                 pending_scroll_message_id = 0;
                 resume_pending_voice_navigation ();
-                return;
-            }
-
-            pending_scroll_message_id = msg_id;
-            /* The jump load prepends big batches; bottom-following would
-               snap the viewport to the end on every splice. */
-            if (goal == ViewportGoal.BOTTOM) goal = ViewportGoal.FREE;
-            if (!loading_more) load_until_pending_message.begin ();
+            } else if (!loading_more) load_until_pending_message.begin ();
         }
 
         public void request_voice_navigation (int direction) {
@@ -1678,18 +1771,22 @@ namespace Dc {
         }
 
         private bool scroll_to_loaded_message (int msg_id) {
-            int pos = find_message_index (filtered_message_store, msg_id);
+            int pos = find_message_index (message_store, msg_id);
             if (pos < 0) return false;
-            var msg = (Message) filtered_message_store.get_item (pos);
+            var msg = (Message) message_store.get_item (pos);
             msg.highlighted = true;
             /* FOCUS lands on the target; keep on_focus_widget_changed from
                treating that as Tab entering the list. */
             focus_jump_until_us = get_monotonic_time () + 1000 * 1000;
-            message_listview.scroll_to (pos, Gtk.ListScrollFlags.FOCUS, null);
-            if ((uint) pos + 1 == filtered_message_store.get_n_items ()) {
+            bool restoring = restore_message_id == msg_id;
+            message_listview.scroll_to (pos, message_search_revealer.reveal_child || restoring
+                ? Gtk.ListScrollFlags.NONE : Gtk.ListScrollFlags.FOCUS, null);
+            if (restoring) {
+                anchor_message (msg_id, (uint) pos, restore_message_top, 45);
+                restore_message_id = 0;
+            } else if ((uint) pos + 1 == message_store.get_n_items () && !has_later_messages ()) {
                 /* Jumping to the last row is just going to the bottom. */
-                goal_generation++;
-                goal = ViewportGoal.BOTTOM;
+                anchor_message (msg_id, (uint) pos, 0, 45, true);
                 scroll_down_btn.visible = false;
             } else {
                 /* 45-frame minimum: survive the focus-restore scroll of a
@@ -1713,7 +1810,8 @@ namespace Dc {
             or user input cancels this one instantly via goal_generation. */
         private void anchor_message (int msg_id, uint position,
                                      double wanted_top = double.MAX,
-                                     uint min_frames = 0) {
+                                     uint min_frames = 0,
+                                     bool align_bottom = false) {
             goal = ViewportGoal.ANCHOR;
             uint generation = ++goal_generation;
             double want = wanted_top;
@@ -1731,11 +1829,24 @@ namespace Dc {
                 bool in_viewport = row != null
                     && current_top + row.get_height () > 0
                     && current_top < message_scroll.get_height ();
+                if (in_viewport) {
+                    var msg = find_message (message_store, msg_id);
+                    if (msg != null && msg.highlighted) {
+                        msg.highlighted = false;
+                        row.highlight ();
+                    }
+                }
                 if (row == null) {
                     /* Not realized yet (or recycled away): re-request. */
                     message_listview.scroll_to (
                         position, Gtk.ListScrollFlags.NONE, null);
                     stable_frames = 0;
+                } else if (align_bottom) {
+                    double target = max_scroll_value ();
+                    if (Math.fabs (target - message_scroll.vadjustment.value) > 0.5) {
+                        restore_scroll_value (target);
+                        stable_frames = 0;
+                    } else stable_frames++;
                 } else if (want == double.MAX) {
                     /* Tick callbacks run BEFORE layout: right after
                        scroll_to the target can still sit realized at its
@@ -1788,7 +1899,7 @@ namespace Dc {
 
         private async void load_messages (bool preserve_scroll = false) {
             if (closed || rpc.account_id <= 0) return;
-            if (loading_messages) {
+            if (loading_messages || loading_more) {
                 reload_requested = true;
                 return;
             }
@@ -1823,30 +1934,36 @@ namespace Dc {
                     previous_scroll_value = message_scroll.vadjustment.value;
                 }
 
-                all_msg_ids = yield rpc.get_message_ids_for (
-                    rpc.account_id, chat_id);
-                if (closed || activation != activation_generation || all_msg_ids == null) return;
-
-                loaded_start_index = MessageHistory.initial_batch_start (
-                    all_msg_ids, first_unread_message_id);
-                /* Keep any history already loaded above the unread boundary
-                   when a core event refreshes the conversation. */
-                if (preserve_scroll && message_store.get_n_items () > 0) {
+                bool had_later_messages = has_later_messages ();
+                uint history = history_generation;
+                var ids = yield rpc.get_message_ids_for (rpc.account_id, chat_id);
+                if (closed || activation != activation_generation || ids == null) return;
+                all_msg_ids = ids;
+                if (history != history_generation) return;
+                uint start = MessageHistory.initial_batch_start (ids, first_unread_message_id);
+                uint end = ids.get_length ();
+                int target = MessageHistory.find_id (ids, pending_scroll_message_id);
+                if (target >= 0) {
+                    MessageHistory.context_range (ids, (uint) target, out start, out end);
+                } else if (preserve_scroll && message_store.get_n_items () > 0) {
                     var first = (Message) message_store.get_item (0);
-                    int previous_start = MessageHistory.find_id (all_msg_ids, first.id);
-                    if (previous_start >= 0)
-                        loaded_start_index = uint.min (loaded_start_index, (uint) previous_start);
+                    var last = (Message) message_store.get_item (message_store.get_n_items () - 1);
+                    int previous_start = MessageHistory.find_id (ids, first.id);
+                    int previous_end = MessageHistory.find_id (ids, last.id);
+                    if (previous_start >= 0) start = had_later_messages
+                        ? (uint) previous_start : uint.min (start, (uint) previous_start);
+                    if (had_later_messages && previous_end >= 0)
+                        end = (uint) previous_end + 1;
                 }
-
-                var messages = yield fetch_messages_batch (
-                    loaded_start_index, all_msg_ids.get_length ());
-                if (closed || activation != activation_generation) return;
-
+                var messages = yield fetch_messages_batch (start, end);
+                if (closed || activation != activation_generation || history != history_generation) return;
                 yield pinned.load_for_chat (chat_id);
-                if (closed || activation != activation_generation) return;
+                if (closed || activation != activation_generation || history != history_generation) return;
                 webxdc_bar.load_for_chat.begin (chat_id);
 
                 loading_chat = true;
+                loaded_start_index = start;
+                loaded_end_index = end;
                 goal_generation++;
                 goal = !preserve_scroll || was_near_bottom
                     ? ViewportGoal.BOTTOM : ViewportGoal.FREE;
@@ -1859,7 +1976,7 @@ namespace Dc {
                 loading_chat = false;
                 if (messages.length > 0) {
                     int unread_pos = find_message_index (
-                        filtered_message_store, first_unread_message_id);
+                        message_store, first_unread_message_id);
                     if (pending_scroll_message_id != 0) {
                         goal = ViewportGoal.FREE;
                     } else if (snapshot_unread && !unread_scroll_cancelled && unread_pos >= 0) {
@@ -1892,8 +2009,10 @@ namespace Dc {
                 if (!closed) {
                     if (reload_requested || unread_snapshot_pending)
                         load_messages.begin (messages_loaded);
-                    else
+                    else {
+                        resume_pending_message_scroll ();
                         flush_pending_seen ();
+                    }
                 }
             }
         }
@@ -1999,9 +2118,9 @@ namespace Dc {
             if (map != null) {
                 foreach (int mid in ids) {
                     string k = mid.to_string ();
-                    if (map.has_member (k)) {
-                        var msg = RpcParsers.parse_message (
-                            map.get_object_member (k));
+                    var obj = json_obj (map, k);
+                    if (obj != null && (!obj.has_member ("kind") || json_str (obj, "kind") == "message")) {
+                        var msg = RpcParsers.parse_message (obj);
                         if (msg.state != MessageState.OUT_DRAFT) {
                             result.add (msg);
                         }
@@ -2048,13 +2167,14 @@ namespace Dc {
             prepend_batch (messages, new_start);
 
             if (anchor_id == 0) return;
-            int anchor_pos = find_message_index (filtered_message_store, anchor_id);
+            int anchor_pos = find_message_index (message_store, anchor_id);
             if (anchor_pos >= 0)
                 anchor_message (anchor_id, (uint) anchor_pos, anchor_top);
         }
 
         private async void load_earlier_messages () {
-            if (loading_more || all_msg_ids == null || loaded_start_index == 0) return;
+            if (closed || loading_messages || loading_more || all_msg_ids == null || loaded_start_index == 0) return;
+            uint history = history_generation;
             loading_more = true;
             set_loading_more_visible (true);
 
@@ -2063,78 +2183,101 @@ namespace Dc {
 
             try {
                 var messages = yield fetch_messages_batch (new_start, loaded_start_index);
-                prepend_batch_preserving_anchor (messages, new_start);
+                if (!closed && history == history_generation)
+                    prepend_batch_preserving_anchor (messages, new_start);
                 finish_loading_earlier ();
             } catch (Error e) {
-                pending_scroll_message_id = 0;
-                pending_voice_direction = 0;
-                finish_loading_earlier (false);
-                window.show_toast ("Failed to load earlier messages: " + e.message);
+                if (!closed && history == history_generation)
+                    window.show_toast ("Failed to load earlier messages: " + e.message);
+                finish_loading_earlier ();
             }
         }
 
-        /* Load every missing history page between the current context and a
-           requested message. Re-evaluate the pending ID after each RPC call
-           so a newer click replaces an older jump without racing it. */
-        private async void load_until_pending_message () {
-            if (loading_more || pending_scroll_message_id == 0
-                    || all_msg_ids == null) return;
-
+        private async void load_later_messages () {
+            if (closed || loading_messages || loading_more || !has_later_messages ()) return;
+            uint history = history_generation;
             loading_more = true;
-            set_loading_more_visible (true);
-            /* Never bottom-follow while batches land: scroll_to_message
-               demotes BOTTOM, but a fresh chat load (jump into a chat that
-               was not open, e.g. gallery via a sidebar row's Details)
-               re-establishes it between that demotion and this loop —
-               every splice would then snap to the bottom and the anchor
-               would drag it back up, once per batch. */
-            if (goal == ViewportGoal.BOTTOM) goal = ViewportGoal.FREE;
-            bool unavailable = false;
-
+            uint end = uint.min (loaded_end_index + 100, all_msg_ids.get_length ());
             try {
-                while (pending_scroll_message_id != 0) {
-                    int target_id = pending_scroll_message_id;
-                    if (find_message (message_store, target_id) != null) break;
-
-                    int target_index = MessageHistory.find_id (
-                        all_msg_ids, target_id);
-                    if (target_index < 0
-                            || (uint) target_index >= loaded_start_index) {
-                        if (pending_scroll_message_id == target_id)
-                            pending_scroll_message_id = 0;
-                        unavailable = true;
-                        break;
-                    }
-
-                    /* Jumps (quotes, gallery "view in conversation") can
-                       span thousands of messages; the regular 100-message
-                       batches would mean dozens of sequential roundtrips
-                       that look like nothing is happening. */
-                    uint new_start = MessageHistory.earlier_batch_start (
-                        loaded_start_index, (uint) target_index, 1000);
-                    var messages = yield fetch_messages_batch (
-                        new_start, loaded_start_index);
-
-                    /* The user may have scrolled (which cancels the jump)
-                       during the roundtrip. */
-                    if (pending_scroll_message_id == 0) break;
-
-                    /* Keep the complete context between the old viewport and
-                       the target instead of inserting only the pinned row. */
-                    prepend_batch_preserving_anchor (messages, new_start);
+                var messages = yield fetch_messages_batch (loaded_end_index, end);
+                if (!closed && history == history_generation) {
+                    double top;
+                    var anchor = find_message_row (message_listview, 0, out top);
+                    int id = anchor != null ? anchor.message_id : 0;
+                    message_store.splice (message_store.get_n_items (), 0, pinned_message_batch (messages));
+                    loaded_end_index = end;
+                    int pos = find_message_index (message_store, id);
+                    if (pos >= 0) anchor_message (id, (uint) pos, top);
                 }
             } catch (Error e) {
-                pending_scroll_message_id = 0;
-                finish_loading_earlier (false);
-                window.show_toast ("Failed to load message: " + e.message);
-                return;
+                if (!closed && history == history_generation)
+                    window.show_toast ("Failed to load messages: " + e.message);
             }
-
             finish_loading_earlier ();
-            if (unavailable) {
-                pending_voice_direction = 0;
-                window.show_toast ("Message is no longer available");
+        }
+
+        /* Fetch only the context around a distant target. This keeps jumps
+           constant-sized even in conversations with years of history. */
+        private async void load_until_pending_message () {
+            if (closed || loading_messages || loading_more || pending_scroll_message_id == 0) return;
+            loading_more = true;
+            set_loading_more_visible (true);
+            uint history = history_generation;
+            try {
+                while (!closed && pending_scroll_message_id != 0) {
+                    int target_id = pending_scroll_message_id;
+                    history = history_generation;
+                    if (find_message (message_store, target_id) != null) break;
+                    var ids = yield rpc.get_message_ids_for (rpc.account_id, chat_id);
+                    if (closed) break;
+                    if (history != history_generation) continue;
+                    int target = ids != null ? MessageHistory.find_id (ids, target_id) : -1;
+                    if (target < 0) {
+                        unavailable_search_match (target_id);
+                        break;
+                    }
+                    all_msg_ids = ids;
+                    uint start, end;
+                    MessageHistory.context_range (ids, (uint) target, out start, out end);
+                    var messages = yield fetch_messages_batch (start, end);
+                    if (closed) break;
+                    if (history != history_generation) continue;
+                    bool found = false;
+                    foreach (var msg in messages) if (msg.id == target_id) found = true;
+                    if (!found) {
+                        unavailable_search_match (target_id);
+                        break;
+                    }
+                    loading_chat = true;
+                    goal_generation++;
+                    goal = ViewportGoal.FREE;
+                    message_store.splice (0, message_store.get_n_items (), pinned_message_batch (messages));
+                    loaded_start_index = start;
+                    loaded_end_index = end;
+                    loading_chat = false;
+                    update_conversation_media_bar ();
+                    break;
+                }
+            } catch (Error e) {
+                if (!closed && history == history_generation) {
+                    pending_scroll_message_id = 0;
+                    window.show_toast ("Failed to load message: " + e.message);
+                }
             }
+            finish_loading_earlier ();
+        }
+
+        private void unavailable_search_match (int id) {
+            pending_scroll_message_id = 0;
+            pending_voice_direction = 0;
+            if (message_search_revealer.reveal_child) {
+                int[] remaining = {};
+                foreach (int match in message_search.ids) if (match != id) remaining += match;
+                message_search.ids = remaining;
+                search_index = int.min (search_index, remaining.length - 1);
+                update_search_position ();
+            }
+            window.show_toast ("Message is no longer available");
         }
 
         /* Find a row by ID, or the top visible row when message_id is zero. */
@@ -2144,6 +2287,10 @@ namespace Dc {
             top = double.MAX;
             var row = widget as MessageRow;
             if (row != null) {
+                /* ListView keeps unmapped rows in its recycling pool. Their
+                   old coordinates cannot confirm that a jump reached its
+                   target, nor serve as a viewport-restoration anchor. */
+                if (!row.get_mapped () || row.get_height () <= 0) return null;
                 Graphene.Point point = Graphene.Point ();
                 if ((message_id != 0 && row.message_id != message_id)
                         || !row.compute_point (message_scroll,
@@ -2171,6 +2318,7 @@ namespace Dc {
 
         private void finish_loading_earlier (bool resume_pending = true) {
             loading_more = false;
+            if (closed) return;
             set_loading_more_visible (false);
             /* An anchor started by the prepend still owns the viewport;
                it hands the goal back itself once the layout settles. */
@@ -2181,10 +2329,11 @@ namespace Dc {
             scroll_down_btn.visible = !is_near_bottom ();
             update_date_pill ();
             if (resume_pending) resume_pending_message_scroll ();
+            if (reload_requested && !loading_more) load_messages.begin (true);
         }
 
         private void resume_pending_message_scroll () {
-            if (pending_scroll_message_id == 0) return;
+            if (closed || loading_messages || pending_scroll_message_id == 0) return;
             if (scroll_to_loaded_message (pending_scroll_message_id)) {
                 pending_scroll_message_id = 0;
                 resume_pending_voice_navigation ();
@@ -2252,7 +2401,15 @@ namespace Dc {
             loading_more_revealer.reveal_child = true;
         }
 
+        private bool has_later_messages () {
+            return all_msg_ids != null && loaded_end_index < all_msg_ids.get_length ();
+        }
+
         private bool is_near_bottom () {
+            return !has_later_messages () && at_loaded_bottom ();
+        }
+
+        private bool at_loaded_bottom () {
             var adj = message_scroll.vadjustment;
             if (adj.upper <= adj.page_size) return true;
             return (adj.upper - adj.value - adj.page_size) < 80;
@@ -2275,10 +2432,14 @@ namespace Dc {
         }
 
         public void scroll_to_bottom () {
+            if (has_later_messages ()) {
+                jump_to_message ((int) all_msg_ids.get_int_element (all_msg_ids.get_length () - 1));
+                return;
+            }
             goal_generation++;
             goal = ViewportGoal.BOTTOM;
             maybe_autoscroll ();
-            uint n = filtered_message_store.get_n_items ();
+            uint n = message_store.get_n_items ();
             if (n > 0) {
                 message_listview.scroll_to (n - 1, Gtk.ListScrollFlags.NONE, null);
             }
@@ -2398,8 +2559,11 @@ namespace Dc {
                     var msg = yield rpc.fetch_message (msg_id);
                     if (msg != null) {
                         msg.selection_visible = selection_mode;
-                        insert_message_sorted (msg);
-                        scroll_to_bottom ();
+                        if (has_later_messages ()) jump_to_message (msg_id);
+                        else {
+                            insert_message_sorted (msg);
+                            scroll_to_bottom ();
+                        }
                     }
                 }
             } catch (Error e) {
@@ -2660,7 +2824,7 @@ namespace Dc {
         /* A reload replaces every row and a deletion drops one, and GTK
            then parks the keyboard focus on the first (oldest) row. Runs
            while the focused row is still bound to its message and the
-           filtered store still holds the old order: remember the message
+           row tree still holds the old order: remember the message
            and its neighbour above, then, once the list view has reacted,
            put the focus back on whichever of the two survived (#57). */
         private void keep_focus_after_removal () {
@@ -2674,11 +2838,11 @@ namespace Dc {
             int neighbour_id = above_row != null ? above_row.message_id : 0;
             Idle.add (() => {
                 if (closed) return Source.REMOVE;
-                int pos = find_message_index (filtered_message_store, id);
-                if (pos < 0) pos = find_message_index (filtered_message_store, neighbour_id);
+                int pos = find_message_index (message_store, id);
+                if (pos < 0) pos = find_message_index (message_store, neighbour_id);
                 var current = focused_message_row ();
                 if (pos < 0 || (current != null && current.message_id
-                        == ((Message) filtered_message_store.get_item (pos)).id)) {
+                        == ((Message) message_store.get_item (pos)).id)) {
                     return Source.REMOVE;
                 }
                 focus_jump_until_us = get_monotonic_time () + 1000 * 1000;
@@ -2757,11 +2921,6 @@ namespace Dc {
            than triggering the row action or arming a double-click reaction. */
         private bool pointer_on_audio (double x, double y) {
             return pick_ancestor_matches (x, y, (w) => w is AudioPlayer);
-        }
-
-        private bool search_filter_active () {
-            return message_search_revealer.reveal_child
-                && message_search_entry.text.strip ().length > 0;
         }
 
         /* True when the picked widget or an ancestor inside the row carries
@@ -2903,6 +3062,8 @@ namespace Dc {
         public void close () {
             if (closed) return;
             closed = true;
+            message_search.cancel ();
+            history_generation++;
             activation_generation++;
             if (seen_timer != 0) {
                 Source.remove (seen_timer);
@@ -2945,7 +3106,6 @@ namespace Dc {
                if an already-running async RPC briefly keeps this view alive. */
             message_listview.set_model (null);
             message_listview.set_factory (null);
-            filtered_message_store.set_model (null);
             message_store.remove_all ();
             all_msg_ids = null;
             mention_roster = null;

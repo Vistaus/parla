@@ -20,6 +20,8 @@ namespace Dc {
         private Gtk.Label content_title_label;
         private Gtk.Image content_mute_icon;
         private Gtk.SearchEntry search_entry;
+        private SearchResultsView message_results;
+        private uint search_open_generation = 0;
         private Gtk.Box sidebar_box;
         private Gtk.Button sidebar_toggle_btn;
         private Gtk.Button message_search_btn;
@@ -178,6 +180,8 @@ namespace Dc {
             chat_store.remove_all ();
             clear_listbox (chat_listbox);
             current_chat_row = null;
+            search_open_generation++;
+            message_results.search.cancel ();
             search_entry.text = "";
             showing_archived = false;
             archived_count = 0;
@@ -639,20 +643,26 @@ namespace Dc {
 
             /* Search */
             search_entry = new Gtk.SearchEntry ();
-            search_entry.placeholder_text = "Search contacts…";
+            search_entry.placeholder_text = "Search chats or messages…";
             search_entry.margin_start = 8;
             search_entry.margin_end = 8;
             search_entry.margin_top = 4;
             search_entry.margin_bottom = 4;
-            search_entry.search_changed.connect (() => {
+            search_entry.changed.connect (() => {
+                search_open_generation++;
                 chat_listbox.invalidate_filter ();
+                message_results.submit (search_entry.text);
+                update_archived_toggle ();
             });
             /* Return opens the first chat matching the search and puts the
                caret in the message entry; Tab/Down move focus into the chat
                list so it can be walked with the arrow keys. */
             search_entry.activate.connect (() => {
                 var row = first_visible_chat_row ();
-                if (row == null) return;
+                if (row == null) {
+                    message_results.focus_first (true);
+                    return;
+                }
                 var chat_row = row.child as ChatRow;
                 if (chat_row == null) return;
                 select_chat_by_id (chat_row.chat_id);
@@ -672,12 +682,16 @@ namespace Dc {
                         row.grab_focus ();
                         return true;
                     }
+                    return message_results.focus_first ();
                 }
                 return false;
             });
             search_entry.add_controller (search_keys);
             sidebar_box.append (search_entry);
-
+            message_results = new SearchResultsView ();
+            message_results.message_activated.connect ((acct, chat, msg) => {
+                open_search_message.begin (acct, chat, msg);
+            });
             /* Archived-chats toggle. Hidden until the account actually has
                archived chats; flips the list between normal and archived. */
             archived_btn_content = new Adw.ButtonContent ();
@@ -786,7 +800,10 @@ namespace Dc {
             });
             chat_listbox.add_controller (list_keys);
 
-            chat_scroll.child = chat_listbox;
+            var results_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
+            results_box.append (chat_listbox);
+            results_box.append (message_results);
+            chat_scroll.child = results_box;
             sidebar_box.append (chat_scroll);
 
             /* ---- Content area ---- */
@@ -966,6 +983,7 @@ namespace Dc {
 
         private async void try_connect () {
             rpc = ((Dc.Application) this.application).rpc;
+            message_results.set_rpc (rpc);
 
             /* Reset any error widget left from a previous failed attempt. */
             show_empty_status ("parla-welcome", "Welcome to Parla",
@@ -1421,6 +1439,7 @@ namespace Dc {
             discard_all_views ();
             app.reset_rpc_client ();
             rpc = app.rpc;
+            message_results.set_rpc (rpc);
             events = null;
             chat_menu = null;
             current_chat_id = 0;
@@ -1537,7 +1556,8 @@ namespace Dc {
         private void update_archived_toggle () {
             if (archived_toggle_btn == null) return;
             bool compact = settings.sidebar_mode == SidebarMode.COMPACT;
-            archived_toggle_btn.visible = showing_archived || archived_count > 0;
+            archived_toggle_btn.visible = search_entry.text.strip () == ""
+                && (showing_archived || archived_count > 0);
             if (showing_archived) {
                 archived_btn_content.icon_name = "go-previous-symbolic";
                 archived_btn_content.label = compact ? "" : "Back to Chats";
@@ -1841,8 +1861,12 @@ namespace Dc {
             if (chat_row == null) return;
 
             int chat_id = chat_row.chat_id;
+            search_open_generation++;
             mark_current_chat_row (row);
+            open_chat (chat_id, find_chat_entry (chat_store, chat_id));
+        }
 
+        private void open_chat (int chat_id, ChatEntry? entry, int message_id = 0) {
             /* Opening from the list itself (Enter on the focused row) keeps
                the focus there until the activation handler moves it; every
                other path lands the caret in the message entry. In collapsed
@@ -1856,14 +1880,16 @@ namespace Dc {
                 }
                 var v = current_view ();
                 if (v != null) {
-                    v.on_reselected (focus_compose);
+                    if (message_id > 0) v.scroll_to_message (message_id);
+                    else v.on_reselected (focus_compose);
                     if (this.is_active) v.flush_pending_seen ();
                 }
                 notice_chat.begin (chat_id);
                 return;
             }
 
-            var entry = find_chat_entry (chat_store, chat_id);
+            var old_view = current_view ();
+            if (old_view != null) old_view.suspend_search ();
             var view = get_or_create_view (
                 chat_id, entry != null ? entry.kind : ChatKind.UNKNOWN);
             current_chat_id = chat_id;
@@ -1877,7 +1903,8 @@ namespace Dc {
                 entry != null ? entry.chat_type : "");
 
             content_stack.visible_child_name = "chat_%d".printf (chat_id);
-            view.on_activated (focus_compose);
+            view.on_activated (message_id > 0 ? false : focus_compose);
+            if (message_id > 0) view.scroll_to_message (message_id);
 
             /* In narrow/mobile mode, hide the sidebar so the chat takes over */
             if (split_view.collapsed) {
@@ -1887,6 +1914,26 @@ namespace Dc {
             if (this.is_active) view.flush_pending_seen ();
 
             notice_chat.begin (current_chat_id);
+        }
+
+        private async void open_search_message (int acct_id, int chat_id, int msg_id) {
+            uint token = ++search_open_generation;
+            try {
+                var msg = yield rpc.fetch_message_for (acct_id, msg_id);
+                if (acct_id != rpc.account_id || token != search_open_generation) return;
+                if (msg == null || msg.chat_id != chat_id) {
+                    show_toast ("Message is no longer available");
+                    return;
+                }
+                var chat = yield rpc.get_full_chat_by_id_for (acct_id, chat_id);
+                if (acct_id != rpc.account_id || token != search_open_generation) return;
+                if (chat == null) { show_toast ("Chat is no longer available"); return; }
+                mark_current_chat_row (null);
+                open_chat (chat_id, RpcParsers.parse_chat_item (chat_id, chat), msg_id);
+            } catch (Error e) {
+                if (acct_id == rpc.account_id && token == search_open_generation)
+                    show_toast ("Cannot open search result: " + e.message);
+            }
         }
 
         private async void notice_chat (int chat_id) {
@@ -3329,6 +3376,7 @@ namespace Dc {
                 split_view.sidebar_width_fraction = 0.0;
                 sidebar_box.add_css_class ("sidebar-compact");
                 search_entry.visible = false;
+                search_entry.text = "";
                 sidebar_menu_button.visible = false;
                 sidebar_title.visible = false;
                 sidebar_title.title = "";
@@ -3743,7 +3791,7 @@ namespace Dc {
             "Open chat info",        "<Primary>i",
             "Apps and media gallery","<Primary>m",
             "Search in conversation","<Primary>f",
-            "Search contacts",       "<Primary><Shift>f",
+            "Search chats and messages", "<Primary><Shift>f",
             "Quick switch chat",     "<Primary>k",
             "Focus message entry",   "<Primary>l",
             "Message action (from Settings)", "Return",

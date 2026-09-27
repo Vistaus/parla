@@ -406,6 +406,20 @@ namespace Dc {
                 Params.begin ().add_int (acct_id).add_int (msg_id).build ());
         }
 
+        public async int[] search_messages (int acct_id, string query,
+                                            int chat_id = 0) throws Error {
+            var params = Params.begin ().add_int (acct_id).add_string (query);
+            if (chat_id > 0) params.add_int (chat_id);
+            else params.add_null ();
+            return json_int_array (yield call ("search_messages", params.build ()));
+        }
+
+        public async Json.Object? message_ids_to_search_results (
+                int acct_id, int[] ids) throws Error {
+            return yield call_object ("message_ids_to_search_results",
+                Params.begin ().add_int (acct_id).add_int_array (ids).build ());
+        }
+
         public async string? get_message_html_for (int acct_id, int msg_id) throws Error {
             return yield call_string_opt ("get_message_html",
                 Params.begin ().add_int (acct_id).add_int (msg_id).build ());

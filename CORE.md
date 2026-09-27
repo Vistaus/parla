@@ -23,8 +23,8 @@ recommendations, not release commitments.
 
 | ID | Priority | Status | Task |
 | --- | --- | --- | --- |
-| [CORE-001](#core-001-full-history-conversation-search) | P1 | TODO | Full-history conversation search |
-| [CORE-002](#core-002-search-messages-across-chats) | P2 | TODO | Search messages across chats |
+| [CORE-001](#core-001-full-history-conversation-search) | P1 | Done | Full-history conversation search |
+| [CORE-002](#core-002-search-messages-across-chats) | P2 | Done | Search messages across chats |
 | [CORE-003](#core-003-retry-failed-messages) | P1 | Done | Retry failed messages |
 | [CORE-004](#core-004-detailed-read-receipts) | P2 | TODO | Detailed read receipts |
 | [CORE-005](#core-005-channel-view-counts) | P2 | TODO | Channel view counts |
@@ -44,44 +44,61 @@ recommendations, not release commitments.
 | [CORE-019](#core-019-webxdc-activity-links) | P2 | TODO | Webxdc activity links |
 | [CORE-020](#core-020-persistent-profile-order) | P3 | TODO | Persistent profile order |
 
-Suggested first sequence: CORE-001, CORE-014, CORE-016, then
-CORE-004/CORE-005. CORE-002 can reuse the search infrastructure from CORE-001.
+Suggested next sequence: CORE-014, CORE-016, then CORE-004/CORE-005.
 
 ## CORE-001: Full-history conversation search
 
-**Gap:** Conversation search currently filters the messages already in the
-view's model. Matches outside loaded history can be missed.
+**Status:** Done (2026-09-27).
 
-**Implement:** Search through core with `search_messages(account_id, query,
-chat_id)`. Show result position/count and previous/next navigation, and load
-the surrounding history when jumping to a result. Preserve the conversation's
-normal scroll position when search closes. Debounce typing and discard replies
-for superseded queries, chats, or profiles.
+**Implemented:** Conversation search uses core's `search_messages` across the
+full history, with a match counter, previous/next buttons, and Enter/Shift+Enter
+navigation. Typing is debounced, and replies for superseded queries, chats, or
+profiles are discarded. Deleted results are rechecked before navigation.
 
-**Done when:** A match outside the initial message batch is found and opened;
-rapid query changes, deleted results, no matches, and profile switches behave
-correctly. Search results do not mark off-screen messages seen.
+Distant jumps load at most 61 surrounding messages instead of every intervening
+page. Scrolling can extend that window in either direction. Closing search
+restores the original reading position or follows the newest messages again.
+Only messages actually visible after scrolling settles can be marked seen.
+
+**Validation:** [RPC regression tests](tests/message_search_test.vala) cover
+query debounce, stale replies, profile changes, cancellation, errors, and
+Unicode snippets. [History tests](tests/message_history_test.vala) check the
+bounded context. The optional [GTK test](tests/search_ui_test.py) exercises
+real conversation widgets against an offline 2,000-message fixture, including
+stale context loads, deleted results, restoration, and off-screen read state.
 
 **Entry points:** [conversation_view.vala](src/conversation_view.vala),
-[message_history.vala](src/message_history.vala), [rpc_client.vala](src/rpc_client.vala).
+[message_history.vala](src/message_history.vala),
+[message_search.vala](src/message_search.vala), [rpc_client.vala](src/rpc_client.vala).
 
 ## CORE-002: Search messages across chats
 
-**Gap:** Sidebar search filters chat/contact names; there is no global message
-search interface.
+**Status:** Done (2026-09-27).
 
-**Implement:** Call `search_messages` with a null chat ID and use
-`message_ids_to_search_results` to display snippets, chat names, and dates.
-Search the selected profile and make that scope visible. Open the owning chat
-at the selected message. Core caps global results at 1,000, so show an
-appropriate truncated-result indication rather than an exact total at the cap.
+**Implemented:** The existing sidebar search field searches chat names and
+message history together. Message results appear below matching chats, with
+plain-text excerpts around the query, chat names, authors, dates, and archived
+status. The heading identifies the selected profile. There are no search-mode
+buttons.
 
-**Done when:** Results from multiple chats navigate correctly, including
-archived chats and messages outside loaded history. Stale responses cannot
-populate another profile's search. Keyboard navigation reaches every result.
+Global search calls `search_messages` with a null chat ID and loads
+`message_ids_to_search_results` in pages of 50. The 1,000-result cap is shown
+as `1,000+`, and the keyboard-accessible Load more action focuses the first new
+result. Opening a result revalidates it and navigates directly to its chat,
+including archived chats absent from the sidebar. Profile/query changes
+invalidate pending result loads and navigation.
 
-**Dependencies:** Reuse CORE-001's query handling and message navigation.
+**Validation:** The [GTK test](tests/search_ui_test.py) checks that activated
+results are visible and highlighted when switching chats or jumping within a
+chat. It also covers archived results, all 1,000 result positions,
+deleted-result recovery, and profile switches. The isolated
+[native core test](tests/core_search_test.py)
+checks both RPCs, Unicode matching, archived metadata, profile isolation, and
+unchanged read state without configuring transport or starting network I/O.
+
 **Entry points:** [window.vala](src/window.vala),
+[search_results_view.vala](src/search_results_view.vala),
+[message_search.vala](src/message_search.vala),
 [conversation_view.vala](src/conversation_view.vala), [rpc_client.vala](src/rpc_client.vala).
 
 ## CORE-003: Retry failed messages

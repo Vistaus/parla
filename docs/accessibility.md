@@ -192,7 +192,7 @@ A working backend only exposes what widgets declare, so:
    focus the message list, and use Up/Down to focus a message. Return and
    keypad Enter should start a reply to that
    message and focus the composer, announced as "Type a reply". Repeat while
-   filtering messages with conversation search to check the reply target.
+   navigating matches with conversation search to check the reply target.
 2. Cancel the reply with Escape. Tab into a message's link or playback
    button and press Enter: it should activate that control, without starting
    a reply. Enter in selectable message text must retain GTK's behavior.
