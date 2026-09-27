@@ -290,14 +290,15 @@ namespace Dc {
             text_view.pixels_inside_wrap = 0;
             text_view.hexpand = true;
             text_view.vexpand = false;
+            // Center short text within the scroller's minimum height.
+            text_view.valign = Gtk.Align.CENTER;
             text_view.add_css_class ("compose-entry");
 
             placeholder_label = new Gtk.Label (placeholder_default);
             placeholder_label.add_css_class ("compose-placeholder");
             placeholder_label.halign = Gtk.Align.START;
-            placeholder_label.valign = Gtk.Align.START;
+            placeholder_label.valign = Gtk.Align.CENTER;
             placeholder_label.margin_start = 12;
-            placeholder_label.margin_top = 8;
             placeholder_label.can_target = false;
             placeholder_label.ellipsize = Pango.EllipsizeMode.END;
 
