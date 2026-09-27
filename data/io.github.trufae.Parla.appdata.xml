@@ -37,6 +37,19 @@
     <name translate="no">pancake</name>
   </developer>
   <releases>
+    <release version="0.9.6" date="2026-09-27">
+      <description>
+        <ul>
+          <li>Global search for chats and messages</li>
+          <li>Button to retry failed messages</li>
+          <li>Jump to first unread message in chats</li>
+          <li>Mark chats as unread using core api</li>
+          <li>View contact details from chats and messages</li>
+          <li>Show online status for contacts and chats</li>
+          <li>Fix composebar input alignment</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.9.4" date="2026-09-24">
       <description>
         <ul>
