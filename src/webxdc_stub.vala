@@ -26,9 +26,8 @@ namespace Dc.Webxdc {
 
     public void open (Gtk.Window? parent, RpcClient rpc, Message msg) { }
 
-    public void status_update (int msg_id) { }
-
-    public void instance_deleted (int msg_id) { }
+    public bool handle_event (RpcClient rpc, int account_id, string kind,
+                              Json.Object event) { return false; }
 
     public void set_active_chat (int account_id, int chat_id,
                                  bool window_visible) { }

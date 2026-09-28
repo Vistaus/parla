@@ -339,6 +339,16 @@ private void test_unread_calls () {
 }
 
 public int main (string[] args) {
+    if (args.length > 1 && args[1] == "--realtime-settings")
+        return run_realtime_settings_test ();
+#if WEBXDC && !MACOS && !WINDOWS
+    if (args.length > 1 && args[1] == "--realtime-ui") {
+        test_executable = File.new_for_path (args[0]).get_path ();
+        return run_realtime_ui_test ();
+    }
+#endif
+    if (args.length > 1 && args[1] == "--fake-realtime")
+        return run_fake_realtime_server ();
     if (args.length > 1 && args[1] == "--fake-retry")
         return run_fake_retry_server ();
     if (args.length > 1 && args[1] == "--search-ui")
@@ -360,5 +370,7 @@ public int main (string[] args) {
     Test.add_func ("/core-compat/unread-calls", test_unread_calls);
     Test.add_func ("/core-compat/message-retry", test_message_retry);
     Test.add_func ("/core-compat/message-search", test_message_search);
+    Test.add_func ("/core-compat/webxdc-realtime", test_webxdc_realtime);
+    Test.add_func ("/core-compat/webxdc-realtime-bytes", test_webxdc_realtime_bytes);
     return Test.run ();
 }

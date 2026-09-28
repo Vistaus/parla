@@ -94,6 +94,7 @@ namespace Dc {
         public bool animate_stickers { get; set; default = true; }
         /* Only honored in builds with -Dwebxdc=true (Webxdc.AVAILABLE). */
         public bool webxdc_apps { get; set; default = true; }
+        public bool webxdc_realtime { get; set; default = true; }
         /* App windows follow their chat: hidden unless the chat is open. */
         public bool webxdc_follow_chat { get; set; default = false; }
         /* Webxdc capabilities are opt-in: missing settings stay safest. */
@@ -211,6 +212,7 @@ namespace Dc {
             AudioPlayer.prefer_system = system_audio_player;
             animate_stickers = kf_bool (kf, "animate_stickers", true);
             webxdc_apps = kf_bool (kf, "webxdc_apps", true);
+            webxdc_realtime = kf_bool (kf, "webxdc_realtime", true);
             webxdc_follow_chat = kf_bool (kf, "webxdc_follow_chat", false);
             webxdc_allow_internet =
                 kf_bool (kf, "webxdc_allow_internet",
@@ -386,6 +388,11 @@ namespace Dc {
         public void save_webxdc_follow_chat (bool v) {
             webxdc_follow_chat = v;
             save_bool ("webxdc_follow_chat", v);
+        }
+
+        public void save_webxdc_realtime (bool v) {
+            webxdc_realtime = v;
+            save_bool ("webxdc_realtime", v);
         }
 
         public void save_webxdc_allow_internet (bool v) {
@@ -1082,6 +1089,12 @@ namespace Dc {
                 app_window.settings.webxdc_follow_chat,
                 (v) => app_window.settings.save_webxdc_follow_chat (v));
 
+            var realtime_switch = add_switch_row (webxdc_group,
+                "Realtime Channels",
+                "Let apps exchange live data with other participants in the chat",
+                app_window.settings.webxdc_realtime,
+                (v) => app_window.settings.save_webxdc_realtime (v));
+
             var internet_switch = add_switch_row (webxdc_group,
                 "Internet Access",
                 "Allow apps to contact websites, which can reveal your IP address and app data",
@@ -1121,10 +1134,11 @@ namespace Dc {
 
             var safest_row = action_row (
                 "Restrict App Permissions",
-                "Turn off internet access, advanced graphics, WebAssembly, and developer tools; running apps will close");
+                "Turn off realtime channels, internet access, advanced graphics, WebAssembly, and developer tools; running apps will close");
             var safest_button = new Gtk.Button.with_label ("Restrict");
             safest_button.valign = Gtk.Align.CENTER;
             safest_button.clicked.connect (() => {
+                realtime_switch.active = false;
                 internet_switch.active =
                     WebxdcSecurity.SAFE_ALLOW_INTERNET;
                 wasm_switch.active = WebxdcSecurity.SAFE_ALLOW_WASM;

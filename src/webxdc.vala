@@ -9,7 +9,16 @@ namespace Dc.Webxdc {
 
     public const bool AVAILABLE = true;
 
-    private HashTable<int, Instance>? windows = null;
+    private HashTable<string, Instance>? windows = null;
+
+    private string instance_key (int account_id, int msg_id) {
+        return "%d:%d".printf (account_id, msg_id);
+    }
+
+    private Instance? current_instance (int msg_id) {
+        return windows == null || client == null ? null
+            : windows.lookup (instance_key (client.account_id, msg_id));
+    }
 
     /** Signal hub for run-state and preference changes, so UI like the
         per-chat apps bar can stay in sync without polling. */
@@ -42,7 +51,8 @@ namespace Dc.Webxdc {
     }
 
     public bool is_running (int msg_id) {
-        return windows != null && windows.lookup (msg_id) != null;
+        var app = current_instance (msg_id);
+        return app != null && !app.closed;
     }
 
     /** Msg ids of the running app windows started from the given chat. */
@@ -50,25 +60,25 @@ namespace Dc.Webxdc {
         int[] ids = {};
         if (windows == null) return ids;
         foreach (unowned Instance app in windows.get_values ()) {
-            if (app.belongs_to (account_id, chat_id)) ids += app.msg_id;
+            if (!app.closed && app.belongs_to (account_id, chat_id)) ids += app.msg_id;
         }
         return ids;
     }
 
     public void stop_app (int msg_id) {
-        var app = windows == null ? null : windows.lookup (msg_id);
+        var app = current_instance (msg_id);
         if (app != null) app.close_view ();
     }
 
     /** Raise the app window (and restore it if minimized). */
     public void present_app (int msg_id) {
-        var app = windows == null ? null : windows.lookup (msg_id);
+        var app = current_instance (msg_id);
         if (app != null) app.present ();
     }
 
     /** Minimize the app window, or restore it if already minimized. */
     public void minimize_app (int msg_id) {
-        var app = windows == null ? null : windows.lookup (msg_id);
+        var app = current_instance (msg_id);
         if (app != null) app.toggle_minimize_view ();
     }
 
@@ -84,6 +94,9 @@ namespace Dc.Webxdc {
     private bool security_close_pending = false;
 
     public void setup (RpcClient rpc, SettingsManager settings) {
+        if (client != null && client != rpc && windows != null) {
+            foreach (var app in windows.get_values ()) app.close_view ();
+        }
         client = rpc;
         config = settings;
         cards = null;   /* msg ids are per-account */
@@ -100,6 +113,12 @@ namespace Dc.Webxdc {
         }
         if (!security_settings_connected) {
             security_settings_connected = true;
+            settings.notify["webxdc-apps"].connect (() => {
+                schedule_security_close ();
+            });
+            settings.notify["webxdc-realtime"].connect (() => {
+                schedule_security_close ();
+            });
             settings.notify["webxdc-allow-internet"].connect (() => {
                 schedule_security_close ();
             });
@@ -124,6 +143,10 @@ namespace Dc.Webxdc {
     private void schedule_security_close () {
         if (security_close_pending) return;
         security_close_pending = true;
+        // Stop accepting traffic synchronously, before native window teardown.
+        if (windows != null) {
+            foreach (var app in windows.get_values ()) app.stop_realtime ();
+        }
         Idle.add (() => {
             security_close_pending = false;
             if (windows != null) {
@@ -184,6 +207,7 @@ namespace Dc.Webxdc {
     }
 
     public void open (Gtk.Window? parent, RpcClient rpc, Message msg) {
+        if (!enabled () || security_close_pending) return;
 #if !MACOS && !WINDOWS
         string sandbox_error;
         if (!linux_sandbox_available (out sandbox_error)) {
@@ -193,14 +217,16 @@ namespace Dc.Webxdc {
         }
 #endif
         if (windows == null) {
-            windows = new HashTable<int, Instance> (direct_hash, direct_equal);
+            windows = new HashTable<string, Instance> (str_hash, str_equal);
         }
-        var existing = windows.lookup (msg.id);
+        var key = instance_key (rpc.account_id, msg.id);
+        var existing = windows.lookup (key);
         if (existing != null) {
-            existing.present ();
+            // Native close callbacks may still own this window's user_data.
+            if (!existing.closed) existing.present ();
             return;
         }
-        windows.insert (msg.id, new Instance (rpc, msg));
+        windows.insert (key, new Instance (rpc, msg));
         Monitor.get_default ().changed (msg.id);
     }
 
@@ -234,23 +260,27 @@ namespace Dc.Webxdc {
     }
 #endif
 
-    /** Routed from the WebxdcStatusUpdate core event. */
-    public void status_update (int msg_id) {
-        var app = windows == null ? null : windows.lookup (msg_id);
-        if (app != null) app.pull_updates.begin ();
-    }
-
-    /** Routed from the WebxdcInstanceDeleted core event. */
-    public void instance_deleted (int msg_id) {
-        var app = windows == null ? null : windows.lookup (msg_id);
-        if (app != null) app.close_view ();
+    public bool handle_event (RpcClient rpc, int account_id, string kind,
+                              Json.Object event) {
+        if (kind != "WebxdcStatusUpdate" && kind != "WebxdcInstanceDeleted")
+            return false;
+        var key = instance_key (account_id, (int) json_int (event, "msgId"));
+        var app = windows == null ? null : windows.lookup (key);
+        if (app != null && app.uses_client (rpc)) {
+            if (kind == "WebxdcInstanceDeleted") app.close_view ();
+            else if (!app.closed) app.pull_updates.begin ();
+        }
+        return true;
     }
 
     private class Instance : Object {
-        /* Strong ref on purpose: switching accounts replaces the shared
-           RpcClient, and a still-open app must keep talking to the account
-           it was started from (account_id is captured for the same reason). */
+        /* Keep the originating client and profile even when another profile
+           becomes active or the application's shared client is replaced. */
         private RpcClient rpc;
+        private RealtimeSession? realtime;
+        private ulong realtime_data_handler;
+        private ulong realtime_error_handler;
+        public bool closed { get; private set; default = false; }
         private int account_id;
         public int msg_id;
         private int chat_id;
@@ -276,6 +306,19 @@ namespace Dc.Webxdc {
             this.msg_id = msg.id;
             this.chat_id = msg.chat_id;
             this.app_name = msg.display_file_name ("Webxdc");
+            if (config == null || config.webxdc_realtime) {
+                realtime = new RealtimeSession (rpc, account_id, msg_id);
+                realtime_data_handler = realtime.data_received.connect ((id, data) => {
+                    var node = new Json.Node (Json.NodeType.ARRAY);
+                    node.set_array (data);
+                    eval_js ("window.__webxdc_realtime_receive(%s,%s)".printf (
+                        js_str (id), Json.to_string (node, false)));
+                });
+                realtime_error_handler = realtime.channel_failed.connect ((id, message) => {
+                    eval_js ("window.__webxdc_realtime_closed(%s,%s)".printf (
+                        js_str (id), js_str (message)));
+                });
+            }
             if (config != null) {
                 allow_internet = config.webxdc_allow_internet;
                 allow_wasm = config.webxdc_allow_wasm;
@@ -326,6 +369,7 @@ namespace Dc.Webxdc {
             } catch (Error e) {
                 warning ("webxdc info: %s", e.message);
             }
+            if (closed) return;
             try {
                 var chat = yield rpc.get_full_chat_by_id_for (account_id,
                                                               chat_id);
@@ -337,6 +381,7 @@ namespace Dc.Webxdc {
             } catch (Error e) {
                 warning ("webxdc chat info: %s", e.message);
             }
+            if (closed) return;
             set_view_title (compose_title ());
             try {
                 var dn = yield rpc.get_config ("displayname", account_id);
@@ -345,7 +390,7 @@ namespace Dc.Webxdc {
             } catch (Error e) {
                 warning ("webxdc config: %s", e.message);
             }
-            load_view ("webxdc://app/index.html");
+            if (!closed) load_view ("webxdc://app/index.html");
         }
 
         /* Everything the page loads is pulled out of the .xdc archive by
@@ -477,12 +522,11 @@ for full diagnostics.</div></main>""".printf (message);
 """;
         }
 
-        /* The window.webxdc object, limited to the documented API used by
-           the official Delta Chat clients: selfAddr, selfName, sendUpdate
-           and setUpdateListener. Serial de-duplication happens here so a
-           pull racing an event push never delivers an update twice. */
+        /* The window.webxdc object and its optional realtime channel.
+           De-duplicate serials so a pull racing an event push never delivers
+           an update twice. */
         private string bridge_js () {
-            return runtime_error_reporter_js () + """window.webxdc = (function () {
+            string js = runtime_error_reporter_js () + """window.webxdc = (function () {
     'use strict';
     var handler = window.webkit.messageHandlers.webxdc;
     var listener = null;
@@ -510,14 +554,45 @@ for full diagnostics.</div></main>""".printf (message);
     };
 })();
 """.printf (js_str (self_addr), js_str (self_name));
+            if (realtime != null) {
+                try {
+                    var bytes = resources_lookup_data (
+                        "/io/github/trufae/Parla/webxdc/webxdc-realtime.js",
+                        ResourceLookupFlags.NONE);
+                    js += (string) bytes.get_data ();
+                } catch (Error e) {
+                    warning ("webxdc realtime bridge: %s", e.message);
+                }
+            }
+            return js;
         }
 
         private void on_message (string json) {
+            if (closed || security_close_pending || !enabled ()) return;
             try {
                 var parser = new Json.Parser ();
                 parser.load_from_data (json);
+                if (parser.get_root ().get_node_type () != Json.NodeType.OBJECT) return;
                 var obj = parser.get_root ().get_object ();
-                switch (obj.get_string_member_with_default ("type", "")) {
+                var type = obj.get_member ("type");
+                if (type == null || type.get_node_type () != Json.NodeType.VALUE
+                        || type.get_value_type () != typeof (string)) return;
+                var channel_node = obj.get_member ("channel");
+                string? channel = channel_node != null
+                    && channel_node.get_node_type () == Json.NodeType.VALUE
+                    && channel_node.get_value_type () == typeof (string)
+                    ? channel_node.get_string () : null;
+                switch (type.get_string ()) {
+                case "realtime-join":
+                    if (realtime != null && channel != null) realtime.join (channel);
+                    break;
+                case "realtime-send":
+                    if (realtime != null && channel != null)
+                        realtime.send (channel, obj.get_member ("data"));
+                    break;
+                case "realtime-leave":
+                    if (realtime != null && channel != null) realtime.leave (channel);
+                    break;
                 case "send":
                     var member = obj.get_member ("update");
                     if (member == null) break;
@@ -539,11 +614,13 @@ for full diagnostics.</div></main>""".printf (message);
         /** Fetch status updates newer than last_serial and hand them to the
             page. Called on setUpdateListener and on core events. */
         public async void pull_updates () {
+            if (closed) return;
             string updates;
             try {
                 var res = yield rpc.call ("get_webxdc_status_updates",
                     Params.begin ().add_int (account_id).add_int (msg_id)
                         .add_int ((int) last_serial).build ());
+                if (closed) return;
                 updates = res.get_string ();
                 var parser = new Json.Parser ();
                 parser.load_from_data (updates);
@@ -572,9 +649,22 @@ for full diagnostics.</div></main>""".printf (message);
         }
 
         private void on_view_closed () {
-            if (windows != null) windows.remove (msg_id);
+            closed = true;
+            stop_realtime ();
+            var key = instance_key (account_id, msg_id);
+            if (windows != null && windows.lookup (key) == this) windows.remove (key);
             Monitor.get_default ().changed (msg_id);
         }
+
+        public void stop_realtime () {
+            if (realtime == null) return;
+            realtime.disconnect (realtime_data_handler);
+            realtime.disconnect (realtime_error_handler);
+            realtime.close ();
+            realtime = null;
+        }
+
+        public bool uses_client (RpcClient client) { return rpc == client; }
 
         public bool belongs_to (int account_id, int chat_id) {
             return this.account_id == account_id && this.chat_id == chat_id;
@@ -670,7 +760,7 @@ for full diagnostics.</div></main>""".printf (message);
         }
 
         private static void on_raw_closed (void* user_data) {
-            unowned Instance self = (Instance) user_data;
+            var self = (Instance) user_data;
             var h = self.handle;
             self.handle = null;
             if (h != null) shim_free (h);
@@ -705,7 +795,7 @@ for full diagnostics.</div></main>""".printf (message);
         }
 
         private void eval_js (string js) {
-            if (handle != null) shim_eval_js (handle, js);
+            if (!closed && handle != null) shim_eval_js (handle, js);
         }
 
         /* A blob fetch may complete after the window is gone; the null
@@ -719,6 +809,8 @@ for full diagnostics.</div></main>""".printf (message);
         }
 
         public void close_view () {
+            closed = true;
+            stop_realtime ();
             if (handle != null) shim_close (handle);
         }
 #else
@@ -860,7 +952,7 @@ for full diagnostics.</div></main>""".printf (message);
         }
 
         private void eval_js (string js) {
-            view.evaluate_javascript.begin (js, -1, null, null, null);
+            if (!closed) view.evaluate_javascript.begin (js, -1, null, null, null);
         }
 
         private void deliver (WebKit.URISchemeRequest token, uint8[] data,
@@ -885,6 +977,8 @@ for full diagnostics.</div></main>""".printf (message);
         }
 
         public void close_view () {
+            closed = true;
+            stop_realtime ();
             if (win != null) win.close ();
         }
 #endif

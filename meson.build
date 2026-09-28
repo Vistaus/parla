@@ -153,6 +153,7 @@ sources = files(
   'src/webxdc_bar.vala',
   'src/webxdc_manager_dialog.vala',
   'src/webxdc_security.vala',
+  'src/webxdc_realtime.vala',
   'src/quick_switch_dialog.vala',
   'src/event_handler.vala',
   'src/message_details_dialog.vala',
@@ -186,7 +187,13 @@ endif
 # installed Evergreen WebView2 Runtime through Microsoft's SDK loader.
 # Native implementations remain isolated in their platform files.
 if get_option('webxdc')
+  add_project_arguments(['--define=WEBXDC'], language: 'vala')
   sources += files('src/webxdc.vala')
+  resources += gnome.compile_resources(
+    'webxdc-resources',
+    'data/webxdc.gresource.xml',
+    source_dir: 'data',
+  )
   if host_machine.system() == 'darwin'
     sources += files('src/webxdc_macos.m')
     deps += dependency('appleframeworks', modules: ['WebKit'])
@@ -478,10 +485,22 @@ core_compat_test = executable(
   'core-compat-test',
   files('tests/core_compat_test.vala', 'tests/unread_ui_test.vala',
         'tests/message_retry_test.vala', 'tests/message_search_test.vala',
-        'tests/search_ui_test.vala'),
+        'tests/search_ui_test.vala', 'tests/webxdc_realtime_test.vala',
+        'tests/webxdc_realtime_ui_test.vala'),
   sources, config_file, appdata_vala, resources,
   dependencies: deps,
   include_directories: src_inc,
   install: false,
 )
 test('core-compat', core_compat_test)
+test('webxdc-realtime-settings', python, args: [
+  files('tests/webxdc_realtime_test.py'), core_compat_test,
+])
+
+node = find_program('node', 'nodejs', required: false)
+if node.found()
+  test('webxdc-realtime-js', node, args: [
+    files('tests/webxdc_realtime_test.js'),
+    files('data/webxdc-realtime.js'),
+  ])
+endif

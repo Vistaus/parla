@@ -32,7 +32,7 @@ recommendations, not release commitments.
 | [CORE-007](#core-007-export-and-restore-backup-files) | P2 | TODO | Export and restore backup files |
 | [CORE-008](#core-008-keep-sending-while-work-is-pending) | P2 | TODO | Keep sending while work is pending |
 | [CORE-009](#core-009-relay-provided-app-update-information) | P3 | TODO | Relay-provided app update information |
-| [CORE-010](#core-010-webxdc-realtime-channels) | P2 | TODO | Webxdc realtime channels |
+| [CORE-010](#core-010-webxdc-realtime-channels) | P2 | Done | Webxdc realtime channels |
 | [CORE-011](#core-011-voice-and-video-calls) | P3 | TODO | Voice and video calls |
 | [CORE-012](#core-012-location-messages-and-live-sharing) | P3 | TODO | Location messages and live sharing |
 | [CORE-013](#core-013-contact-cards-and-vcard-importexport) | P2 | TODO | Contact cards and vCard import/export |
@@ -245,21 +245,35 @@ entries. The existence of this RPC alone does not supply Parla release data.
 
 ## CORE-010: Webxdc realtime channels
 
-**Gap:** Webxdc status updates work, but the JavaScript bridge lacks realtime
-channel support and the event handler does not route realtime events.
+**Status:** Done (2026-09-28).
 
-**Implement:** Implement the Webxdc realtime JavaScript contract through
-`send_webxdc_realtime_advertisement`, `send_webxdc_realtime_data`, and
-`leave_webxdc_realtime`. Route `WebxdcRealtimeData` and
-`WebxdcRealtimeAdvertisementReceived` by profile and app instance. Handle binary
-payloads and channel closure consistently in the platform web views.
+**Implemented:** `joinRealtimeChannel()` exposes `setListener`, `send`, and
+`leave` through the shared JavaScript bridge on all three web-view backends.
+Payloads are `Uint8Array`, limited to 128000 bytes and validated again at the
+native boundary. The Webxdc settings include **Realtime Channels**, enabled
+by default with a persisted opt-out. Disabled apps do not expose the API;
+Restrict App Permissions also turns realtime off.
 
-**Done when:** Two clients exchange realtime data in the same app instance;
-closing, deleting, or disabling an app ends its channel. No send/advertisement
-may occur after leaving until the instance opens again. Existing direct-network
-permissions and Webxdc sandbox boundaries remain effective.
+Open windows and events are scoped to the originating profile and message,
+including background profiles. Core handles incoming peer advertisements;
+Parla never automatically joins a closed app or replies with an advertisement
+loop. Closing, deleting, disabling, or changing app permissions stops traffic
+immediately and leaves after outstanding RPCs complete. Queued sends are
+dropped, and a reopened window or explicitly rejoined JS channel waits for the
+previous leave. Direct Internet permissions and browser sandbox policies are
+unchanged.
+
+**Validation:** [Host/RPC tests](tests/webxdc_realtime_test.vala) exercise binary
+validation, profile routing, failed joins and closure/rejoin races. The shared
+[JavaScript contract test](tests/webxdc_realtime_test.js) checks two-peer binary
+exchange and stale handles. [Settings and optional WebKitGTK integration
+tests](tests/webxdc_realtime_test.py) check persisted opt-out and two actual
+web views exchanging data through an offline core fixture, as well as profile
+isolation, deletion and disabling apps. Live relay/Iroh connectivity and native
+macOS/Windows execution are not exercised by these local tests.
 
 **Entry points:** [webxdc.vala](src/webxdc.vala),
+[webxdc_realtime.vala](src/webxdc_realtime.vala),
 [event_handler.vala](src/event_handler.vala), [Webxdc platform notes](docs/webxdc.md).
 
 ## CORE-011: Voice and video calls

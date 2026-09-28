@@ -55,6 +55,14 @@ namespace Dc {
 
                     string kind = event.get_string_member ("kind");
 
+                    // App windows can outlive a profile switch.
+                    if (kind == "WebxdcRealtimeData"
+                            || kind == "WebxdcRealtimeAdvertisementReceived") {
+                        Webxdc.RealtimeSession.route_event (rpc, ctx, kind, event);
+                        continue;
+                    }
+                    if (Webxdc.handle_event (rpc, ctx, kind, event)) continue;
+
                     if (kind == "TransportsModified") {
                         transports_changed (ctx);
                         continue;
@@ -189,14 +197,6 @@ namespace Dc {
                 contacts_changed (rpc.account_id);
                 schedule_messages_reload ();
                 schedule_chats_reload ();
-                break;
-
-            case "WebxdcStatusUpdate":
-                Webxdc.status_update ((int) event.get_int_member ("msgId"));
-                break;
-
-            case "WebxdcInstanceDeleted":
-                Webxdc.instance_deleted ((int) event.get_int_member ("msgId"));
                 break;
 
             default:

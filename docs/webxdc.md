@@ -69,11 +69,17 @@ needs conditional compilation and linking stays trivial.
   the app card stays recognizable and the dialog explains why it cannot
   start the app, offering only **Download File** and **Cancel**. Builds
   compiled without Webxdc support use the same download-only flow.
+- **Realtime Channels** is enabled by default in the same settings page.
+  It lets instances of the same app exchange ephemeral data through Chatmail
+  core. Turning it off closes running apps and hides the realtime JavaScript
+  API on subsequent launches. The setting is saved across restarts and is
+  separate from direct Internet access.
 - The same section has opt-in switches for direct Internet access,
   WebAssembly, WebGL, developer tools, and (on WebKitGTK) hardware
   acceleration. All default to off, including when upgrading from a version
   which did not have these settings. **Restrict** resets every capability
-  at once. Changing any security switch closes running app windows so the next
+  at once, including realtime channels. Changing any security switch closes
+  running app windows so the next
   launch cannot retain an older, broader policy.
 - Sending an `.xdc` file from Parla announces it with the `Webxdc`
   viewtype, so other clients show it as an app too.
@@ -87,7 +93,14 @@ needs conditional compilation and linking stays trivial.
 - Status updates flow through the core jsonrpc calls
   `send_webxdc_status_update` / `get_webxdc_status_updates`; incoming
   `WebxdcStatusUpdate` events are routed to the matching open window,
-  and `WebxdcInstanceDeleted` closes it.
+  and `WebxdcInstanceDeleted` closes it. All app events and open windows are
+  matched by profile and message, even while another profile is selected.
+- Realtime channels use `send_webxdc_realtime_advertisement`,
+  `send_webxdc_realtime_data`, and `leave_webxdc_realtime`. Incoming binary
+  data is delivered to the matching channel; core connects advertised peers
+  without another advertisement from the app. Calls are serialized so an
+  in-flight send finishes before leaving. Closing/deleting an app or disabling
+  apps/realtime drops queued sends, and reopening waits for the old leave.
 
 ## Security boundaries
 
@@ -95,7 +108,9 @@ Webxdc's contract is that apps run **offline and sandboxed**. Parla starts
 with the following safest policy inside all three engines; users may explicitly
 relax individual capabilities in Settings:
 
-- **No network.** WebKitGTK: the `WebKit.NetworkSession` is ephemeral (no
+- **No direct browser network.** Realtime exchange is mediated by core and
+  restricted to the app's chat; it does not enable browser networking.
+  WebKitGTK: the `WebKit.NetworkSession` is ephemeral (no
   cookies or cache on disk) and configured with a blackhole SOCKS proxy,
   so any `http(s)` request an app attempts dies before reaching the
   network. macOS: a compiled `WKContentRuleList` blocks every load and
@@ -161,7 +176,15 @@ as used by the official Delta Chat clients — nothing else is injected:
 | `webxdc.selfName` | display name (falls back to the address) |
 | `webxdc.sendUpdate(update, descr)` | `send_webxdc_status_update` |
 | `webxdc.setUpdateListener(cb, serial)` | replays updates after `serial`, then live ones |
+| `webxdc.joinRealtimeChannel()` | joins the app's ephemeral channel; available when Realtime Channels is enabled |
 
-Optional spec extras (`sendToChat`, `importFiles`, `joinRealtimeChannel`)
+The [realtime channel](https://webxdc.org/docs/spec/joinRealtimeChannel.html)
+offers `setListener(callback)`, `send(Uint8Array)` (up to 128000 bytes), and
+`leave()`. Only one handle can be active in an app at a time. Leaving invalidates
+that handle; the app can call `joinRealtimeChannel()` again for a new one.
+Payloads are not stored or replayed, and delivery is not guaranteed. A full
+outgoing queue drops additional data instead of growing without a bound.
+
+Optional spec extras (`sendToChat`, `importFiles`)
 are intentionally absent; apps must feature-detect them, and well-behaved
 ones degrade gracefully.
