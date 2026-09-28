@@ -98,20 +98,30 @@ namespace Dc {
             }
         }
 
+        /* On macOS the GTK window stays mapped while AppKit hides it, so
+           include the background hold when checking actual visibility. */
+        private bool is_window_visible () {
+            return this.visible && !held_in_background;
+        }
+
+        private void sync_window_visibility () {
+            if (tray != null) tray.set_window_visible (is_window_visible ());
+            sync_webxdc_chat_visibility ();
+        }
+
         /* Feed the shown-chat state to the Webxdc runner so app windows in
-           follow-chat mode track their chat. Deliberately based on `visible`
-           and not `is_active`: focusing the app window itself unfocuses this
-           one, and hiding on focus loss would fight the user. */
+           follow-chat mode track their chat. Focusing an app window itself
+           unfocuses this one, so focus alone must not hide it. */
         private void sync_webxdc_chat_visibility () {
             Webxdc.set_active_chat (rpc != null ? rpc.account_id : 0,
-                                    _current_chat_id, this.visible);
+                                    _current_chat_id, is_window_visible ());
         }
 
         public bool is_chat_visible (int chat_id) {
             if (chat_id <= 0 || chat_id != current_chat_id) return false;
             /* Hidden in the tray or unfocused: the user cannot be reading
                this chat, however recently it was active. */
-            if (!this.visible || !this.is_active) return false;
+            if (!is_window_visible () || !this.is_active) return false;
             if (split_view.collapsed && split_view.show_sidebar)
                 return false;
             return true;
@@ -306,10 +316,7 @@ namespace Dc {
             settings.notify["minimize-to-tray"].connect (sync_tray);
 
             /* Keep the tray menu's show/minimize label matching the window. */
-            this.notify["visible"].connect (() => {
-                if (tray != null) tray.set_window_visible (this.visible);
-                sync_webxdc_chat_visibility ();
-            });
+            this.notify["visible"].connect (sync_window_visibility);
 
             /* Defer until the main loop — the tray's D-Bus connection and the
                application property aren't ready during construct. */
@@ -462,7 +469,7 @@ namespace Dc {
                    deliberate — the tray setting being off (or getting
                    toggled off) must not summon it. */
                 if (runs_in_background ()) return;
-                if (held_in_background || !this.visible) restore_from_tray ();
+                if (!is_window_visible ()) restore_from_tray ();
                 else release_background_hold ();
                 return;
             }
@@ -501,17 +508,22 @@ namespace Dc {
             ensure_tray_backend ();
             if (tray == null) return false;
             tray.set_notifications_enabled (settings.notifications_enabled);
-            tray.set_window_visible (this.visible);
+            tray.set_window_visible (is_window_visible ());
             return tray.show ();
         }
 
         private void minimize_to_tray () {
             close_active_modal ();
-            this.set_visible (false);
             if (!held_in_background) {
                 this.application.hold ();
                 held_in_background = true;
             }
+#if MACOS
+            MacosTray.set_native_window_visible (this, false);
+#else
+            this.set_visible (false);
+#endif
+            sync_window_visibility ();
         }
 
         private void close_active_modal () {
@@ -523,13 +535,21 @@ namespace Dc {
 
         public void restore_from_tray () {
             release_background_hold ();
+            present_window ();
+        }
+
+        private void present_window () {
             this.present ();
+#if MACOS
+            MacosTray.set_native_window_visible (this, true);
+#endif
+            sync_window_visibility ();
         }
 
         /* The menu item toggles on the real window state, not the label the
            menu happens to show, so a stale label still does the right thing. */
         private void toggle_window_from_tray (string? activation_token) {
-            if (this.visible) {
+            if (is_window_visible ()) {
                 minimize_to_tray ();
                 return;
             }
@@ -543,7 +563,7 @@ namespace Dc {
                 request_activation_on_current_desktop (activation_token)) {
                 return;
             }
-            this.present ();
+            present_window ();
         }
 
         /* Re-activate with the tray click token so GTK presents Parla on the current desktop. */
@@ -568,7 +588,7 @@ namespace Dc {
                         conn.call.end (res);
                     } catch (Error e) {
                         debug ("Tray activation fallback: %s", e.message);
-                        this.present ();
+                        present_window ();
                     }
                 });
             return true;
@@ -2145,7 +2165,7 @@ namespace Dc {
             /* The app is on screen and focused: the user already sees new
                activity in the app (chat list and account badges), so no
                desktop banner. Hidden, minimized or unfocused: notify. */
-            if (this.visible && this.is_active) return;
+            if (is_window_visible () && this.is_active) return;
 
             var p = new PendingNotification ();
             p.acct_id = acct_id;

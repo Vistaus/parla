@@ -2,6 +2,8 @@
 
 #include <glib.h>
 
+typedef struct _GtkWindow GtkWindow;
+
 /*
  * macOS menu-bar ("tray") counterpart of the freedesktop
  * StatusNotifierItem in tray_icon.vala. All Cocoa/objc logic lives in
@@ -25,6 +27,10 @@ void parla_macos_tray_init (ParlaMacosTrayAction window_toggle,
 
 gboolean parla_macos_tray_show (void);
 void parla_macos_tray_hide (void);
+
+/* Hide/show only the native window; the GTK window must stay mapped to
+ * preserve its accessibility context. The caller tracks hidden state. */
+void parla_macos_window_set_visible (GtkWindow *window, gboolean visible);
 
 /* Keep the menu labels/checkmark in sync with the app state. */
 void parla_macos_tray_set_window_visible (gboolean visible);

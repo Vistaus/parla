@@ -8,8 +8,8 @@ namespace Dc {
      * single #if MACOS around the constructor.
      *
      * macOS has no per-desktop activation tokens, so the token argument
-     * of the show/toggle signals is always null and the generic
-     * this.present () fallback in window.vala does the work.
+     * of the show/toggle signals is always null. window.vala presents
+     * the existing native window directly.
      */
     public class MacosTray : Object {
 
@@ -31,6 +31,10 @@ namespace Dc {
         [CCode (cheader_filename = "tray_macos.h",
                 cname = "parla_macos_tray_hide")]
         private static extern void tray_hide ();
+        [CCode (cheader_filename = "tray_macos.h",
+                cname = "parla_macos_window_set_visible")]
+        public static extern void set_native_window_visible (Gtk.Window window,
+                                                              bool visible);
         [CCode (cheader_filename = "tray_macos.h",
                 cname = "parla_macos_tray_set_window_visible")]
         private static extern void tray_set_window_visible (bool visible);

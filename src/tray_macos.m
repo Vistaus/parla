@@ -6,6 +6,9 @@
 #import <objc/message.h>
 #import <objc/runtime.h>
 
+#include <gtk/gtk.h>
+#include <gdk/macos/gdkmacos.h>
+
 #include "tray_macos_icon.h"
 
 /*
@@ -315,6 +318,27 @@ parla_macos_tray_hide (void)
 	tray.item = nil;
 	tray.toggle_menu_item = nil;
 	tray.notifications_menu_item = nil;
+}
+
+void
+parla_macos_window_set_visible (GtkWindow *window, gboolean visible)
+{
+	GdkSurface *surface = gtk_native_get_surface (GTK_NATIVE (window));
+	if (!GDK_IS_MACOS_SURFACE (surface)) {
+		return;
+	}
+
+	NSWindow *native = (NSWindow *) gdk_macos_surface_get_native_window (
+		GDK_MACOS_SURFACE (surface));
+	/* GtkWindow's unmap unrealizes its accessibility context while child
+	 * contexts can retain the AccessKit adapter. Showing that same view
+	 * then tries to install a second adapter and aborts. Keep the GTK
+	 * window mapped and let AppKit hide/show the existing native window. */
+	if (visible) {
+		[native makeKeyAndOrderFront:nil];
+	} else {
+		[native orderOut:nil];
+	}
 }
 
 void
