@@ -26,7 +26,8 @@ if get_option('a11y')
 endif
 
 # Silence warnings emitted by valac-generated C and lagging GTK/glib vapi
-# bindings (unused temporaries, g_once_init_enter atomics, const mismatches).
+# bindings (unused temporaries/finally labels, g_once_init_enter atomics,
+# const mismatches).
 # These are not fixable from the Vala source.
 cc = meson.get_compiler('c')
 add_project_arguments(
@@ -34,6 +35,7 @@ add_project_arguments(
     '-Wno-unused-but-set-variable',
     '-Wno-unused-function',
     '-Wno-unused-variable',
+    '-Wno-unused-label',
     '-Wno-incompatible-pointer-types',
     '-Wno-discarded-qualifiers',
     '-Wno-address',

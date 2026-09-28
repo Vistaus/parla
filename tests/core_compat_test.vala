@@ -19,8 +19,8 @@ private int run_fake_server (string mode) {
         var args = request.get_array_member ("params");
         if (method != "test_calls") requests.add_object_element (request);
         if (method == "init_transports" && mode != "latest") {
-            stdout.printf ("{\"jsonrpc\":\"2.0\",\"id\":%lld,\"error\":{\"code\":%d,\"message\":\"%s\"}}\n",
-                request.get_int_member ("id"), mode == "legacy" ? -32601 : -32000,
+            stdout.printf ("{\"jsonrpc\":\"2.0\",\"id\":%s,\"error\":{\"code\":%d,\"message\":\"%s\"}}\n",
+                request.get_int_member ("id").to_string (), mode == "legacy" ? -32601 : -32000,
                 mode == "legacy" ? "Method not found" : "Relay unavailable");
             stdout.flush ();
             continue;
@@ -43,7 +43,7 @@ private int run_fake_server (string mode) {
             break;
         case "release_read":
             assert (pending_seen != 0);
-            stdout.printf ("{\"jsonrpc\":\"2.0\",\"id\":%lld,\"result\":null}\n", pending_seen);
+            stdout.printf ("{\"jsonrpc\":\"2.0\",\"id\":%s,\"result\":null}\n", pending_seen.to_string ());
             pending_seen = 0;
             first_unread = 0;
             result = "null";
@@ -90,8 +90,8 @@ private int run_fake_server (string mode) {
             stderr.printf ("Unexpected RPC method: %s\n", method);
             return 1;
         }
-        stdout.printf ("{\"jsonrpc\":\"2.0\",\"id\":%lld,\"result\":%s}\n",
-            request.get_int_member ("id"), result);
+        stdout.printf ("{\"jsonrpc\":\"2.0\",\"id\":%s,\"result\":%s}\n",
+            request.get_int_member ("id").to_string (), result);
         stdout.flush ();
     }
     return 0;
