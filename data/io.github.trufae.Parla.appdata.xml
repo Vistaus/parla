@@ -37,6 +37,13 @@
     <name translate="no">pancake</name>
   </developer>
   <releases>
+    <release version="0.9.8" date="2026-09-28">
+      <description>
+        <ul>
+          <li>WebXdc realtime channels</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.9.6" date="2026-09-27">
       <description>
         <ul>
