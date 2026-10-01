@@ -12,11 +12,20 @@ namespace Dc {
         private bool _listening = false;
         private uint chats_reload_timer = 0;
         private uint messages_reload_timer = 0;
+        private uint connectivity_timer = 0;
+        private bool connectivity_loading = false;
+        private bool connectivity_pending = false;
+        private int connectivity_account = 0;
+        private int connectivity = 0;
         /* -1 means the notification server has not been queried yet. */
         private int notification_actions_supported = -1;
 
         public int active_chat_id { get; set; default = 0; }
+        public bool syncing {
+            get { return connectivity_account == rpc.account_id && connectivity == 3000; }
+        }
 
+        public signal void connectivity_changed (int state);
         public signal void chats_reload_fired ();
         public signal void messages_reload_fired ();
         public signal void incoming_msg_received (int acct_id, int chat_id, int msg_id);
@@ -54,6 +63,11 @@ namespace Dc {
                     if (event == null) continue;
 
                     string kind = event.get_string_member ("kind");
+
+                    if (kind == "ConnectivityChanged") {
+                        if (ctx == rpc.account_id) refresh_connectivity ();
+                        continue;
+                    }
 
                     // App windows can outlive a profile switch.
                     if (kind == "WebxdcRealtimeData"
@@ -135,7 +149,7 @@ namespace Dc {
 
         public void schedule_chats_reload () {
             if (chats_reload_timer > 0) return;
-            chats_reload_timer = Timeout.add (150, () => {
+            chats_reload_timer = Timeout.add (syncing ? 1500 : 150, () => {
                 chats_reload_timer = 0;
                 chats_reload_fired ();
                 return Source.REMOVE;
@@ -144,11 +158,57 @@ namespace Dc {
 
         public void schedule_messages_reload () {
             if (messages_reload_timer > 0 || active_chat_id <= 0) return;
-            messages_reload_timer = Timeout.add (150, () => {
+            messages_reload_timer = Timeout.add (syncing ? 1500 : 150, () => {
                 messages_reload_timer = 0;
                 messages_reload_fired ();
                 return Source.REMOVE;
             });
+        }
+
+        /* ConnectivityChanged can itself arrive in bursts. Keep only one
+           query in flight, and query again if a change arrived meanwhile. */
+        public void refresh_connectivity () {
+            connectivity_pending = true;
+            if (connectivity_timer != 0 || connectivity_loading) return;
+            connectivity_timer = Timeout.add (150, () => {
+                connectivity_timer = 0;
+                load_connectivity.begin ();
+                return Source.REMOVE;
+            });
+        }
+
+        private async void load_connectivity () {
+            connectivity_loading = true;
+            connectivity_pending = false;
+            int acct_id = rpc.account_id;
+            try {
+                if (acct_id <= 0 || !rpc.is_connected) return;
+                int state = yield rpc.get_connectivity (acct_id);
+                if (acct_id != rpc.account_id || !rpc.is_connected) return;
+                bool was_syncing = syncing;
+                connectivity_account = acct_id;
+                connectivity = state;
+                connectivity_changed (state);
+                if (was_syncing != syncing) {
+                    /* Re-time pending work on entry to sync, and finish the
+                       last batch promptly on idle or connection loss. */
+                    if (chats_reload_timer != 0) {
+                        Source.remove (chats_reload_timer);
+                        chats_reload_timer = 0;
+                        schedule_chats_reload ();
+                    }
+                    if (messages_reload_timer != 0) {
+                        Source.remove (messages_reload_timer);
+                        messages_reload_timer = 0;
+                        schedule_messages_reload ();
+                    }
+                }
+            } catch (Error e) {
+                /* Old/offline cores still get ordinary event refreshes. */
+            } finally {
+                connectivity_loading = false;
+                if (connectivity_pending && rpc.is_connected) refresh_connectivity ();
+            }
         }
 
         private void dispatch (string kind, Json.Object event) {

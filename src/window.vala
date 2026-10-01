@@ -32,6 +32,11 @@ namespace Dc {
         /* Chat list */
         private Gtk.ListBox chat_listbox;
         public GLib.ListStore chat_store { get; private set; }
+        private HashTable<int, int> chat_order = new HashTable<int, int> (direct_hash, direct_equal);
+        private uint chats_load_generation = 0;
+        private uint chats_loading = 0;
+        private uint unread_update_timer = 0;
+        private bool unread_update_loading = false;
 
         /* Archived-chats view: the sidebar shows either the normal chatlist
            or the archived one; the toggle only exists while the account has
@@ -186,6 +191,9 @@ namespace Dc {
         }
 
         private void reset_chat_ui () {
+            chats_load_generation++;
+            sidebar_title.subtitle = "";
+            sidebar_header.tooltip_text = null;
             discard_all_views ();
             chat_store.remove_all ();
             clear_listbox (chat_listbox);
@@ -1046,6 +1054,8 @@ namespace Dc {
                a handler in case the server goes away later. */
             set_connection_status (true);
             rpc.disconnected.connect ((reason) => {
+                sidebar_title.subtitle = "";
+                sidebar_header.tooltip_text = null;
                 set_connection_status (false, "Disconnected — " + reason);
             });
 
@@ -1077,8 +1087,15 @@ namespace Dc {
             Webxdc.setup (rpc, settings);
             events.set_app (this.application);
             events.chats_reload_fired.connect (() => {
-                load_chats.begin ();
+                if (chats_loading > 0) events.schedule_chats_reload ();
+                else load_chats.begin ();
             });
+            events.connectivity_changed.connect ((state) => {
+                sidebar_title.subtitle = state == 3000 ? "Syncing…"
+                    : state == 2000 ? "Connecting…" : state == 1000 ? "Offline" : "";
+                sidebar_header.tooltip_text = sidebar_title.subtitle;
+            });
+            events.refresh_connectivity ();
             events.messages_reload_fired.connect (() => {
                 var v = current_view ();
                 if (v != null) v.reload_messages.begin ();
@@ -1095,7 +1112,7 @@ namespace Dc {
                 on_chat_messages_changed (acct_id, chat_id);
             });
             events.account_unread_changed.connect ((acct_id) => {
-                update_unread_indicators.begin ();
+                schedule_unread_update ();
             });
             events.contacts_changed.connect ((acct_id) => {
                 invalidate_all_mention_rosters ();
@@ -1592,15 +1609,19 @@ namespace Dc {
 
         public async void load_chats () {
             if (rpc.account_id <= 0) return;
+            uint generation = ++chats_load_generation;
+            int acct_id = rpc.account_id;
+            bool archived_view = showing_archived;
+            chats_loading++;
 
             try {
                 /* The main list drops core's special entries (the "archived
                    chats" pseudo-chat used to show up as an empty row). */
                 var entries = yield rpc.get_chatlist_entries_for (
-                    rpc.account_id, null,
-                    showing_archived ? RpcClient.GCL_ARCHIVED_ONLY
+                    acct_id, null,
+                    archived_view ? RpcClient.GCL_ARCHIVED_ONLY
                                      : RpcClient.GCL_NO_SPECIALS);
-                if (entries == null) return;
+                if (!chats_load_is_current (generation, acct_id, archived_view) || entries == null) return;
 
                 if (showing_archived) {
                     archived_count = (int) entries.get_length ();
@@ -1614,17 +1635,18 @@ namespace Dc {
                     }
                 } else {
                     var archived = yield rpc.get_chatlist_entries_for (
-                        rpc.account_id, null, RpcClient.GCL_ARCHIVED_ONLY);
+                        acct_id, null, RpcClient.GCL_ARCHIVED_ONLY);
+                    if (!chats_load_is_current (generation, acct_id, archived_view)) return;
                     archived_count = archived != null
                         ? (int) archived.get_length () : 0;
                 }
                 update_archived_toggle ();
 
                 var items = yield rpc.get_chatlist_items_by_entries_for (
-                    rpc.account_id, entries);
+                    acct_id, entries);
+                if (!chats_load_is_current (generation, acct_id, archived_view)) return;
 
                 int desired_chat_id = current_chat_id;
-                bool keep_empty_selection = desired_chat_id <= 0;
                 var shown_entry = find_chat_entry (chat_store, desired_chat_id);
 
                 ChatEntry[] parsed_entries = {};
@@ -1656,39 +1678,60 @@ namespace Dc {
                         }
                     }
                 }
-                yield hydrate_chat_text_previews (parsed_entries,
+                yield hydrate_chat_text_previews (acct_id, parsed_entries,
                     preview_msg_ids);
+                if (!chats_load_is_current (generation, acct_id, archived_view)) return;
+
+                /* A click while the RPCs were pending takes precedence over
+                   the selection that was open when this load started. */
+                desired_chat_id = current_chat_id;
+                bool keep_empty_selection = desired_chat_id <= 0;
 
                 /* Nothing visible changed (typically a draft save or a
                    notice for the open chat): keep the rows, so focus, the
                    highlight and the accessibility tree stay untouched. */
                 if (same_chat_rows (parsed_entries)) return;
 
-                /* Rebuilding the rows destroys the one holding the keyboard
-                   focus; remember which chat it was so the user can keep
-                   arrowing through the list after the refresh. */
-                int focused_chat_id = focused_chat_row_id ();
-
-                chat_store.remove_all ();
-                clear_listbox (chat_listbox);
-                current_chat_row = null;
+                /* Retain row widgets and untouched contents. Rebuilding the
+                   whole sidebar on each arrival cancels clicks and focus. */
+                var rows = new HashTable<int, Gtk.ListBoxRow> (direct_hash, direct_equal);
+                var old_entries = new HashTable<int, ChatEntry> (direct_hash, direct_equal);
+                for (var child = chat_listbox.get_first_child (); child != null;
+                        child = child.get_next_sibling ()) {
+                    var row = child as Gtk.ListBoxRow;
+                    var chat_row = row != null ? row.child as ChatRow : null;
+                    if (chat_row != null) rows.insert (chat_row.chat_id, row);
+                }
+                for (uint i = 0; i < chat_store.get_n_items (); i++) {
+                    var entry = (ChatEntry) chat_store.get_item (i);
+                    old_entries.insert (entry.id, entry);
+                }
+                bool new_day = chat_rows_day != today_stamp ();
                 chat_rows_day = today_stamp ();
+                chat_order.remove_all ();
+                for (int i = 0; i < parsed_entries.length; i++)
+                    chat_order.insert (parsed_entries[i].id, i);
+
+                foreach (int id in rows.get_keys ()) {
+                    if (!chat_order.contains (id)) chat_listbox.remove (rows.lookup (id));
+                }
+                chat_store.splice (0, chat_store.get_n_items (), parsed_entries);
 
                 Gtk.ListBoxRow? reselect_row = null;
-                Gtk.ListBoxRow? refocus_row = null;
                 foreach (var entry in parsed_entries) {
-                    chat_store.append (entry);
-
-                    var row = new Gtk.ListBoxRow ();
-                    var chat_row = new ChatRow (entry);
-                    row.child = chat_row;
-                    chat_row.set_compact (settings.sidebar_mode == SidebarMode.COMPACT);
-                    chat_row.accept_file_drop.connect (() => can_attach_file_to_chat (chat_row.chat_id));
-                    chat_row.file_dropped.connect ((path, name) => attach_file_to_chat (chat_row.chat_id, path, name));
-                    chat_row.file_drop_failed.connect ((message) => show_toast ("Attach failed: " + message));
-                    chat_listbox.append (row);
-
-                    if (entry.id == focused_chat_id) refocus_row = row;
+                    var row = rows.lookup (entry.id);
+                    var old_entry = old_entries.lookup (entry.id);
+                    bool new_row = row == null;
+                    if (new_row) row = new Gtk.ListBoxRow ();
+                    if (new_day || old_entry == null || !old_entry.same_display (entry)) {
+                        var chat_row = new ChatRow (entry);
+                        row.child = chat_row;
+                        chat_row.set_compact (settings.sidebar_mode == SidebarMode.COMPACT);
+                        chat_row.accept_file_drop.connect (() => can_attach_file_to_chat (chat_row.chat_id));
+                        chat_row.file_dropped.connect ((path, name) => attach_file_to_chat (chat_row.chat_id, path, name));
+                        chat_row.file_drop_failed.connect ((message) => show_toast ("Attach failed: " + message));
+                    }
+                    if (new_row) chat_listbox.append (row);
                     if (entry.id == desired_chat_id) {
                         reselect_row = row;
                         /* Refresh header state that can change while the
@@ -1698,15 +1741,28 @@ namespace Dc {
                     }
                 }
 
+                chat_listbox.set_sort_func ((a, b) => {
+                    return chat_order.lookup (((ChatRow) a.child).chat_id)
+                        - chat_order.lookup (((ChatRow) b.child).chat_id);
+                });
+                chat_listbox.invalidate_filter ();
+
                 mark_current_chat_row (reselect_row);
                 if (reselect_row == null && !keep_empty_selection) {
                     /* The open chat left the list (deleted, archived). */
                     clear_chat_view ();
                 }
-                if (refocus_row != null) refocus_row.grab_focus ();
             } catch (Error e) {
-                show_toast ("Failed to load chats: " + e.message);
+                if (chats_load_is_current (generation, acct_id, archived_view))
+                    show_toast ("Failed to load chats: " + e.message);
+            } finally {
+                chats_loading--;
             }
+        }
+
+        private bool chats_load_is_current (uint generation, int acct_id, bool archived_view) {
+            return generation == chats_load_generation && acct_id == rpc.account_id
+                && archived_view == showing_archived;
         }
 
         private static int today_stamp () {
@@ -1717,7 +1773,6 @@ namespace Dc {
         /* Whether the rows currently in the list already show exactly what
            `entries` describe, so load_chats can leave them alone. */
         private bool same_chat_rows (ChatEntry[] entries) {
-            if (entries.length == 0) return false;
             if (chat_store.get_n_items () != entries.length) return false;
             if (chat_rows_day != today_stamp ()) return false;
             for (int i = 0; i < entries.length; i++) {
@@ -1727,12 +1782,12 @@ namespace Dc {
             return true;
         }
 
-        private async void hydrate_chat_text_previews (ChatEntry[] entries,
+        private async void hydrate_chat_text_previews (int acct_id, ChatEntry[] entries,
                                                        int[] msg_ids) {
             if (entries.length == 0 || msg_ids.length == 0) return;
 
             try {
-                var map = yield rpc.get_messages_for (rpc.account_id, msg_ids);
+                var map = yield rpc.get_messages_for (acct_id, msg_ids);
                 if (map == null) return;
 
                 foreach (var entry in entries) {
@@ -2320,13 +2375,14 @@ namespace Dc {
             check_mention.begin (acct_id, chat_id, msg_id);
             if (acct_id != rpc.account_id) {
                 queue_chat_notification (acct_id, chat_id, msg_id);
-                update_unread_indicators.begin ();
                 return;
             }
 
             var view = views.lookup (chat_id);
             bool handled = false;
-            if (view != null) {
+            if (view != null && events != null && events.syncing) {
+                view.mark_messages_stale ();
+            } else if (view != null) {
                 handled = yield view.handle_incoming_msg (msg_id);
             }
             if (view != null && !handled) {
@@ -2848,30 +2904,48 @@ namespace Dc {
            account (whose own unread is already shown in the chat list). */
         private async void update_unread_indicators () {
             if (profile_unread_badge == null) return;
-            bool other_unread = false;
-            if (rpc != null && rpc.is_connected && rpc.account_id > 0) {
-                try {
-                    var accounts_node = yield rpc.get_all_accounts ();
-                    if (accounts_node != null) {
-                        var accounts = accounts_node.get_array ();
-                        for (uint i = 0; i < accounts.get_length (); i++) {
-                            var acct = accounts.get_object_element (i);
-                            int id = (int) acct.get_int_member ("id");
-                            if (id <= 0 || id == rpc.account_id) continue;
-                            if ((yield rpc.get_fresh_msg_count (id)) > 0) {
-                                other_unread = true;
-                                break;
+            if (unread_update_loading) {
+                schedule_unread_update ();
+                return;
+            }
+            unread_update_loading = true;
+            try {
+                bool other_unread = false;
+                if (rpc != null && rpc.is_connected && rpc.account_id > 0) {
+                    try {
+                        var accounts_node = yield rpc.get_all_accounts ();
+                        if (accounts_node != null) {
+                            var accounts = accounts_node.get_array ();
+                            for (uint i = 0; i < accounts.get_length (); i++) {
+                                var acct = accounts.get_object_element (i);
+                                int id = (int) acct.get_int_member ("id");
+                                if (id <= 0 || id == rpc.account_id) continue;
+                                if ((yield rpc.get_fresh_msg_count (id)) > 0) {
+                                    other_unread = true;
+                                    break;
+                                }
                             }
                         }
+                    } catch (Error e) {
+                        return;
                     }
-                } catch (Error e) {
-                    return;
                 }
+                profile_unread_badge.visible = other_unread;
+                if (account_popover != null && account_popover.get_visible ()) {
+                    yield load_account_menu ();
+                }
+            } finally {
+                unread_update_loading = false;
             }
-            profile_unread_badge.visible = other_unread;
-            if (account_popover != null && account_popover.get_visible ()) {
-                yield load_account_menu ();
-            }
+        }
+
+        private void schedule_unread_update () {
+            if (unread_update_timer != 0) return;
+            unread_update_timer = Timeout.add (events != null && events.syncing ? 1500 : 150, () => {
+                unread_update_timer = 0;
+                update_unread_indicators.begin ();
+                return Source.REMOVE;
+            });
         }
 
         private void on_new_chat () {
@@ -3287,6 +3361,7 @@ namespace Dc {
 
         public async void reload_active_account () {
             reset_chat_ui ();
+            if (events != null) events.refresh_connectivity ();
 
             if (rpc.account_id <= 0) {
                 clear_self_identity ();
@@ -3322,6 +3397,10 @@ namespace Dc {
         }
 
         public override void dispose () {
+            if (unread_update_timer != 0) {
+                Source.remove (unread_update_timer);
+                unread_update_timer = 0;
+            }
             discard_all_views ();
             base.dispose ();
         }

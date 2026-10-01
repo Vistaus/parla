@@ -357,6 +357,8 @@ public int main (string[] args) {
         return run_retry_ui_test ();
     if (args.length > 1 && args[1] == "--unread-ui")
         return run_unread_ui_test ();
+    if (args.length > 1 && args[1] == "--sync-ui")
+        return run_sync_ui_test ();
     if (args.length > 1 && args[1] == "--fake-core")
         return run_fake_server (args.length > 2 ? args[2] : "latest");
     test_executable = File.new_for_path (args[0]).get_path ();
