@@ -53,13 +53,14 @@ private async void check_sync_ui (Dc.Application app, Dc.Window window) {
         int64 unread_loads = json_int (counts, "get_all_accounts");
         assert (chat_loads > 0 && chat_loads <= 3);
         assert (unread_loads > 0 && unread_loads <= 4);
-        stdout.printf ("Sync burst: %lld chat refreshes, %lld unread refreshes\n", chat_loads, unread_loads);
+        stdout.printf ("Sync burst: %s chat refreshes, %s unread refreshes\n",
+            chat_loads.to_string (), unread_loads.to_string ());
 
         var final_revision = yield app.rpc.call ("test_finish", Params.begin ().build ());
         yield sync_ui_pause (600);
         assert (!sync_status_visible (window));
         assert (find_chat_entry (window.chat_store, 10).last_message
-            == "History %lld".printf (final_revision.get_int ()));
+            == "History " + final_revision.get_int ().to_string ());
         assert (list.get_row_at_index (0) == row30);
         assert (sync_chat_row (window, 20) == row20);
 
