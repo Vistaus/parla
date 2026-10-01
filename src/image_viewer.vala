@@ -183,7 +183,7 @@ namespace Dc {
                 update_nav_buttons ();
                 return true;
             } catch (Error e) {
-                toast ("Cannot open image: " + e.message);
+                toast (_("Cannot open image: ") + e.message);
                 return false;
             }
         }
@@ -203,7 +203,7 @@ namespace Dc {
             vbox.margin_end = 4;
             vbox.margin_top = 4;
             vbox.margin_bottom = 4;
-            var save_btn = new PopoverButton (popover, "Save image");
+            var save_btn = new PopoverButton (popover, _("Save image"));
             save_btn.selected.connect (() => {
                 if (window != null) window.save_attachment.begin (
                     path, Path.get_basename (path));

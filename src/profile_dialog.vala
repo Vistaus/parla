@@ -948,10 +948,12 @@ namespace Dc {
 
         private void show_clear_cache_info () {
             var dialog = new Adw.AlertDialog (
-                "Free Up Space",
-                "Delete messages or chats that are no longer needed. Unused attachment files are cleaned up automatically.\n\n" + DELETE_FOR_ME_DESCRIPTION + "\n\nParla cannot currently remove only downloaded files while keeping the messages. Files saved elsewhere and backups must be removed separately."
+                _("Free Up Space"),
+                _("Delete messages or chats that are no longer needed. Unused attachment files are cleaned up automatically.")
+                + "\n\n" + _(DELETE_FOR_ME_DESCRIPTION)
+                + "\n\n" + _("Parla cannot currently remove only downloaded files while keeping the messages. Files saved elsewhere and backups must be removed separately.")
             );
-            dialog.add_response ("ok", "OK");
+            dialog.add_response ("ok", _("OK"));
             dialog.present (this);
         }
     }

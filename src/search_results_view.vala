@@ -18,11 +18,11 @@ namespace Dc {
             Object (orientation: Gtk.Orientation.VERTICAL, spacing: 6);
             visible = false;
             search = new MessageSearch ();
-            scope = new Gtk.Label ("Messages in selected profile");
+            scope = new Gtk.Label (_("Messages in selected profile"));
             scope.wrap = true;
             scope.add_css_class ("dim-label");
             append (scope);
-            status = new Gtk.Label ("Type to search messages");
+            status = new Gtk.Label (_("Type to search messages"));
             status.wrap = true;
             status.margin_start = status.margin_end = 8;
             append (status);
@@ -37,7 +37,7 @@ namespace Dc {
             });
             var content = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
             content.append (list);
-            more = new Gtk.Button.with_label ("Load more results");
+            more = new Gtk.Button.with_label (_("Load more results"));
             more.visible = false;
             more.clicked.connect (() => { load_page.begin (true); });
             content.append (more);
@@ -48,12 +48,12 @@ namespace Dc {
                 loaded = 0;
                 loading = false;
                 more.visible = false;
-                if (search.busy) status.label = "Searching…";
-                else if (search.error_message != null) status.label = "Search failed: " + search.error_message;
-                else if (search.query == "") status.label = "Type to search messages";
-                else if (search.ids.length == 0) status.label = "No messages found";
-                else if (search.ids.length >= 1000) status.label = "1,000+ results · newest matches shown";
-                else status.label = "%d results".printf (search.ids.length);
+                if (search.busy) status.label = _("Searching…");
+                else if (search.error_message != null) status.label = _("Search failed: ") + search.error_message;
+                else if (search.query == "") status.label = _("Type to search messages");
+                else if (search.ids.length == 0) status.label = _("No messages found");
+                else if (search.ids.length >= 1000) status.label = _("1,000+ results · newest matches shown");
+                else status.label = _("%d results").printf (search.ids.length);
                 if (!search.busy && search.ids.length > 0) load_page.begin ();
             });
         }
@@ -74,14 +74,14 @@ namespace Dc {
 
         private async void load_scope (int acct_id) {
             scope_account = acct_id;
-            scope.label = "Messages in selected profile";
+            scope.label = _("Messages in selected profile");
             try {
                 string? name = yield rpc.get_config ("displayname", acct_id);
                 if (rpc.account_id != acct_id || scope_account != acct_id) return;
                 if (name == null || name == "")
                     name = yield rpc.get_account_address (acct_id);
                 if (rpc.account_id != acct_id || scope_account != acct_id) return;
-                scope.label = "Messages in %s".printf (name ?? "selected profile");
+                scope.label = _("Messages in %s").printf (name ?? _("selected profile"));
             } catch (Error e) { /* The explicit selected-profile scope remains. */ }
         }
 
@@ -123,7 +123,7 @@ namespace Dc {
                 if (obj == null) continue;
                 var row = new Gtk.ListBoxRow ();
                 row.set_data<Json.Object> ("result", obj);
-                string chat_name = json_str (obj, "chatName") ?? "Chat";
+                string chat_name = json_str (obj, "chatName") ?? _("Chat");
                 var content = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 10);
                 content.add_css_class ("chat-row");
                 content.margin_start = content.margin_end = 8;
@@ -160,7 +160,7 @@ namespace Dc {
                 var date = new DateTime.from_unix_local (json_int (obj, "timestamp"));
                 var detail = new Gtk.Label ("%s · %s%s".printf (
                     json_str (obj, "authorName") ?? "", date.format ("%x %H:%M"),
-                    json_bool (obj, "isChatArchived") ? " · Archived" : ""));
+                    json_bool (obj, "isChatArchived") ? " · " + _("Archived") : ""));
                 detail.xalign = 0;
                 detail.ellipsize = Pango.EllipsizeMode.END;
                 detail.add_css_class ("dim-label");
@@ -174,7 +174,7 @@ namespace Dc {
             loading = false;
             more.sensitive = true;
             more.visible = loaded < search.ids.length;
-            if (list.get_first_child () == null) status.label = "Results are no longer available";
+            if (list.get_first_child () == null) status.label = _("Results are no longer available");
             if (focus_new && first != null) first.grab_focus ();
         }
     }

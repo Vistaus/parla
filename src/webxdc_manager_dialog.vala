@@ -57,13 +57,13 @@ namespace Dc {
         public WebxdcManagerDialog (Window window, RpcClient rpc) {
             this.app_window = window;
             this.rpc = rpc;
-            this.title = "Apps";
+            this.title = _("Apps");
             this.content_width = 560;
             this.content_height = 620;
             favorites = load_favorites ();
 
             search_entry = new Gtk.SearchEntry ();
-            search_entry.placeholder_text = "Search apps…";
+            search_entry.placeholder_text = _("Search apps…");
             search_entry.hexpand = true;
             search_entry.search_changed.connect (() => { rebuild_list (); });
 
@@ -86,9 +86,9 @@ namespace Dc {
 
             empty_page = new Adw.StatusPage ();
             empty_page.icon_name = "application-x-executable-symbolic";
-            empty_page.title = "No Apps Yet";
-            empty_page.description = "Webxdc apps shared in any chat of "
-                + "any profile will appear here";
+            empty_page.title = _("No Apps Yet");
+            empty_page.description = _("Webxdc apps shared in any chat of "
+                + "any profile will appear here");
 
             stack = new Gtk.Stack ();
             stack.vexpand = true;
@@ -110,7 +110,7 @@ namespace Dc {
             toolbar.content = content;
 
             nav = new Adw.NavigationView ();
-            nav.add (new Adw.NavigationPage (toolbar, "Apps"));
+            nav.add (new Adw.NavigationPage (toolbar, _("Apps")));
             this.child = nav;
 
             install_escape_close (this);
@@ -165,7 +165,7 @@ namespace Dc {
             try { self_addr = yield rpc.get_account_address (acct_id); }
             catch (Error e) { /* Fall back to the profile name or ID. */ }
             string account_label = json_str (acct, "displayName")
-                ?? self_addr ?? "Profile %d".printf (acct_id);
+                ?? self_addr ?? _("Profile %d").printf (acct_id);
 
             int[] msg_ids;
             Json.Object? map;
@@ -208,7 +208,7 @@ namespace Dc {
                 string name = info != null
                     ? (json_str (info, "name") ?? "") : "";
                 if (name.length == 0) {
-                    name = msg.display_file_name ("App");
+                    name = msg.display_file_name (_("App"));
                     if (name.down ().has_suffix (".xdc")) {
                         name = name.substring (0, name.length - 4);
                     }
@@ -239,7 +239,7 @@ namespace Dc {
                 yield lookup_chat (acct_id, msg.chat_id, chat_names,
                                    chat_avatars);
                 inst.chat_name = chat_names.lookup (msg.chat_id)
-                    ?? "Chat %d".printf (msg.chat_id);
+                    ?? _("Chat %d").printf (msg.chat_id);
                 inst.chat_avatar = chat_avatars.lookup (msg.chat_id);
                 entry.instances.add (inst);
 
@@ -328,7 +328,7 @@ namespace Dc {
 
         private static string sender_label (Message msg) {
             if (msg.is_outgoing) return "Me";
-            return msg.sender_name ?? msg.sender_address ?? "Unknown";
+            return msg.sender_name ?? msg.sender_address ?? _("Unknown");
         }
 
         private void add_user (AppEntry entry, int acct_id, Message msg) {
@@ -400,7 +400,7 @@ namespace Dc {
             star.icon_name = entry.favorite
                 ? "starred-symbolic" : "non-starred-symbolic";
             star.tooltip_text = entry.favorite
-                ? "Remove from favorites" : "Add to favorites";
+                ? _("Remove from favorites") : _("Add to favorites");
             return star;
         }
 
@@ -430,7 +430,7 @@ namespace Dc {
             } else {
                 stack.visible_child_name = "list";
                 if (shown == 0) {
-                    var none = new Gtk.Label ("No apps match the search");
+                    var none = new Gtk.Label (_("No apps match the search"));
                     none.add_css_class ("dim-label");
                     none.margin_top = 12;
                     none.margin_bottom = 12;
@@ -444,7 +444,7 @@ namespace Dc {
             row.use_markup = false;
             row.title = entry.name;
             row.subtitle = "%s · %s".printf (entry.author,
-                count_label (entry.instances.length, "chat"));
+                count_label (entry.instances.length, _("chat"), _("chats")));
             row.activatable = true;
             row.add_prefix (app_icon (entry, 40));
 
@@ -494,9 +494,10 @@ namespace Dc {
             return box;
         }
 
-        private static string count_label (uint n, string noun) {
-            return n == 1 ? "1 %s".printf (noun)
-                          : "%u %ss".printf (n, noun);
+        /* English-style "+s" pluralisation is not portable, so the caller
+           passes both forms and we pick by count. */
+        private static string count_label (uint n, string one, string many) {
+            return n == 1 ? _("1 %s").printf (one) : _("%u %s").printf (n, many);
         }
 
         /* ================================================================
@@ -523,13 +524,13 @@ namespace Dc {
             name_lbl.wrap = true;
             name_lbl.xalign = 0;
             meta.append (name_lbl);
-            meta.append (detail_line ("Shared by %s".printf (entry.author)));
+            meta.append (detail_line (_("Shared by %s").printf (entry.author)));
             if (entry.created > 0) {
-                meta.append (detail_line ("First seen %s".printf (
+                meta.append (detail_line (_("First seen %s").printf (
                     format_date_time (entry.created))));
             }
             if (entry.internet_access) {
-                meta.append (detail_line ("Requests internet access"));
+                meta.append (detail_line (_("Requests internet access")));
             }
             head.append (meta);
 
@@ -546,20 +547,20 @@ namespace Dc {
             /* Actions: Run continues an existing chat or picks a contact;
                the rest mirror the message-card options. */
             var actions = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 8);
-            var run_btn = new Gtk.Button.with_label ("Run");
+            var run_btn = new Gtk.Button.with_label (_("Run"));
             run_btn.add_css_class ("suggested-action");
             run_btn.add_css_class ("pill");
             run_btn.clicked.connect (() => { show_run_menu (run_btn, entry); });
             actions.append (run_btn);
 
-            var chat_btn = new Gtk.Button.with_label ("New Chat…");
+            var chat_btn = new Gtk.Button.with_label (_("New Chat…"));
             chat_btn.add_css_class ("pill");
             chat_btn.tooltip_text =
-                "Share and start this app in a chat with a contact";
+                _("Share and start this app in a chat with a contact");
             chat_btn.clicked.connect (() => { pick_contact_and_send (entry); });
             actions.append (chat_btn);
 
-            var save_btn = new Gtk.Button.with_label ("Save to Disk…");
+            var save_btn = new Gtk.Button.with_label (_("Save to Disk…"));
             save_btn.add_css_class ("pill");
             save_btn.clicked.connect (() => { save_app.begin (entry); });
             actions.append (save_btn);
@@ -570,13 +571,13 @@ namespace Dc {
             about.selection_mode = Gtk.SelectionMode.NONE;
             about.add_css_class ("boxed-list");
             if (entry.summary != null) {
-                about.append (info_row ("Description", entry.summary));
+                about.append (info_row (_("Description"), entry.summary));
             }
             if (entry.document != null) {
-                about.append (info_row ("Document", entry.document));
+                about.append (info_row (_("Document"), entry.document));
             }
             if (entry.source_code_url != null) {
-                var url_row = info_row ("Source Code", entry.source_code_url);
+                var url_row = info_row (_("Source Code"), entry.source_code_url);
                 url_row.activatable = true;
                 url_row.activated.connect (() => {
                     open_url (entry.source_code_url);
@@ -587,11 +588,11 @@ namespace Dc {
                 url_row.add_suffix (open_img);
                 about.append (url_row);
             }
-            var used_row = info_row ("Used by",
-                count_label (entry.users.length, "person"));
+            var used_row = info_row (_("Used by"),
+                count_label (entry.users.length, _("person"), _("people")));
             used_row.add_suffix (users_cluster (entry, 24, 6));
             about.append (used_row);
-            box.append (section ("About", about));
+            box.append (section (_("About"), about));
 
             /* Every chat the app ran in, with a per-chat run button. */
             var chats = new Gtk.ListBox ();
@@ -600,7 +601,7 @@ namespace Dc {
             for (uint i = 0; i < entry.instances.length; i++) {
                 chats.append (build_instance_row (entry.instances[i]));
             }
-            box.append (section ("Chats", chats));
+            box.append (section (_("Chats"), chats));
 
             var scroll = new Gtk.ScrolledWindow ();
             scroll.vexpand = true;
@@ -652,7 +653,7 @@ namespace Dc {
 
             if (Webxdc.is_running (inst.msg.id)
                     && inst.account_id == rpc.account_id) {
-                var running = new Gtk.Label ("Running");
+                var running = new Gtk.Label (_("Running"));
                 running.add_css_class ("caption");
                 running.add_css_class ("accent");
                 running.valign = Gtk.Align.CENTER;
@@ -663,7 +664,7 @@ namespace Dc {
                 "media-playback-start-symbolic");
             run.add_css_class ("flat");
             run.valign = Gtk.Align.CENTER;
-            run.tooltip_text = "Run in this chat";
+            run.tooltip_text = _("Run in this chat");
             run.clicked.connect (() => { launch (inst); });
             row.add_suffix (run);
 
@@ -695,7 +696,7 @@ namespace Dc {
                 vbox.append (btn);
             }
             vbox.append (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
-            var fresh = new PopoverButton (popover, "Start in a new chat…");
+            var fresh = new PopoverButton (popover, _("Start in a new chat…"));
             fresh.selected.connect (() => { pick_contact_and_send (entry); });
             vbox.append (fresh);
             popover.popup ();
@@ -728,7 +729,7 @@ namespace Dc {
             var inst = local_instance (entry);
             if (inst == null) {
                 app_window.show_toast (
-                    "The app file has not been downloaded yet");
+                    _("The app file has not been downloaded yet"));
                 return;
             }
             yield app_window.save_attachment (inst.msg.file_path,
@@ -739,11 +740,11 @@ namespace Dc {
             var inst = local_instance (entry);
             if (inst == null) {
                 app_window.show_toast (
-                    "The app file has not been downloaded yet");
+                    _("The app file has not been downloaded yet"));
                 return;
             }
             var picker = new ContactPickerDialog (rpc, null,
-                "Start App With…");
+                _("Start App With…"));
             picker.contact_picked.connect ((contact_id, email) => {
                 send_and_run.begin (inst, contact_id, email);
             });
@@ -763,10 +764,10 @@ namespace Dc {
                 int msg_id = yield rpc.send_msg (chat_id, null,
                     inst.msg.file_path, inst.msg.file_name, 0, "Webxdc");
                 if (msg_id <= 0) {
-                    app_window.show_toast ("Could not share the app");
+                    app_window.show_toast (_("Could not share the app"));
                     return;
                 }
-                app_window.show_toast ("App shared into the chat");
+                app_window.show_toast (_("App shared into the chat"));
                 var sent = yield rpc.fetch_message (msg_id);
                 if (sent != null) {
                     this.close ();
@@ -776,7 +777,7 @@ namespace Dc {
                 }
                 yield reload ();
             } catch (Error e) {
-                show_error (this, "Could not share the app: " + e.message);
+                show_error (this, _("Could not share the app: ") + e.message);
             }
         }
 
@@ -786,7 +787,7 @@ namespace Dc {
                 try {
                     launcher.launch.end (res);
                 } catch (Error e) {
-                    app_window.show_toast ("Could not open link: "
+                    app_window.show_toast (_("Could not open link: ")
                                            + e.message);
                 }
             });

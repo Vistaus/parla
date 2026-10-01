@@ -218,7 +218,7 @@ release.
 See [docs/rpc-server.md](docs/rpc-server.md) for how Parla finds the JSON-RPC
 server and how to package it for Flatpak or distro packages.
 
-Parla is being localized with GNU gettext. See [doc/locales.md](doc/locales.md)
+Parla is being localized with GNU gettext. See [docs/locales.md](docs/locales.md)
 for how to run Parla in another language and how to contribute translations.
 
 ## Webxdc apps (experimental)

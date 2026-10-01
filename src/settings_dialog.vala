@@ -699,17 +699,17 @@ namespace Dc {
         public SettingsDialog (Window window, RpcClient rpc) {
             this.app_window = window;
             this.rpc = rpc;
-            this.title = "Settings";
+            this.title = _("Settings");
             this.content_width = 640;
             this.content_height = 576;
 
             var general_page = new Adw.PreferencesPage ();
-            general_page.title = "General";
+            general_page.title = _("General");
             general_page.icon_name = "preferences-system-symbolic";
             this.add (general_page);
 
             var advanced_page = new Adw.PreferencesPage ();
-            advanced_page.title = "Advanced";
+            advanced_page.title = _("Advanced");
             advanced_page.icon_name = "preferences-other-symbolic";
             this.add (advanced_page);
 
@@ -725,35 +725,38 @@ namespace Dc {
         }
 
         private void build_appearance_section (Adw.PreferencesPage page) {
-            var appearance_group = settings_group (page, "Appearance");
+            var appearance_group = settings_group (page, _("Appearance"));
 
-            string[] theme_labels = { "System", "Light", "Dark" };
+            string[] theme_labels = { _("System"), _("Light"), _("Dark") };
             row_combo (appearance_group,
-                "Appearance", "Use the system style or choose light or dark",
+                _("Appearance"), _("Use the system style or choose light or dark"),
                 theme_labels, (uint) app_window.settings.theme_override, (sel) => {
                 app_window.settings.save_theme_override ((ThemeOverride) sel);
                 apply_theme_override ();
             });
 
+            /* Syntax colour scheme names are proper nouns and stay as is. */
             string[] code_labels = {
                 "Adaptive", "Solarized", "Monokai", "Nord", "None"
             };
             row_combo (appearance_group,
-                "Code highlighting", "Color scheme for code blocks in messages",
+                _("Code highlighting"), _("Color scheme for code blocks in messages"),
                 code_labels, (uint) app_window.settings.code_theme, (sel) => {
                 app_window.settings.save_code_theme ((CodeTheme) sel);
             });
 
-            string[] style_labels = { "Bubbles", "Compact", "Rows" };
+            string[] style_labels = { _("Bubbles"), _("Compact"), _("Rows") };
             row_combo (appearance_group,
-                "Message layout", "Choose how messages are arranged",
+                _("Message layout"), _("Choose how messages are arranged"),
                 style_labels, (uint) app_window.settings.message_style, (sel) => {
                 app_window.settings.save_message_style ((MessageStyle) sel);
             });
 
-            string[] avatar_labels = { "None", "Other People", "Everyone" };
+            string[] avatar_labels = {
+                _("None"), _("Other People"), _("Everyone")
+            };
             row_combo (appearance_group,
-                "Profile pictures", "Choose whose picture appears beside message bubbles",
+                _("Profile pictures"), _("Choose whose picture appears beside message bubbles"),
                 avatar_labels, (uint) app_window.settings.bubble_avatar_display,
                 (sel) => {
                 app_window.settings.save_bubble_avatar_display (
@@ -761,8 +764,8 @@ namespace Dc {
             });
 
             var direct_avatar_row = action_row (
-                "Show profile pictures in direct chats",
-                "Apply the profile picture setting to direct chats too");
+                _("Show profile pictures in direct chats"),
+                _("Apply the profile picture setting to direct chats too"));
             var direct_avatar_check = new Gtk.CheckButton ();
             direct_avatar_check.active =
                 app_window.settings.bubble_avatars_in_direct_chats;
@@ -775,20 +778,20 @@ namespace Dc {
             appearance_group.add (direct_avatar_row);
 
             font_type_row = action_row (
-                "Message font",
-                "Use the system font or choose another family, style and size");
+                _("Message font"),
+                _("Use the system font or choose another family, style and size"));
             font_type_row.title_lines = 1;
             font_type_row.subtitle_lines = 2;
             var font_dialog = new Gtk.FontDialog ();
-            font_dialog.title = "Choose Font";
+            font_dialog.title = _("Choose Font");
             font_dialog.modal = true;
-            font_btn = flat_button ("Choose…");
-            font_btn.tooltip_text = "Choose a font family, style and size";
+            font_btn = flat_button (_("Choose…"));
+            font_btn.tooltip_text = _("Choose a font family, style and size");
             font_btn.clicked.connect (() => { on_choose_font.begin (font_dialog); });
             font_type_row.add_suffix (font_btn);
 
             var font_reset_btn = flat_icon_button ("edit-undo-symbolic",
-                "Reset font settings to defaults");
+                _("Reset font settings to defaults"));
             font_reset_btn.clicked.connect (() => {
                 app_window.settings.reset_font_defaults ();
                 sync_font_controls ();
@@ -799,8 +802,8 @@ namespace Dc {
             sync_font_controls ();
 
             var accent_row = action_row (
-                "Accent color",
-                "Override the system accent color");
+                _("Accent color"),
+                _("Override the system accent color"));
 
             var accent_btn = new Gtk.ColorDialogButton (new Gtk.ColorDialog ());
             accent_btn.valign = Gtk.Align.CENTER;
@@ -811,7 +814,7 @@ namespace Dc {
             });
 
             var accent_reset_btn = flat_icon_button ("edit-undo-symbolic",
-                "Use system accent color");
+                _("Use system accent color"));
             accent_reset_btn.clicked.connect (() => {
                 app_window.settings.save_accent_color ("");
                 apply_hex_to_button (accent_btn, "");
@@ -821,10 +824,12 @@ namespace Dc {
             accent_row.add_suffix (accent_reset_btn);
             appearance_group.add (accent_row);
 
-            string[] bg_mode_labels = { "System", "Solid", "Gradient" };
+            string[] bg_mode_labels = {
+                _("System"), _("Solid"), _("Gradient")
+            };
             var bg_mode_combo = row_combo (appearance_group,
-                "Background color",
-                "Tint the window background with a solid color or a gradient",
+                _("Background color"),
+                _("Tint the window background with a solid color or a gradient"),
                 bg_mode_labels, (uint) app_window.settings.background_mode);
 
             var bg_color_btn = new Gtk.ColorDialogButton (new Gtk.ColorDialog ());
@@ -849,40 +854,43 @@ namespace Dc {
         }
 
         private void build_behavior_section (Adw.PreferencesPage page) {
-            var behavior_group = settings_group (page, "Chats");
+            var behavior_group = settings_group (page, _("Chats"));
 
             string[] dblclick_labels = {
-                "Reply to Message", "React with ❤️", "React with 👍",
-                "Show Contact Details", "Show Message Menu", "Do Nothing"
+                _("Reply to Message"), _("React with ❤️"), _("React with 👍"),
+                _("Show Contact Details"), _("Show Message Menu"), _("Do Nothing")
             };
 
             uint dblclick_selected = swap_dblclick_45 (
                 (uint) app_window.settings.double_click_action);
             row_combo (behavior_group,
-                "Double-click action",
-                "Action when a message is double-clicked or Enter is pressed on its row",
+                _("Double-click action"),
+                _("Action when a message is double-clicked or Enter is pressed on its row"),
                 dblclick_labels, dblclick_selected, (sel) => {
                 app_window.settings.save_double_click_action (
                     (int) swap_dblclick_45 (sel));
             });
 
-            string[] md_labels = { "Format Text", "Hide Formatting Marks", "Show Original Text" };
+            string[] md_labels = {
+                _("Format Text"), _("Hide Formatting Marks"),
+                _("Show Original Text")
+            };
             row_combo (behavior_group,
-                "Message formatting", "Choose how Markdown formatting is displayed",
+                _("Message formatting"), _("Choose how Markdown formatting is displayed"),
                 md_labels, (uint) app_window.settings.markdown_mode, (sel) => {
                 app_window.settings.save_markdown_mode (
                     (MarkdownMode) sel);
             });
 
             add_switch_row (behavior_group,
-                "Send with Shift+Enter",
-                "Enter inserts a new line; Shift+Enter sends the message",
+                _("Send with Shift+Enter"),
+                _("Enter inserts a new line; Shift+Enter sends the message"),
                 app_window.settings.shift_enter_sends,
                 (v) => app_window.settings.save_shift_enter_sends (v));
 
             var audio_row = action_row (
-                "Use External Audio Tools",
-                "Use installed audio programs for voice playback and recording");
+                _("Use External Audio Tools"),
+                _("Use installed audio programs for voice playback and recording"));
             var audio_switch = row_switch (
                 audio_row, app_window.settings.system_audio_player);
             audio_switch.notify["active"].connect (() => {
@@ -890,30 +898,33 @@ namespace Dc {
             });
 
             add_switch_row (behavior_group,
-                "Keep Running in Background",
+                _("Keep Running in Background"),
                 Platform.is_macos ()
-                    ? "Closing the window keeps Parla running as a menu bar icon; "
-                    + "the Dock icon stays visible and notifications still appear"
-                    : "Closing the window keeps Parla running in the status bar; "
-                    + "notifications still appear",
+                    ? _("Closing the window keeps Parla running as a menu bar icon; "
+                        + "the Dock icon stays visible and notifications still appear")
+                    : _("Closing the window keeps Parla running in the status bar; "
+                        + "notifications still appear"),
                 app_window.settings.minimize_to_tray,
                 (v) => app_window.set_minimize_to_tray (v));
 
             var sticker_row = action_row (
-                "Animate Stickers",
-                "Play stickers automatically; click a sticker to pause or resume");
+                _("Animate Stickers"),
+                _("Play stickers automatically; click a sticker to pause or resume"));
             var sticker_switch = row_switch (
                 sticker_row, app_window.settings.animate_stickers);
             sticker_switch.notify["active"].connect (() => {
                 app_window.settings.save_animate_stickers (sticker_switch.active);
             });
 
+            /* The sizes are locale-independent byte counts; only the two words
+               around them are translated. */
             string[] download_labels = {
-                "Never", "256 KB", "512 KB", "1 MB", "2 MB", "5 MB", "Unlimited"
+                _("Never"), "256 KB", "512 KB", "1 MB", "2 MB", "5 MB",
+                _("Unlimited")
             };
             var download_combo = row_combo (behavior_group,
-                "Automatic download limit",
-                "Download attachments up to this size for all profiles; larger files can be downloaded manually",
+                _("Automatic download limit"),
+                _("Download attachments up to this size for all profiles; larger files can be downloaded manually"),
                 download_labels, auto_download_limit_index (
                     app_window.settings.auto_download_limit));
             download_combo.notify["selected"].connect (() => {
@@ -923,10 +934,10 @@ namespace Dc {
 
             bool whisper_found = Transcriber.available ();
             var transcription_row = action_row (
-                "Voice transcription",
-                whisper_found ? "Transcribe voice messages on this device with Whisper" : "Install Whisper to transcribe voice messages on this device");
+                _("Voice transcription"),
+                whisper_found ? _("Transcribe voice messages on this device with Whisper") : _("Install Whisper to transcribe voice messages on this device"));
             var transcription_status = new Gtk.Label (
-                whisper_found ? "Available" : "Not found");
+                whisper_found ? _("Available") : _("Not found"));
             transcription_status.valign = Gtk.Align.CENTER;
             transcription_status.add_css_class ("dim-label");
             transcription_row.add_suffix (transcription_status);
@@ -937,47 +948,47 @@ namespace Dc {
         }
 
         private void build_notifications_section (Adw.PreferencesPage page) {
-            var notifications_group = settings_group (page, "Notifications");
+            var notifications_group = settings_group (page, _("Notifications"));
             add_switch_row (notifications_group,
-                "Desktop Notifications",
-                "Show notifications for new messages when Parla is not the active window",
+                _("Desktop Notifications"),
+                _("Show notifications for new messages when Parla is not the active window"),
                 app_window.settings.notifications_enabled,
                 (v) => app_window.set_notifications_enabled (v));
 
             add_switch_row (notifications_group,
-                "Show Message Content",
-                "Include message text and attachment names in notifications",
+                _("Show Message Content"),
+                _("Include message text and attachment names in notifications"),
                 app_window.settings.show_notification_contents,
                 (v) => app_window.settings.save_show_notification_contents (v));
         }
 
         private void build_chatmail_core_section (Adw.PreferencesPage page) {
-            var chatmail_group = settings_group (page, "Chatmail Core");
+            var chatmail_group = settings_group (page, _("Chatmail Core"));
 
-            string[] rpc_source_labels = { "Automatic", "Custom" };
-            rpc_source_dropdown = row_combo (chatmail_group, "Source", null,
+            string[] rpc_source_labels = { _("Automatic"), _("Custom") };
+            rpc_source_dropdown = row_combo (chatmail_group, _("Source"), null,
                 rpc_source_labels,
                 (uint) app_window.settings.effective_rpc_server_source ());
             rpc_row = rpc_source_dropdown;
             rpc_source_dropdown.notify["selected"].connect (on_rpc_source_changed);
 
-            rpc_choose_btn = flat_button ("Choose…");
-            rpc_choose_btn.tooltip_text = "Choose a Chatmail Core binary";
+            rpc_choose_btn = flat_button (_("Choose…"));
+            rpc_choose_btn.tooltip_text = _("Choose a Chatmail Core binary");
             rpc_choose_btn.clicked.connect (() => { on_browse_rpc_server.begin (); });
             rpc_row.add_suffix (rpc_choose_btn);
 
-            var update_row = action_row ("Check for Updates",
-                "Check for a new Chatmail Core version");
-            rpc_check_btn = flat_button ("Check");
-            rpc_check_btn.tooltip_text = "Check for the latest Chatmail Core release";
+            var update_row = action_row (_("Check for Updates"),
+                _("Check for a new Chatmail Core version"));
+            rpc_check_btn = flat_button (_("Check"));
+            rpc_check_btn.tooltip_text = _("Check for the latest Chatmail Core release");
             rpc_check_btn.clicked.connect (() => { check_rpc_updates.begin (); });
             update_row.add_suffix (rpc_check_btn);
             update_row.activatable_widget = rpc_check_btn;
             chatmail_group.add (update_row);
 
             var rpc_autocheck_row = action_row (
-                "Check for Updates on Startup",
-                "Notify when a newer Chatmail Core version is available");
+                _("Check for Updates on Startup"),
+                _("Notify when a newer Chatmail Core version is available"));
             var autocheck_switch = row_switch (
                 rpc_autocheck_row,
                 app_window.settings.rpc_check_updates_on_startup);
@@ -990,18 +1001,18 @@ namespace Dc {
 
             update_rpc_row ();
 
-            accounts_path_row = action_row ("Profile Storage Folder");
+            accounts_path_row = action_row (_("Profile Storage Folder"));
             accounts_path_row.subtitle_lines = 2;
 
             var accounts_path_change_btn = flat_icon_button ("folder-symbolic",
-                "Choose a different folder");
+                _("Choose a different folder"));
             accounts_path_change_btn.clicked.connect (() => {
                 on_browse_accounts_path.begin ();
             });
             accounts_path_row.add_suffix (accounts_path_change_btn);
 
             accounts_path_reset_btn = flat_icon_button ("edit-undo-symbolic",
-                "Use the default folder");
+                _("Use the default folder"));
             accounts_path_reset_btn.clicked.connect (() => {
                 app_window.settings.reset_accounts_path ();
                 sync_accounts_path_row ();
@@ -1014,11 +1025,11 @@ namespace Dc {
         }
 
         private void build_network_section (Adw.PreferencesPage page) {
-            var network_group = settings_group (page, "Network");
+            var network_group = settings_group (page, _("Network"));
 
             proxy_switch_row = action_row (
-                "Use Proxy",
-                "Route this profile through the configured proxy");
+                _("Use Proxy"),
+                _("Route this profile through the configured proxy"));
             proxy_switch = row_switch (proxy_switch_row, false);
             proxy_switch.notify["active"].connect (() => {
                 if (!loading_proxy) save_proxy_settings.begin ();
@@ -1026,8 +1037,8 @@ namespace Dc {
             network_group.add (proxy_switch_row);
 
             proxy_url_row = action_row (
-                "Proxy URL",
-                "socks5://, http://, https://, or ss://");
+                _("Proxy URL"),
+                _("socks5://, http://, https://, or ss://"));
 
             proxy_entry = new Gtk.Entry ();
             proxy_entry.placeholder_text = "socks5://127.0.0.1:9050";
@@ -1046,14 +1057,14 @@ namespace Dc {
         }
 
         private void build_factory_reset_section (Adw.PreferencesPage page) {
-            var reset_group = settings_group (page, "Reset Settings");
+            var reset_group = settings_group (page, _("Reset Settings"));
             var reset_row = action_row (
-                "Reset Settings",
-                "Restore Parla’s preferences and close the app; profiles and messages are kept");
-            var reset_btn = new Gtk.Button.with_label ("Reset…");
+                _("Reset Settings"),
+                _("Restore Parla’s preferences and close the app; profiles and messages are kept"));
+            var reset_btn = new Gtk.Button.with_label (_("Reset…"));
             reset_btn.valign = Gtk.Align.CENTER;
             reset_btn.add_css_class ("destructive-action");
-            reset_btn.tooltip_text = "Reset Settings and Close Parla";
+            reset_btn.tooltip_text = _("Reset Settings and Close Parla");
             reset_btn.clicked.connect (() => { on_reset_settings.begin (); });
             reset_row.add_suffix (reset_btn);
             reset_group.add (reset_row);
@@ -1063,13 +1074,13 @@ namespace Dc {
             app windows behave. Builds without -Dwebxdc=true say so instead
             of offering switches that cannot work. */
         private void build_webxdc_section (Adw.PreferencesPage page) {
-            var webxdc_group = settings_group (page, "In-Chat Apps");
+            var webxdc_group = settings_group (page, _("In-Chat Apps"));
 
             if (!Webxdc.AVAILABLE) {
                 var unavailable_row = action_row (
-                    "In-Chat Apps",
-                    "In-chat apps are unavailable in this version of Parla");
-                var status = new Gtk.Label ("Unavailable");
+                    _("In-Chat Apps"),
+                    _("In-chat apps are unavailable in this version of Parla"));
+                var status = new Gtk.Label (_("Unavailable"));
                 status.valign = Gtk.Align.CENTER;
                 status.add_css_class ("dim-label");
                 unavailable_row.add_suffix (status);
@@ -1078,64 +1089,64 @@ namespace Dc {
             }
 
             add_switch_row (webxdc_group,
-                "In-Chat Apps",
-                "Open interactive apps shared in chats (Webxdc, experimental)",
+                _("In-Chat Apps"),
+                _("Open interactive apps shared in chats (Webxdc, experimental)"),
                 app_window.settings.webxdc_apps,
                 (v) => app_window.settings.save_webxdc_apps (v));
 
             add_switch_row (webxdc_group,
-                "Follow the Current Chat",
-                "Hide app windows when switching to another chat",
+                _("Follow the Current Chat"),
+                _("Hide app windows when switching to another chat"),
                 app_window.settings.webxdc_follow_chat,
                 (v) => app_window.settings.save_webxdc_follow_chat (v));
 
             var realtime_switch = add_switch_row (webxdc_group,
-                "Realtime Channels",
-                "Let apps exchange live data with other participants in the chat",
+                _("Realtime Channels"),
+                _("Let apps exchange live data with other participants in the chat"),
                 app_window.settings.webxdc_realtime,
                 (v) => app_window.settings.save_webxdc_realtime (v));
 
             var internet_switch = add_switch_row (webxdc_group,
-                "Internet Access",
-                "Allow apps to contact websites, which can reveal your IP address and app data",
+                _("Internet Access"),
+                _("Allow apps to contact websites, which can reveal your IP address and app data"),
                 app_window.settings.webxdc_allow_internet,
                 (v) => app_window.settings.save_webxdc_allow_internet (v));
 
             var wasm_switch = add_switch_row (webxdc_group,
-                "WebAssembly",
-                "Allow apps to compile and run WebAssembly",
+                _("WebAssembly"),
+                _("Allow apps to compile and run WebAssembly"),
                 app_window.settings.webxdc_allow_wasm,
                 (v) => app_window.settings.save_webxdc_allow_wasm (v));
 
             var webgl_switch = add_switch_row (webxdc_group,
-                "WebGL",
+                _("WebGL"),
                 Platform.is_macos ()
-                    ? "macOS may still allow 3D graphics when this is turned off"
-                    : "Allow apps to access accelerated 3D graphics",
+                    ? _("macOS may still allow 3D graphics when this is turned off")
+                    : _("Allow apps to access accelerated 3D graphics"),
                 app_window.settings.webxdc_allow_webgl,
                 (v) => app_window.settings.save_webxdc_allow_webgl (v));
 
             Gtk.Switch? acceleration_switch = null;
             if (!Platform.is_macos () && !Platform.is_windows ()) {
                 acceleration_switch = add_switch_row (webxdc_group,
-                    "Hardware Acceleration",
-                    "Use the graphics processor to display apps",
+                    _("Hardware Acceleration"),
+                    _("Use the graphics processor to display apps"),
                     app_window.settings.webxdc_allow_hardware_acceleration,
                     (v) => app_window.settings
                         .save_webxdc_allow_hardware_acceleration (v));
             }
 
             var developer_tools_switch = add_switch_row (webxdc_group,
-                "Developer Tools",
-                "Open the browser inspector and JavaScript console when "
-                + "apps start",
+                _("Developer Tools"),
+                _("Open the browser inspector and JavaScript console when "
+                  + "apps start"),
                 app_window.settings.webxdc_developer_tools,
                 (v) => app_window.settings.save_webxdc_developer_tools (v));
 
             var safest_row = action_row (
-                "Restrict App Permissions",
-                "Turn off realtime channels, internet access, advanced graphics, WebAssembly, and developer tools; running apps will close");
-            var safest_button = new Gtk.Button.with_label ("Restrict");
+                _("Restrict App Permissions"),
+                _("Turn off realtime channels, internet access, advanced graphics, WebAssembly, and developer tools; running apps will close"));
+            var safest_button = new Gtk.Button.with_label (_("Restrict"));
             safest_button.valign = Gtk.Align.CENTER;
             safest_button.clicked.connect (() => {
                 realtime_switch.active = false;
@@ -1154,7 +1165,7 @@ namespace Dc {
                 }
                 developer_tools_switch.active =
                     WebxdcSecurity.SAFE_DEVELOPER_TOOLS;
-                app_window.show_toast ("In-chat app permissions restricted");
+                app_window.show_toast (_("In-chat app permissions restricted"));
             });
             safest_row.add_suffix (safest_button);
             webxdc_group.add (safest_row);
@@ -1162,17 +1173,17 @@ namespace Dc {
 
         /* Settings → Links: previews and tracking removal for pasted URLs. */
         private void build_links_group (Adw.PreferencesPage page) {
-            var links_group = settings_group (page, "Links");
+            var links_group = settings_group (page, _("Links"));
 
             add_switch_row (links_group,
-                "Link Previews",
-                "Attach a preview image when pasting a link. Parla contacts the website from this device; previews can be removed before sending",
+                _("Link Previews"),
+                _("Attach a preview image when pasting a link. Parla contacts the website from this device; previews can be removed before sending"),
                 app_window.settings.link_previews,
                 (v) => app_window.settings.save_link_previews (v));
 
             var clean_links_row = action_row (
-                "Remove Link Tracking",
-                "Remove known tracking information from pasted links");
+                _("Remove Link Tracking"),
+                _("Remove known tracking information from pasted links"));
             var clean_links_switch = row_switch (
                 clean_links_row, app_window.settings.clean_pasted_links);
             links_group.add (clean_links_row);
@@ -1180,17 +1191,17 @@ namespace Dc {
             /* Optional uBlock Origin / AdGuard $removeparam list that
                replaces the built-in rules above. */
             var filter_row = action_row (
-                "Use a Custom Filter List",
-                "Replace the built-in rules with a uBlock Origin or AdGuard list that supports $removeparam. The list is downloaded through the active profile and refreshed automatically");
+                _("Use a Custom Filter List"),
+                _("Replace the built-in rules with a uBlock Origin or AdGuard list that supports $removeparam. The list is downloaded through the active profile and refreshed automatically"));
             var filter_switch = row_switch (
                 filter_row, app_window.settings.tracking_filter_enabled);
             links_group.add (filter_row);
 
-            tracking_filter_url_row = action_row ("Filter list address");
+            tracking_filter_url_row = action_row (_("Filter list address"));
             /* URL on the first line, status on the second; a URL has no
                break points, so ellipsize instead of wrapping. */
             tracking_filter_url_row.subtitle_lines = 2;
-            var url_btn = new Gtk.Button.with_label ("Set Address…");
+            var url_btn = new Gtk.Button.with_label (_("Set Address…"));
             url_btn.valign = Gtk.Align.CENTER;
             url_btn.clicked.connect (() => {
                 prompt_tracking_filter_url.begin ();
@@ -1199,7 +1210,7 @@ namespace Dc {
             tracking_filter_url_row.activatable_widget = url_btn;
 
             tracking_filter_refresh_btn = flat_icon_button (
-                "view-refresh-symbolic", "Download the list again");
+                "view-refresh-symbolic", _("Download the list again"));
             tracking_filter_refresh_btn.clicked.connect (() => {
                 update_tracking_filter.begin ();
             });
@@ -1233,7 +1244,7 @@ namespace Dc {
                 settings.clean_pasted_links && settings.tracking_filter_enabled;
             string url = settings.tracking_filter_url;
             if (url.length == 0) {
-                tracking_filter_url_row.subtitle = "No list configured";
+                tracking_filter_url_row.subtitle = _("No list configured");
                 tracking_filter_url_row.tooltip_text = null;
                 tracking_filter_refresh_btn.sensitive = false;
                 return;
@@ -1242,14 +1253,15 @@ namespace Dc {
             var filter = RemoveParamFilter.active;
             string status;
             if (filter == null) {
-                status = "Not downloaded yet";
+                status = _("Not downloaded yet");
             } else {
-                status = "%d rules".printf (filter.rule_count);
+                status = _("%d rules").printf (filter.rule_count);
                 if (filter.version.length > 0)
-                    status += ", version " + filter.version;
+                    status += _(", version %s").printf (filter.version);
                 var when = RemoveParamFilter.cache_time ();
                 if (when != null)
-                    status += ", updated " + when.to_local ().format ("%x %H:%M");
+                    status += _(", updated %s")
+                        .printf (when.to_local ().format ("%x %H:%M"));
             }
             tracking_filter_url_row.subtitle =
                 Markup.escape_text (url) + "\n" + status;
@@ -1258,16 +1270,16 @@ namespace Dc {
 
         private async void prompt_tracking_filter_url () {
             string current = app_window.settings.tracking_filter_url;
-            string? entered = yield prompt_text (this, "Filter List URL",
-                "Address of a uBlock Origin or AdGuard filter list with "
-                + "$removeparam rules, for example the AdGuard URL Tracking "
-                + "filter.", "Download",
+            string? entered = yield prompt_text (this, _("Filter List URL"),
+                _("Address of a uBlock Origin or AdGuard filter list with "
+                  + "$removeparam rules, for example the AdGuard URL Tracking "
+                  + "filter."), _("Download"),
                 current.length > 0 ? current : RemoveParamFilter.DEFAULT_URL,
                 RemoveParamFilter.DEFAULT_URL);
             if (entered == null) return;
             string url = entered.strip ();
             if (!url.has_prefix ("https://") && !url.has_prefix ("http://")) {
-                app_window.show_toast ("The filter list URL must start with http(s)://");
+                app_window.show_toast (_("The filter list URL must start with http(s)://"));
                 return;
             }
             bool changed = url != current;
@@ -1288,8 +1300,8 @@ namespace Dc {
             } else {
                 var f = RemoveParamFilter.active;
                 app_window.show_toast (f != null
-                    ? "Filter list updated: %d rules".printf (f.rule_count)
-                    : "Filter list updated");
+                    ? _("Filter list updated: %d rules").printf (f.rule_count)
+                    : _("Filter list updated"));
             }
             sync_tracking_filter_rows ();
         }
@@ -1391,7 +1403,7 @@ namespace Dc {
             string family = app_window.settings.font_family;
             font_type_row.subtitle = family.length > 0
                 ? family
-                : "System default";
+                : _("System default");
             font_type_row.tooltip_text = family.length > 0 ? family : null;
         }
 
@@ -1418,8 +1430,8 @@ namespace Dc {
         private async void load_proxy_settings () {
             if (!rpc.is_connected || rpc.account_id <= 0) {
                 set_proxy_controls_sensitive (false);
-                proxy_switch_row.subtitle = "No active profile";
-                proxy_url_row.subtitle = "No active profile";
+                proxy_switch_row.subtitle = _("No active profile");
+                proxy_url_row.subtitle = _("No active profile");
                 return;
             }
 
@@ -1438,12 +1450,12 @@ namespace Dc {
                 saved_proxy_url = first;
 
                 proxy_switch_row.subtitle = proxy_switch.active
-                    ? "Enabled for current profile"
-                    : "Disabled for current profile";
-                proxy_url_row.subtitle = "socks5://, http://, https://, or ss://";
+                    ? _("Enabled for current profile")
+                    : _("Disabled for current profile");
+                proxy_url_row.subtitle = _("socks5://, http://, https://, or ss://");
                 proxy_url_row.tooltip_text = first.length > 0 ? first : null;
             } catch (Error e) {
-                proxy_switch_row.subtitle = "Unable to read proxy settings";
+                proxy_switch_row.subtitle = _("Unable to read proxy settings");
                 proxy_url_row.tooltip_text = e.message;
             } finally {
                 loading_proxy = false;
@@ -1470,12 +1482,12 @@ namespace Dc {
                 var qr = yield rpc.check_qr (rpc.account_id, url);
                 if (qr == null || !qr.has_member ("kind") ||
                     qr.get_string_member ("kind") != "proxy") {
-                    show_error (this, "Invalid proxy URL: " + url);
+                    show_error (this, _("Invalid proxy URL: ") + url);
                     return null;
                 }
                 return qr.has_member ("url") ? qr.get_string_member ("url") : url;
             } catch (Error e) {
-                show_error (this, "Invalid proxy URL: %s\n%s".printf (
+                show_error (this, _("Invalid proxy URL: %s\n%s").printf (
                     url, e.message));
                 return null;
             }
@@ -1485,7 +1497,7 @@ namespace Dc {
             if (loading_proxy || saving_proxy) return;
 
             if (!rpc.is_connected || rpc.account_id <= 0) {
-                app_window.show_toast ("No active profile");
+                app_window.show_toast (_("No active profile"));
                 return;
             }
 
@@ -1497,7 +1509,7 @@ namespace Dc {
             }
 
             if (enabled && url.length == 0) {
-                show_error (this, "Enter a proxy URL before enabling the proxy.");
+                show_error (this, _("Enter a proxy URL before enabling the proxy."));
                 loading_proxy = true;
                 proxy_switch.active = false;
                 loading_proxy = false;
@@ -1530,14 +1542,14 @@ namespace Dc {
                 yield rpc.start_io (rpc.account_id);
 
                 proxy_switch_row.subtitle = enabled
-                    ? "Enabled for current profile"
-                    : "Disabled for current profile";
+                    ? _("Enabled for current profile")
+                    : _("Disabled for current profile");
                 proxy_url_row.tooltip_text = url.length > 0 ? url : null;
                 saved_proxy_enabled = enabled;
                 saved_proxy_url = url;
-                app_window.show_toast ("Proxy settings saved");
+                app_window.show_toast (_("Proxy settings saved"));
             } catch (Error e) {
-                show_error (this, "Failed to save proxy settings: " + e.message);
+                show_error (this, _("Failed to save proxy settings: ") + e.message);
             } finally {
                 saving_proxy = false;
                 set_proxy_controls_sensitive (true);
@@ -1560,23 +1572,23 @@ namespace Dc {
             switch (source) {
             case RpcServerSource.CUSTOM:
                 if (custom.length == 0) {
-                    rpc_row.subtitle = "No custom binary selected";
-                    rpc_row.tooltip_text = "Choose a Chatmail Core binary";
+                    rpc_row.subtitle = _("No custom binary selected");
+                    rpc_row.tooltip_text = _("Choose a Chatmail Core binary");
                 } else if (found == null) {
-                    rpc_row.subtitle = "Custom path is not executable";
+                    rpc_row.subtitle = _("Custom path is not executable");
                     rpc_row.tooltip_text = custom;
                 } else {
-                    rpc_row.subtitle = "Checking version…";
+                    rpc_row.subtitle = _("Checking version…");
                     rpc_row.tooltip_text = custom;
                 }
                 break;
             case RpcServerSource.AUTO:
             default:
                 rpc_row.subtitle = found != null
-                    ? "Checking version…"
-                    : "Chatmail Core not found";
+                    ? _("Checking version…")
+                    : _("Chatmail Core not found");
                 rpc_row.tooltip_text = found
-                    ?? "Install Chatmail Core or choose a custom binary";
+                    ?? _("Install Chatmail Core or choose a custom binary");
                 break;
             }
             update_rpc_version_row.begin (found);
@@ -1614,11 +1626,11 @@ namespace Dc {
                     rpc_current_version = RpcInstaller.extract_version (version);
                     rpc_row.subtitle = rpc_current_version ?? version;
                 } else {
-                    rpc_row.subtitle = "Unable to read version";
+                    rpc_row.subtitle = _("Unable to read version");
                 }
             } catch (Error e) {
                 if (request_id != rpc_version_request) return;
-                rpc_row.subtitle = "Unable to read version";
+                rpc_row.subtitle = _("Unable to read version");
                 rpc_row.tooltip_text = "%s\n%s".printf (rpc_path, e.message);
             }
         }
@@ -1626,7 +1638,7 @@ namespace Dc {
         private async bool confirm_update_dialog (string title, string body,
                                                    string action_label) {
             var d = new Adw.AlertDialog (title, body);
-            d.add_response ("dismiss", "Dismiss");
+            d.add_response ("dismiss", _("Dismiss"));
             d.add_response ("update", action_label);
             d.set_response_appearance ("update", Adw.ResponseAppearance.SUGGESTED);
             d.default_response = "update";
@@ -1639,19 +1651,20 @@ namespace Dc {
 
             rpc_check_btn.sensitive = false;
             string previous_subtitle = rpc_row.subtitle;
-            rpc_row.subtitle = "Checking for updates…";
+            rpc_row.subtitle = _("Checking for updates…");
 
             try {
                 string latest_tag = yield RpcInstaller.fetch_latest_tag ();
                 string? latest_version = RpcInstaller.extract_version (latest_tag);
                 rpc_row.subtitle = previous_subtitle;
                 if (latest_version == null) {
-                    app_window.show_toast ("Could not parse the latest Chatmail Core version");
+                    app_window.show_toast (_("Could not parse the latest Chatmail Core version"));
                     return;
                 }
 
                 if (rpc_current_version != null && rpc_current_version == latest_version) {
-                    app_window.show_toast ("Chatmail Core is up to date: " + latest_version);
+                    app_window.show_toast (_("Chatmail Core is up to date: %s").printf (
+                        latest_version));
                     return;
                 }
 
@@ -1664,35 +1677,35 @@ namespace Dc {
                 if (!managed_active && rpc_current_version != null) {
                     /* Parla doesn't control the active binary, so it can't
                        overwrite it — point at the release instead. */
-                    if (yield confirm_update_dialog ("Update Available",
-                            "Chatmail Core %s is available. Parla doesn't manage the active binary, so open its release page to update it manually.".printf (latest_version),
-                            "View Release")) {
+                    if (yield confirm_update_dialog (_("Update Available"),
+                            _("Chatmail Core %s is available. Parla doesn't manage the active binary, so open its release page to update it manually.").printf (latest_version),
+                            _("View Release"))) {
                         yield open_rpc_download_page ();
                     }
                     return;
                 }
 
                 if (!RpcInstaller.can_auto_install ()) {
-                    if (yield confirm_update_dialog ("Update Available",
-                            "Chatmail Core %s is available, but no prebuilt binary exists for this platform.".printf (latest_version),
-                            "View Release")) {
+                    if (yield confirm_update_dialog (_("Update Available"),
+                            _("Chatmail Core %s is available, but no prebuilt binary exists for this platform.").printf (latest_version),
+                            _("View Release"))) {
                         yield open_rpc_download_page ();
                     }
                     return;
                 }
 
                 string body = rpc_current_version == null
-                    ? "Chatmail Core %s is available to install.".printf (latest_version)
-                    : "Chatmail Core %s is available (installed: %s).".printf (
+                    ? _("Chatmail Core %s is available to install.").printf (latest_version)
+                    : _("Chatmail Core %s is available (installed: %s).").printf (
                         latest_version, rpc_current_version);
                 if (yield confirm_update_dialog (
-                        "Update Available", body,
-                        rpc_current_version == null ? "Install" : "Update")) {
+                        _("Update Available"), body,
+                        rpc_current_version == null ? _("Install") : _("Update"))) {
                     yield install_managed_server ();
                 }
             } catch (Error e) {
                 rpc_row.subtitle = previous_subtitle;
-                app_window.show_toast ("Update check failed: " + e.message);
+                app_window.show_toast (_("Update check failed: ") + e.message);
             } finally {
                 rpc_check_btn.sensitive = !SettingsManager.rpc_server_path_is_fixed ();
             }
@@ -1716,14 +1729,14 @@ namespace Dc {
             }
 
             app_window.settings.save_rpc_server_source (source);
-            app_window.show_toast ("Chatmail Core source saved");
+            app_window.show_toast (_("Chatmail Core source saved"));
             update_rpc_row ();
             app_window.reconnect_rpc_server.begin ();
         }
 
         private async void on_browse_rpc_server () {
             var dlg = new Gtk.FileDialog ();
-            dlg.title = "Locate a Chatmail Core binary";
+            dlg.title = _("Locate a Chatmail Core binary");
             dlg.modal = true;
 
             string start = app_window.settings.rpc_server_path;
@@ -1738,10 +1751,10 @@ namespace Dc {
                         app_window.settings.save_rpc_server_path (path);
                         app_window.settings.save_rpc_server_source (RpcServerSource.CUSTOM);
                         sync_rpc_source_dropdown ();
-                        app_window.show_toast ("Chatmail Core binary saved");
+                        app_window.show_toast (_("Chatmail Core binary saved"));
                         app_window.reconnect_rpc_server.begin ();
                     } else {
-                        show_error (app_window, "Selected file is not an executable binary.");
+                        show_error (app_window, _("Selected file is not an executable binary."));
                     }
                 }
             } catch (Error e) {
@@ -1755,14 +1768,14 @@ namespace Dc {
             string path = app_window.settings.effective_accounts_path ();
             accounts_path_row.subtitle = path;
             accounts_path_row.tooltip_text =
-                "Changing this folder switches the profiles Parla opens; existing data is not moved";
+                _("Changing this folder switches the profiles Parla opens; existing data is not moved");
             accounts_path_reset_btn.sensitive =
                 !app_window.settings.uses_default_accounts_path ();
         }
 
         private async void on_browse_accounts_path () {
             var dlg = new Gtk.FileDialog ();
-            dlg.title = "Choose Profile Storage Folder";
+            dlg.title = _("Choose Profile Storage Folder");
             dlg.modal = true;
 
             string path = app_window.settings.effective_accounts_path ();
@@ -1777,7 +1790,7 @@ namespace Dc {
                     if (selected_path != null) {
                         app_window.settings.save_accounts_path (selected_path);
                         sync_accounts_path_row ();
-                        app_window.show_toast ("Profile storage folder changed");
+                        app_window.show_toast (_("Profile storage folder changed"));
                         app_window.reconnect_rpc_server.begin ();
                     }
                 }
@@ -1802,10 +1815,10 @@ namespace Dc {
             var installer = new RpcInstaller ();
             installer.progress.connect ((received, total) => {
                 if (total > 0) {
-                    rpc_row.subtitle = "Downloading… %.0f%%".printf (
+                    rpc_row.subtitle = _("Downloading… %.0f%%").printf (
                         (double) received / (double) total * 100.0);
                 } else {
-                    rpc_row.subtitle = "Downloading… %.1f MB".printf (
+                    rpc_row.subtitle = _("Downloading… %.1f MB").printf (
                         received / 1048576.0);
                 }
             });
@@ -1818,11 +1831,11 @@ namespace Dc {
                     app_window.settings.save_rpc_server_source (RpcServerSource.AUTO);
                     sync_rpc_source_dropdown ();
                 }
-                app_window.show_toast ("Chatmail Core installed");
+                app_window.show_toast (_("Chatmail Core installed"));
                 yield app_window.reconnect_rpc_server ();
             } catch (Error e) {
                 rpc_row.subtitle = prev_subtitle;
-                app_window.show_toast ("Download failed: " + e.message);
+                app_window.show_toast (_("Download failed: ") + e.message);
             } finally {
                 rpc_check_btn.sensitive = !SettingsManager.rpc_server_path_is_fixed ();
             }
@@ -1835,14 +1848,14 @@ namespace Dc {
                     "https://github.com/chatmail/core/releases/latest")).launch (
                     app_window, null);
             } catch (Error e) {
-                show_error (app_window, "Unable to open download page: " + e.message);
+                show_error (app_window, _("Unable to open download page: ") + e.message);
             }
         }
 
         private async void on_reset_settings () {
-            if (yield confirm_action (app_window, "Reset Settings",
-                "Restore Parla’s preferences and close the app? Profiles and messages are kept. If a custom profile storage folder is in use, select it again after restarting.",
-                "reset", "Reset and Close")) {
+            if (yield confirm_action (app_window, _("Reset Settings"),
+                _("Restore Parla’s preferences and close the app? Profiles and messages are kept. If a custom profile storage folder is in use, select it again after restarting."),
+                "reset", _("Reset and Close"))) {
                 delete_parla_config ();
                 app_window.quit_application ();
             }

@@ -1,14 +1,14 @@
-# Catalan translation for Parla.
-# Copyright (C) 2026 The Parla authors
+# Catalan translation of Parla.
+# Copyright (C) 2026 the Parla authors
 # This file is distributed under the same license as the parla package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: parla 0.9.8\n"
+"Project-Id-Version: parla\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-01 12:31+0200\n"
-"PO-Revision-Date: 2026-10-01 13:00+0200\n"
-"Last-Translator: Parla contributors\n"
+"POT-Creation-Date: 2026-10-01 00:00+0000\n"
+"PO-Revision-Date: 2026-10-01 00:00+0000\n"
+"Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -24,33 +24,417 @@ msgstr "Inicia en segon pla sense obrir una finestra"
 msgid "Show the main window"
 msgstr "Mostra la finestra principal"
 
-#: src/audio_player.vala:549
+#: src/audio_player.vala:563
 msgid "Voice Message"
 msgstr "Missatge de veu"
 
-#: src/audio_player.vala:560
+#: src/audio_player.vala:574
 msgid "Transcribe voice message"
 msgstr "Transcriu el missatge de veu"
 
-#: src/audio_player.vala:600 src/compose_bar.vala:822
+#: src/audio_player.vala:614 src/compose_bar.vala:867
 msgid "Transcribing…"
 msgstr "S'està transcrivint…"
 
-#: src/audio_player.vala:605
+#: src/audio_player.vala:619
 msgid "(no speech detected)"
 msgstr "(no s'ha detectat veu)"
 
-#: src/audio_player.vala:607
+#: src/audio_player.vala:621
 msgid "Transcription: "
 msgstr "Transcripció: "
 
-#: src/audio_player.vala:619
+#: src/audio_player.vala:633 src/compose_bar.vala:842
+#: src/conversation_media_bar.vala:215
 msgid "Pause"
 msgstr "Pausa"
 
-#: src/audio_player.vala:619
+#: src/audio_player.vala:633 src/conversation_media_bar.vala:63
+#: src/conversation_media_bar.vala:215
 msgid "Play"
 msgstr "Reprodueix"
+
+#: src/chat_info_dialog.vala:6
+msgid "For 1 hour"
+msgstr "Per 1 hora"
+
+#: src/chat_info_dialog.vala:6
+msgid "For 8 hours"
+msgstr "Per 8 hores"
+
+#: src/chat_info_dialog.vala:6
+msgid "For 1 day"
+msgstr "Per 1 dia"
+
+#: src/chat_info_dialog.vala:6
+msgid "For 7 days"
+msgstr "Per 7 dies"
+
+#: src/chat_info_dialog.vala:6
+msgid "Forever"
+msgstr "Per sempre"
+
+#: src/chat_info_dialog.vala:80 src/chat_row.vala:315
+msgid "Chat Details"
+msgstr "Detalls del xat"
+
+#: src/chat_info_dialog.vala:149 src/chat_info_dialog.vala:232
+#: src/search_results_view.vala:126
+msgid "Chat"
+msgstr "Xat"
+
+#: src/chat_info_dialog.vala:184
+msgid "View image"
+msgstr "Mostra la imatge"
+
+#: src/chat_info_dialog.vala:195
+msgid "Change Avatar"
+msgstr "Canvia l'avatar"
+
+#: src/chat_info_dialog.vala:212
+msgid "Edit contact name"
+msgstr "Edita el nom del contacte"
+
+#: src/chat_info_dialog.vala:218
+msgid "Edit channel name"
+msgstr "Edita el nom del canal"
+
+#: src/chat_info_dialog.vala:218
+msgid "Edit group name"
+msgstr "Edita el nom del grup"
+
+#: src/chat_info_dialog.vala:227 src/new_group_dialog.vala:19
+msgid "Channel"
+msgstr "Canal"
+
+#: src/chat_info_dialog.vala:228 src/new_group_dialog.vala:19
+msgid "Group"
+msgstr "Grup"
+
+#: src/chat_info_dialog.vala:229
+msgid "Mailing List"
+msgstr "Llista de correu"
+
+#: src/chat_info_dialog.vala:230
+msgid "Saved Messages"
+msgstr "Missatges desats"
+
+#: src/chat_info_dialog.vala:231
+msgid "Device Messages"
+msgstr "Missatges del dispositiu"
+
+#: src/chat_info_dialog.vala:232
+msgid "Direct Chat"
+msgstr "Xat directe"
+
+#: src/chat_info_dialog.vala:233
+msgid " · End-to-end encrypted"
+msgstr " · Cifrat d'extremitat a extremitat"
+
+#: src/chat_info_dialog.vala:241
+msgid "Invite Link"
+msgstr "Enllaç d'invitació"
+
+#: src/chat_info_dialog.vala:242
+msgid "Share a link or QR code for others to join"
+msgstr "Comparteix un enllaç o un codi QR perquè s'hi uneixin"
+
+#: src/chat_info_dialog.vala:254 src/chat_info_dialog.vala:279
+msgid "Off"
+msgstr "Desactivat"
+
+#: src/chat_info_dialog.vala:254
+msgid "1 minute"
+msgstr "1 minut"
+
+#: src/chat_info_dialog.vala:254
+msgid "5 minutes"
+msgstr "5 minuts"
+
+#: src/chat_info_dialog.vala:254
+msgid "30 minutes"
+msgstr "30 minuts"
+
+#: src/chat_info_dialog.vala:255
+msgid "1 hour"
+msgstr "1 hora"
+
+#: src/chat_info_dialog.vala:255
+msgid "6 hours"
+msgstr "6 hores"
+
+#: src/chat_info_dialog.vala:255
+msgid "1 day"
+msgstr "1 dia"
+
+#: src/chat_info_dialog.vala:255
+msgid "1 week"
+msgstr "1 setmana"
+
+#: src/chat_info_dialog.vala:255
+msgid "4 weeks"
+msgstr "4 setmanes"
+
+#: src/chat_info_dialog.vala:263
+msgid "Disappearing messages"
+msgstr "Missatges que desapareixen"
+
+#: src/chat_info_dialog.vala:272
+msgid "Applies to new messages for everyone in this chat"
+msgstr "S'aplica als missatges nous de tothom en aquest xat"
+
+#: src/chat_info_dialog.vala:283
+msgid "Mute notifications"
+msgstr "Silencia les notificacions"
+
+#: src/chat_info_dialog.vala:294
+msgid "Open Chat"
+msgstr "Obre el xat"
+
+#: src/chat_info_dialog.vala:294
+msgid "Open this conversation"
+msgstr "Obre aquesta conversa"
+
+#: src/chat_info_dialog.vala:304 src/chat_row.vala:313
+msgid "View Media"
+msgstr "Mostra els fitxers multimèdia"
+
+#: src/chat_info_dialog.vala:305
+msgid "Browse apps and media shared in this chat"
+msgstr "Explora les aplicacions i els mitjans compartits en aquest xat"
+
+#: src/chat_info_dialog.vala:324
+#, c-format
+msgid "Members (%u)"
+msgstr "Membres (%u)"
+
+#: src/chat_info_dialog.vala:324
+msgid "Contact"
+msgstr "Contacte"
+
+#: src/chat_info_dialog.vala:332
+msgid "Add member"
+msgstr "Afegeix un membre"
+
+#: src/chat_info_dialog.vala:366
+msgid "New Channel with Same Members"
+msgstr "Canal nou amb els mateixos membres"
+
+#: src/chat_info_dialog.vala:367
+msgid "New Group with Same Members"
+msgstr "Grup nou amb els mateixos membres"
+
+#: src/chat_info_dialog.vala:368
+msgid "Start a new one without picking members again"
+msgstr "Comença'n un de nou sense tornar a triar els membres"
+
+#: src/chat_info_dialog.vala:376
+msgid "Block Chat…"
+msgstr "Bloqueja el xat…"
+
+#: src/chat_info_dialog.vala:377
+msgid "Hide this chat and new messages; keep the history"
+msgstr "Amaga aquest xat i els missatges nous; conserva l'historial"
+
+#: src/chat_info_dialog.vala:384 src/chat_row.vala:318
+msgid "Clear Chat…"
+msgstr "Buida el xat…"
+
+#: src/chat_info_dialog.vala:385
+msgid "Delete messages for this profile and keep the chat"
+msgstr "Suprimeix els missatges d'aquest perfil i conserva el xat"
+
+#: src/chat_info_dialog.vala:391
+msgid "Delete Sent Messages for Everyone…"
+msgstr "Suprimeix els missatges enviats per a tothom…"
+
+#: src/chat_info_dialog.vala:392
+msgid "Ask other participants to delete messages sent by this profile"
+msgstr "Demana als altres participants que suprimeixin els missatges enviats per aquest perfil"
+
+#: src/chat_info_dialog.vala:399 src/chat_row.vala:324
+msgid "Leave Channel…"
+msgstr "Surt del canal…"
+
+#: src/chat_info_dialog.vala:399 src/chat_row.vala:324
+msgid "Leave Group…"
+msgstr "Surt del grup…"
+
+#: src/chat_info_dialog.vala:400
+msgid "Stop receiving messages, with the option to keep the history"
+msgstr "Deixa de rebre missatges, amb l'opció de conservar l'historial"
+
+#: src/chat_info_dialog.vala:405 src/chat_row.vala:327
+msgid "Delete Chat…"
+msgstr "Suprimeix el xat…"
+
+#: src/chat_info_dialog.vala:406
+msgid "Delete the chat and its messages for this profile"
+msgstr "Suprimeix el xat i els seus missatges per a aquest perfil"
+
+#: src/chat_info_dialog.vala:413
+msgid "Failed to load: "
+msgstr "No s'ha pogut carregar: "
+
+#: src/chat_info_dialog.vala:433
+msgid "View contact details"
+msgstr "Mostra els detalls del contacte"
+
+#: src/chat_info_dialog.vala:461
+msgid "Copy email address"
+msgstr "Copia l'adreça electrònica"
+
+#: src/chat_info_dialog.vala:470
+msgid "Remove from channel…"
+msgstr "Surt del canal…"
+
+#: src/chat_info_dialog.vala:470
+msgid "Remove from group…"
+msgstr "Surt del grup…"
+
+#: src/chat_info_dialog.vala:483
+msgid "View Contact Details"
+msgstr "Mostra els detalls del contacte"
+
+#: src/chat_info_dialog.vala:489
+msgid "Copy Email Address"
+msgstr "Copia l'adreça electrònica"
+
+#: src/chat_info_dialog.vala:498
+msgid "Remove from Channel…"
+msgstr "Surt del canal…"
+
+#: src/chat_info_dialog.vala:498
+msgid "Remove from Group…"
+msgstr "Surt del grup…"
+
+#: src/chat_info_dialog.vala:515 src/message_actions.vala:509
+msgid "Could not open contact details: "
+msgstr "No s'han pogut obrir els detalls del contacte: "
+
+#: src/chat_info_dialog.vala:538
+msgid "Unblock Contact"
+msgstr "Desbloqueja el contacte"
+
+#: src/chat_info_dialog.vala:539
+#, c-format
+msgid "Allow messages from %s"
+msgstr "Permet els missatges de %s"
+
+#: src/chat_info_dialog.vala:541
+msgid "Block Contact…"
+msgstr "Bloqueja el contacte…"
+
+#: src/chat_info_dialog.vala:542
+#, c-format
+msgid "Block direct messages from %s and keep the history"
+msgstr "Bloqueja els missatges directes de %s i conserva l'historial"
+
+#: src/chat_info_dialog.vala:549
+msgid "this contact"
+msgstr "aquest contacte"
+
+#: src/chat_info_dialog.vala:554
+msgid "Edit Contact Name"
+msgstr "Edita el nom del contacte"
+
+#: src/chat_info_dialog.vala:555
+msgid "Leave empty to use the contact's own name."
+msgstr "Deixa-ho en blanc per fer servir el nom del propi contacte."
+
+#: src/chat_info_dialog.vala:555 src/chat_info_dialog.vala:593
+#: src/full_message_dialog.vala:88
+msgid "Save"
+msgstr "Desa"
+
+#: src/chat_info_dialog.vala:556
+msgid "Contact name"
+msgstr "Nom del contacte"
+
+#: src/chat_info_dialog.vala:592
+msgid "Edit Channel Name"
+msgstr "Edita el nom del canal"
+
+#: src/chat_info_dialog.vala:592
+msgid "Edit Group Name"
+msgstr "Edita el nom del grup"
+
+#: src/chat_info_dialog.vala:594
+msgid "Channel name"
+msgstr "Nom del canal"
+
+#: src/chat_info_dialog.vala:594
+msgid "Group name"
+msgstr "Nom del grup"
+
+#: src/chat_info_dialog.vala:615
+#, c-format
+msgid "Remove “%s” from “%s”? They keep messages already received."
+msgstr "Voleu suprimir «%s» de «%s»? Conserva els missatges ja rebuts."
+
+#: src/chat_info_dialog.vala:618
+msgid " They will no longer receive new messages sent to this channel."
+msgstr " Ja no rebran els missatges nous enviats a aquest canal."
+
+#: src/chat_info_dialog.vala:619
+msgid " They will no longer receive new group messages."
+msgstr " Ja no rebran els missatges nous del grup."
+
+#: src/chat_info_dialog.vala:620
+msgid " Group members will be notified."
+msgstr " Els membres del grup seran informats."
+
+#: src/chat_info_dialog.vala:622
+msgid "Remove Subscriber?"
+msgstr "Voleu suprimir l'abonat?"
+
+#: src/chat_info_dialog.vala:622
+msgid "Remove Member?"
+msgstr "Voleu suprimir el membre?"
+
+#: src/chat_info_dialog.vala:624
+msgid "Remove Subscriber"
+msgstr "Suprimeix l'abonat"
+
+#: src/chat_info_dialog.vala:624
+msgid "Remove Member"
+msgstr "Suprimeix el membre"
+
+#: src/chat_info_dialog.vala:631
+msgid "Remove failed: "
+msgstr "No s'ha pogut suprimir: "
+
+#: src/chat_info_dialog.vala:710
+msgid "No sent messages can be deleted for everyone"
+msgstr "No es pot suprimir per a tothom cap missatge enviat"
+
+#: src/chat_info_dialog.vala:711 src/chat_row.vala:450
+msgid "No messages to clear"
+msgstr "No hi ha missatges per buidar"
+
+#: src/chat_info_dialog.vala:765 src/window.vala:2998
+msgid "Channel created"
+msgstr "Canal creat"
+
+#: src/chat_info_dialog.vala:765 src/window.vala:2998
+msgid "Group created"
+msgstr "Grup creat"
+
+#: src/chat_info_dialog.vala:786 src/chat_row.vala:477
+msgid "Chat left; history kept"
+msgstr "Has sortit del xat; s'ha conservat l'historial"
+
+#: src/chat_info_dialog.vala:792 src/chat_row.vala:485
+msgid "Chat left, but its history could not be deleted: "
+msgstr "Has sortit del xat, però no s'ha pogut suprimir l'historial: "
+
+#: src/chat_info_dialog.vala:793 src/chat_row.vala:486
+msgid "Could not finish leaving; chat history was kept: "
+msgstr "No s'ha pogut completar la sortida; s'ha conservat l'historial: "
+
+#: src/chat_info_dialog.vala:816
+msgid "Select Avatar Image"
+msgstr "Selecciona una imatge d'avatar"
 
 #: src/chat_row.vala:89
 msgid "You were mentioned"
@@ -117,30 +501,6 @@ msgstr "Marca com a llegit"
 msgid "Mark as Unread"
 msgstr "Marca com a no llegit"
 
-#: src/chat_row.vala:313
-msgid "View Media"
-msgstr "Mostra els fitxers multimèdia"
-
-#: src/chat_row.vala:315
-msgid "Chat Details"
-msgstr "Detalls del xat"
-
-#: src/chat_row.vala:318
-msgid "Clear Chat…"
-msgstr "Buida el xat…"
-
-#: src/chat_row.vala:324
-msgid "Leave Channel…"
-msgstr "Surt del canal…"
-
-#: src/chat_row.vala:324
-msgid "Leave Group…"
-msgstr "Surt del grup…"
-
-#: src/chat_row.vala:327
-msgid "Delete Chat…"
-msgstr "Suprimeix el xat…"
-
 #: src/chat_row.vala:350
 msgid "Failed to update pin: "
 msgstr "No s'ha pogut actualitzar la fixació: "
@@ -198,12 +558,9 @@ msgid "Chat blocked"
 msgstr "Xat blocat"
 
 #: src/chat_row.vala:442 src/chat_row.vala:495 src/conversation_view.vala:1247
+#: src/models.vala:240
 msgid "this chat"
 msgstr "aquest xat"
-
-#: src/chat_row.vala:450
-msgid "No messages to clear"
-msgstr "No hi ha missatges per buidar"
 
 #: src/chat_row.vala:458
 msgid "Could not load messages: "
@@ -212,18 +569,6 @@ msgstr "No s'han pogut carregar els missatges: "
 #: src/chat_row.vala:477
 msgid "Chat left and deleted"
 msgstr "Has sortit del xat i l'has suprimit"
-
-#: src/chat_row.vala:477
-msgid "Chat left; history kept"
-msgstr "Has sortit del xat; s'ha conservat l'historial"
-
-#: src/chat_row.vala:485
-msgid "Chat left, but its history could not be deleted: "
-msgstr "Has sortit del xat, però no s'ha pogut suprimir l'historial: "
-
-#: src/chat_row.vala:486
-msgid "Could not finish leaving; chat history was kept: "
-msgstr "No s'ha pogut completar la sortida; s'ha conservat l'historial: "
 
 #: src/chat_row.vala:507
 msgid "Chat cleared for this profile"
@@ -246,104 +591,188 @@ msgstr "Escriu un missatge"
 msgid "Type a reply"
 msgstr "Escriu una resposta"
 
-#: src/compose_bar.vala:161
+#: src/compose_bar.vala:163
 msgid "Cancel reply"
 msgstr "Cancel·la la resposta"
 
-#: src/compose_bar.vala:209 src/compose_bar.vala:268
+#: src/compose_bar.vala:211 src/compose_bar.vala:270
 msgid "Remove attachment"
 msgstr "Elimina l'adjunció"
 
-#: src/compose_bar.vala:224
-msgid ""
-"Long message: recipients get a shortened preview with a “Show Full Message” "
-"button, and it cannot be edited after sending"
-msgstr ""
-"Missatge llarg: els destinataris reben una vista prèvia abreujada amb un "
-"botó “Mostra el missatge sencer”, i no es podrà editar després d'enviar-lo"
+#: src/compose_bar.vala:226
+msgid "Long message: recipients get a shortened preview with a “Show Full Message” button, and it cannot be edited after sending"
+msgstr "Missatge llarg: els destinataris reben una vista prèvia abreujada amb un botó “Mostra el missatge sencer”, i no es podrà editar després d'enviar-lo"
 
-#: src/compose_bar.vala:241
+#: src/compose_bar.vala:243
 msgid "Attach file"
 msgstr "Adjunta un fitxer"
 
-#: src/compose_bar.vala:249
+#: src/compose_bar.vala:251
 msgid "Insert emoji"
 msgstr "Insereix un emoji"
 
-#: src/compose_bar.vala:263 src/message_actions.vala:220
+#: src/compose_bar.vala:265 src/message_actions.vala:220
 msgid "Emoji picker unavailable"
 msgstr "El selector d'emoji no està disponible"
 
-#: src/compose_bar.vala:275
+#: src/compose_bar.vala:277
 msgid "Cancel editing"
 msgstr "Cancel·la l'edició"
 
-#: src/compose_bar.vala:349
+#: src/compose_bar.vala:351
 msgid "Send message"
 msgstr "Envia el missatge"
 
-#: src/compose_bar.vala:356
+#: src/compose_bar.vala:358
 msgid "Send a sticker"
 msgstr "Envia un adhesiu"
 
-#: src/compose_bar.vala:365
+#: src/compose_bar.vala:367
 msgid "Record a voice message"
 msgstr "Grava un missatge de veu"
 
-#: src/compose_bar.vala:385
+#: src/compose_bar.vala:387
 msgid "Cancel voice message"
 msgstr "Cancel·la el missatge de veu"
 
-#: src/compose_bar.vala:395 src/compose_bar.vala:790
+#: src/compose_bar.vala:392 src/compose_bar.vala:842
+msgid "Preview voice message"
+msgstr "Previsualitza el missatge de veu"
+
+#: src/compose_bar.vala:403 src/compose_bar.vala:803
 msgid "Stop recording"
 msgstr "Atura la gravació"
 
-#: src/compose_bar.vala:399 src/compose_bar.vala:871
+#: src/compose_bar.vala:407 src/compose_bar.vala:917
 #: src/message_actions.vala:102
 msgid "Transcribe"
 msgstr "Transcriu"
 
-#: src/compose_bar.vala:403
+#: src/compose_bar.vala:411
 msgid "Transcribe the recording into the message text"
 msgstr "Transcriu la gravació al text del missatge"
 
-#: src/compose_bar.vala:409
+#: src/compose_bar.vala:417
 msgid "Send voice message"
 msgstr "Envia el missatge de veu"
 
-#: src/compose_bar.vala:808
+#: src/compose_bar.vala:821
 msgid "Finishing recording…"
 msgstr "S'està finalitzant la gravació…"
 
-#: src/compose_bar.vala:839
+#: src/compose_bar.vala:884
 msgid "Transcription is unavailable"
 msgstr "La transcripció no està disponible"
 
-#: src/compose_bar.vala:865
+#: src/compose_bar.vala:911
 msgid "No speech detected; the voice message is still attached"
 msgstr "No s'ha detectat veu; el missatge de veu encara està adjunt"
 
-#: src/compose_bar.vala:915
+#: src/compose_bar.vala:963
 msgid "Recording failed: "
 msgstr "La gravació ha fallat: "
 
-#: src/compose_bar.vala:959 src/compose_bar.vala:1113
+#: src/compose_bar.vala:1007 src/compose_bar.vala:1161
 #, c-format
 msgid "%d attachments"
 msgstr "%d adjuncions"
 
-#: src/compose_bar.vala:960 src/compose_bar.vala:1114
+#: src/compose_bar.vala:1008 src/compose_bar.vala:1162
 #, c-format
 msgid "%s + %d more"
 msgstr "%s + %d més"
 
-#: src/compose_bar.vala:1000
+#: src/compose_bar.vala:1048
 msgid "Link preview"
 msgstr "Vista prèvia de l'enllaç"
 
-#: src/compose_bar.vala:1371
+#: src/compose_bar.vala:1419
 msgid "Edit message…"
 msgstr "Edita el missatge…"
+
+#: src/contact_picker_dialog.vala:43
+msgid "Select Destination"
+msgstr "Selecciona el destinatari"
+
+#: src/contact_picker_dialog.vala:43
+msgid "Select Contact"
+msgstr "Selecciona un contacte"
+
+#: src/contact_picker_dialog.vala:64
+msgid "Destination account"
+msgstr "Compte de destinació"
+
+#: src/contact_picker_dialog.vala:72
+msgid "Search chats, contacts or enter email…"
+msgstr "Cerca xats, contactes o introdueix un correu…"
+
+#: src/contact_picker_dialog.vala:73
+msgid "Search or enter email…"
+msgstr "Cerca o introdueix un correu…"
+
+#: src/contact_picker_dialog.vala:93 src/settings_dialog.vala:857
+#: src/webxdc_manager_dialog.vala:604
+msgid "Chats"
+msgstr "Xats"
+
+#: src/contact_picker_dialog.vala:107
+msgid "Contacts"
+msgstr "Contactes"
+
+#: src/contact_picker_dialog.vala:165 src/window.vala:2553
+#, c-format
+msgid "Account #%d"
+msgstr "Compte núm. %d"
+
+#: src/contact_picker_dialog.vala:251
+msgid "Failed to load contacts: "
+msgstr "No s'han pogut carregar els contactes: "
+
+#: src/contact_picker_dialog.vala:331
+#, c-format
+msgid "Start chat with %s"
+msgstr "Comença un xat amb %s"
+
+#: src/conversation_media_bar.vala:53
+msgid "Voice message"
+msgstr "Missatge de veu"
+
+#: src/conversation_media_bar.vala:58
+msgid "Previous voice message"
+msgstr "Missatge de veu anterior"
+
+#: src/conversation_media_bar.vala:69
+msgid "Next voice message"
+msgstr "Missatge de veu següent"
+
+#: src/conversation_media_bar.vala:96 src/conversation_media_bar.vala:99
+#: src/conversation_media_bar.vala:253
+msgid "Playback speed"
+msgstr "Velocitat de reproducció"
+
+#: src/conversation_media_bar.vala:152
+msgid "Close player"
+msgstr "Tanca el reproductor"
+
+#: src/conversation_media_bar.vala:225
+msgid "Drag to seek"
+msgstr "Arrossega per desplaçar-te"
+
+#: src/conversation_media_bar.vala:227
+msgid "Seeking is unavailable with the system audio player"
+msgstr "No es pot desplaçar amb el reproductor d'àudio del sistema"
+
+#: src/conversation_media_bar.vala:228
+msgid "Seeking will be available after the audio loads"
+msgstr "Es podrà desplaçar un cop carregat l'àudio"
+
+#: src/conversation_media_bar.vala:254
+msgid "Install GstPlay, mpv, or ffplay to change playback speed"
+msgstr "Instal·la GstPlay, mpv o ffplay per canviar la velocitat de reproducció"
+
+#: src/conversation_media_bar.vala:301
+msgid "Sent "
+msgstr "Enviat "
 
 #: src/conversation_view.vala:648
 msgid "Search in conversation…"
@@ -377,7 +806,9 @@ msgstr "Suprimeix…"
 msgid "Forward"
 msgstr "Reenvia"
 
-#: src/conversation_view.vala:1050 src/window.vala:2124 src/window.vala:3227
+#: src/conversation_view.vala:1050 src/full_message_dialog.vala:83
+#: src/models.vala:107 src/models.vala:122 src/models.vala:160
+#: src/models.vala:246 src/window.vala:2124 src/window.vala:3229
 msgid "Cancel"
 msgstr "Cancel·la"
 
@@ -401,7 +832,7 @@ msgstr "No s'ha pogut acceptar la sol·licitud: "
 msgid "Could not dismiss request: "
 msgstr "No s'ha pogut descartar la sol·licitud: "
 
-#: src/conversation_view.vala:1466
+#: src/conversation_view.vala:1466 src/search_results_view.vala:51
 msgid "Searching…"
 msgstr "S'està cercant…"
 
@@ -478,6 +909,52 @@ msgstr "La vista prèvia ha fallat: "
 msgid "File is empty"
 msgstr "El fitxer està buit"
 
+#: src/full_message_dialog.vala:39
+#, c-format
+msgid "Message %d"
+msgstr "Missatge %d"
+
+#: src/full_message_dialog.vala:79
+msgid "Edit message"
+msgstr "Edita el missatge"
+
+#: src/full_message_dialog.vala:172 src/full_message_dialog.vala:181
+msgid "Reading settings"
+msgstr "Opcions de lectura"
+
+#: src/full_message_dialog.vala:187
+msgid "Text size"
+msgstr "Mida del text"
+
+#: src/full_message_dialog.vala:221
+msgid "Render Markdown"
+msgstr "Mostra el Markdown"
+
+#: src/full_message_dialog.vala:226
+msgid "Format headings, emphasis, code, and links"
+msgstr "Mostra els encapçalaments, l'èmfasi, el codi i els enllaços"
+
+#: src/full_message_dialog.vala:269
+msgid "Edit Message"
+msgstr "Edita el missatge"
+
+#: src/full_message_dialog.vala:316
+msgid "Saving…"
+msgstr "S'està desant…"
+
+#: src/full_message_dialog.vala:330 src/full_message_dialog.vala:332
+#: src/message_actions.vala:382
+msgid "Edit failed: "
+msgstr "L'edició ha fallat: "
+
+#: src/image_viewer.vala:186
+msgid "Cannot open image: "
+msgstr "No s'ha pogut obrir la imatge: "
+
+#: src/image_viewer.vala:206
+msgid "Save image"
+msgstr "Desa la imatge"
+
 #: src/message_actions.vala:49 src/message_row.vala:728
 msgid "Reply"
 msgstr "Respon"
@@ -542,10 +1019,6 @@ msgstr "Missatges reenviats"
 msgid "Forward failed: "
 msgstr "El reenviament ha fallat: "
 
-#: src/message_actions.vala:382
-msgid "Edit failed: "
-msgstr "L'edició ha fallat: "
-
 #: src/message_actions.vala:408
 msgid "Could not refresh message: "
 msgstr "No s'ha pogut actualitzar el missatge: "
@@ -553,10 +1026,6 @@ msgstr "No s'ha pogut actualitzar el missatge: "
 #: src/message_actions.vala:422
 msgid "Could not retry message: "
 msgstr "No s'ha pogut tornar a provar el missatge: "
-
-#: src/message_actions.vala:509
-msgid "Could not open contact details: "
-msgstr "No s'han pogut obrir els detalls del contacte: "
 
 #: src/message_row.vala:469
 msgid "(edited)"
@@ -670,6 +1139,1194 @@ msgstr "Mostra les reaccions"
 msgid "Unread messages"
 msgstr "Missatges per llegir"
 
+#: src/models.vala:11
+msgid "Messages and their attachments, including in-chat apps, are removed from this history. Deletion is also requested on the server and linked devices using this profile. Other participants keep their copies."
+msgstr "Els missatges i els seus adjunts, incloses les aplicacions internes del xat, s'eliminen d'aquest historial. També se'n sol·lita l'eliminació al servidor i als dispositius enllaçats que fan servir aquest perfil. La resta de participants conserven les seves còpies."
+
+#: src/models.vala:13
+msgid "Files saved elsewhere, forwarded copies and backups are not removed. This cannot be undone."
+msgstr "No s'eliminen els fitxers desats altres llocs, les còpies reenviades ni les còpies de seguretat. Això no es pot desfer."
+
+#: src/models.vala:73
+msgid "Error"
+msgstr "Error"
+
+#: src/models.vala:148
+msgid "Could not check message deletion options: "
+msgstr "No s'han pogut comprovar les opcions d'esborrament de missatges: "
+
+#: src/models.vala:152
+msgid "Delete Message?"
+msgstr "Voleu suprimir el missatge?"
+
+#: src/models.vala:153
+#, c-format
+msgid "Delete %d Messages?"
+msgstr "Voleu suprimir %d missatges?"
+
+#: src/models.vala:154
+msgid "Delete for Me: "
+msgstr "Suprimeix per a mi: "
+
+#: src/models.vala:156
+msgid "Delete for Everyone also asks other participants’ apps to delete these messages. Saved or forwarded copies may remain."
+msgstr "«Suprimeix per a tothom» també demana a les aplicacions dels altres participants que suprimeixin aquests missatges. Poden quedar-ne còpies desades o reenviades."
+
+#: src/models.vala:161
+msgid "Delete for Me"
+msgstr "Suprimeix per a mi"
+
+#: src/models.vala:164 src/models.vala:211
+msgid "Delete for Everyone"
+msgstr "Suprimeix per a tothom"
+
+#: src/models.vala:191
+msgid "Delete Chat?"
+msgstr "Voleu suprimir el xat?"
+
+#: src/models.vala:192
+#, c-format
+msgid "Delete “%s” and its messages?\\n\\n"
+msgstr "Voleu suprimir «%s» i els seus missatges?\\n\\n"
+
+#: src/models.vala:194
+msgid "Any draft in this chat is also deleted. This does not leave a group or channel, unsubscribe from a mailing list, or block a contact. New messages may make the chat appear again."
+msgstr "També se suprimeix qualsevol esborrany d'aquest xat. Això no surt d'un grup ni d'un canal, no cancel·la la subscripció a una llista de correu ni bloqueja cap contacte. Els missatges nous poden fer que el xat torni a aparèixer."
+
+#: src/models.vala:196
+msgid "Delete Chat"
+msgstr "Suprimeix el xat"
+
+#: src/models.vala:202
+#, c-format
+msgid "Delete 1 message in “%s”?"
+msgstr "Voleu suprimir 1 missatge de «%s»?"
+
+#: src/models.vala:203
+#, c-format
+msgid "Delete %d messages in “%s”?"
+msgstr "Voleu suprimir %d missatges de «%s»?"
+
+#: src/models.vala:205
+msgid "Only encrypted messages sent by this profile are selected. They and their attachments, including in-chat apps, are removed from this history, and deletion is requested on the server, linked devices and other participants’ apps. Messages from other people, unencrypted messages and status messages are kept."
+msgstr "Només se seleccionen els missatges xifrats enviats per aquest perfil. Aquestos i els seus adjunts, incloses les aplicacions internes del xat, s'eliminen d'aquest historial, i se'n sol·lita l'eliminació al servidor, als dispositius enllaçats i a les aplicacions dels altres participants. Els missatges d'altres persones, els no xifrats i els missatges d'estat es conserven."
+
+#: src/models.vala:208
+msgid "Delete Sent Messages for Everyone?"
+msgstr "Voleu suprimir per a tothom els missatges enviats?"
+
+#: src/models.vala:208
+msgid "Clear Chat?"
+msgstr "Voleu buidar el xat?"
+
+#: src/models.vala:209
+msgid "The chat, its draft and messages arriving after this confirmation opens are kept."
+msgstr "El xat, el seu esborrany i els missatges que arribin després d'obrir aquesta confirmació es conserven."
+
+#: src/models.vala:211
+msgid "Clear for Me"
+msgstr "Buida per a mi"
+
+#: src/models.vala:229
+msgid "Could not check group membership: "
+msgstr "No s'ha pogut comprovar la pertinença al grup: "
+
+#: src/models.vala:234
+msgid "This group or channel can no longer be left."
+msgstr "Ja no es pot sortir d'aquest grup ni d'aquest canal."
+
+#: src/models.vala:238
+msgid "Leave Channel"
+msgstr "Surt del canal"
+
+#: src/models.vala:238
+msgid "Leave Group"
+msgstr "Surt del grup"
+
+#: src/models.vala:239
+#, c-format
+msgid "Leave “%s” and stop receiving new messages?"
+msgstr "Voleu sortir de «%s» i deixar de rebre missatges nous?"
+
+#: src/models.vala:242
+msgid " Other members will be notified."
+msgstr " Els altres membres seran informats."
+
+#: src/models.vala:243
+#, c-format
+msgid "%s keeps the chat history. Leave and Delete also deletes the chat, its draft, messages and attachments for this profile. Deletion is requested on the server and linked devices. Other participants keep their history."
+msgstr "%s conserva l'historial del xat. «Surt i suprimeix» també suprimeix el xat, el seu esborrany, els missatges i els adjunts per a aquest perfil. Se'n sol·lita l'eliminació al servidor i als dispositius enllaçats. La resta de participants conserven el seu historial."
+
+#: src/models.vala:245
+msgid "Leave Channel?"
+msgstr "Voleu sortir del canal?"
+
+#: src/models.vala:245
+msgid "Leave Group?"
+msgstr "Voleu sortir del grup?"
+
+#: src/models.vala:248
+msgid "Leave and Delete"
+msgstr "Surt i suprimeix"
+
+#: src/models.vala:263
+msgid "Block Contact?"
+msgstr "Voleu bloquejar el contacte?"
+
+#: src/models.vala:263
+msgid "Block Chat?"
+msgstr "Voleu bloquejar el xat?"
+
+#: src/models.vala:264
+#, c-format
+msgid "Block “%s”? The chat is hidden and its history is kept. Blocking syncs to linked devices using this profile."
+msgstr "Voleu bloquejar «%s»? El xat s'oculta i es conserva el seu historial. El bloqueig es sincronitza amb els dispositius enllaçats que fan servir aquest perfil."
+
+#: src/models.vala:267
+msgid "Direct messages from this contact will be blocked. Their messages in shared groups can still appear. The contact is not notified."
+msgstr "Es bloquejaran els missatges directes d'aquest contacte. Els seus missatges en grups compartits encara poden aparèixer. No se notifica el contacte."
+
+#: src/models.vala:268
+msgid "New messages in this chat will be hidden. This does not leave a channel or unsubscribe from a mailing list."
+msgstr "Els missatges nous d'aquest xat quedaran amagats. Això no surt de cap canal ni cancel·la la subscripció a una llista de correu."
+
+#: src/models.vala:269
+msgid "Unblock it later from Profile → Blocked Contacts."
+msgstr "Desbloqueja-lo més endavant des de Perfil → Contactes bloquejats."
+
+#: src/models.vala:270
+msgid "Block Contact"
+msgstr "Bloqueja el contacte"
+
+#: src/models.vala:270
+msgid "Block Chat"
+msgstr "Bloqueja el xat"
+
+#: src/new_group_dialog.vala:20 src/window.vala:3121
+msgid "New Channel"
+msgstr "Canal nou"
+
+#: src/new_group_dialog.vala:20 src/window.vala:3120
+msgid "New Group"
+msgstr "Grup nou"
+
+#: src/new_group_dialog.vala:27
+msgid "Create"
+msgstr "Crea"
+
+#: src/new_group_dialog.vala:46
+msgid "Set Avatar"
+msgstr "Defineix l'avatar"
+
+#. Name
+#: src/new_group_dialog.vala:55
+msgid "Channel Name"
+msgstr "Nom del canal"
+
+#: src/new_group_dialog.vala:55
+msgid "Group Name"
+msgstr "Nom del grup"
+
+#: src/new_group_dialog.vala:61
+msgid "My Channel"
+msgstr "El meu canal"
+
+#: src/new_group_dialog.vala:62
+msgid "My Group"
+msgstr "El meu grup"
+
+#: src/new_group_dialog.vala:71
+msgid "Only you can write in a channel. Members read messages without seeing each other."
+msgstr "Només tu pots escriure en un canal. Els membres llegeixen els missatges sense veure els uns dels altres."
+
+#: src/new_group_dialog.vala:83
+msgid "Members"
+msgstr "Membres"
+
+#. Add member button — opens contact picker
+#: src/new_group_dialog.vala:91
+msgid "Add Member…"
+msgstr "Afegeix un membre…"
+
+#: src/new_group_dialog.vala:196
+msgid "Select Channel Avatar"
+msgstr "Selecciona l'avatar del canal"
+
+#: src/new_group_dialog.vala:196
+msgid "Select Group Avatar"
+msgstr "Selecciona l'avatar del grup"
+
+#: src/profile_dialog.vala:951
+msgid "Free Up Space"
+msgstr "Allibera espai"
+
+#: src/profile_dialog.vala:952
+msgid "Delete messages or chats that are no longer needed. Unused attachment files are cleaned up automatically."
+msgstr "Suprimeix els missatges o els xats que ja no necessitis. Els fitxers d'adjuncions no utilitzats es netejen automàticament."
+
+#: src/profile_dialog.vala:954
+msgid "Parla cannot currently remove only downloaded files while keeping the messages. Files saved elsewhere and backups must be removed separately."
+msgstr "Actualment, Parla no pot suprimir només els fitxers baixats sense conservar els missatges. Els fitxers desats altres llocs i les còpies de seguretat s'han de suprimir per separat."
+
+#: src/profile_dialog.vala:956
+msgid "OK"
+msgstr "D'acord"
+
+#: src/search_results_view.vala:21 src/search_results_view.vala:77
+msgid "Messages in selected profile"
+msgstr "Missatges del perfil seleccionat"
+
+#: src/search_results_view.vala:25 src/search_results_view.vala:53
+msgid "Type to search messages"
+msgstr "Escriu per buscar missatges"
+
+#: src/search_results_view.vala:40
+msgid "Load more results"
+msgstr "Carrega més resultats"
+
+#: src/search_results_view.vala:52
+msgid "Search failed: "
+msgstr "La cerca ha fallat: "
+
+#: src/search_results_view.vala:54
+msgid "No messages found"
+msgstr "No s'ha trobat cap missatge"
+
+#: src/search_results_view.vala:55
+msgid "1,000+ results · newest matches shown"
+msgstr "Més de 1.000 resultats · es mostren les coincidències més recents"
+
+#: src/search_results_view.vala:56
+#, c-format
+msgid "%d results"
+msgstr "%d resultats"
+
+#: src/search_results_view.vala:84
+#, c-format
+msgid "Messages in %s"
+msgstr "Missatges de %s"
+
+#: src/search_results_view.vala:84
+msgid "selected profile"
+msgstr "perfil seleccionat"
+
+#: src/search_results_view.vala:163
+msgid "Archived"
+msgstr "Arxivat"
+
+#: src/search_results_view.vala:177
+msgid "Results are no longer available"
+msgstr "Els resultats ja no estan disponibles"
+
+#: src/settings_dialog.vala:702 src/window.vala:3127
+msgid "Settings"
+msgstr "Configuració"
+
+#: src/settings_dialog.vala:707
+msgid "General"
+msgstr "General"
+
+#: src/settings_dialog.vala:712
+msgid "Advanced"
+msgstr "Avançat"
+
+#: src/settings_dialog.vala:728 src/settings_dialog.vala:732
+msgid "Appearance"
+msgstr "Aparença"
+
+#: src/settings_dialog.vala:730 src/settings_dialog.vala:828
+msgid "System"
+msgstr "Sistema"
+
+#: src/settings_dialog.vala:730
+msgid "Light"
+msgstr "Clar"
+
+#: src/settings_dialog.vala:730
+msgid "Dark"
+msgstr "Fosc"
+
+#: src/settings_dialog.vala:732
+msgid "Use the system style or choose light or dark"
+msgstr "Fes servir l'estil del sistema o tria clar o fosc"
+
+#: src/settings_dialog.vala:743
+msgid "Code highlighting"
+msgstr "Ressaltat de codi"
+
+#: src/settings_dialog.vala:743
+msgid "Color scheme for code blocks in messages"
+msgstr "Paleta de colors per als blocs de codi als missatges"
+
+#: src/settings_dialog.vala:748
+msgid "Bubbles"
+msgstr "Bombolletes"
+
+#: src/settings_dialog.vala:748
+msgid "Compact"
+msgstr "Compacte"
+
+#: src/settings_dialog.vala:748
+msgid "Rows"
+msgstr "Files"
+
+#: src/settings_dialog.vala:750
+msgid "Message layout"
+msgstr "Disposició dels missatges"
+
+#: src/settings_dialog.vala:750
+msgid "Choose how messages are arranged"
+msgstr "Tria com s'ordenen els missatges"
+
+#: src/settings_dialog.vala:756
+msgid "None"
+msgstr "Cap"
+
+#: src/settings_dialog.vala:756
+msgid "Other People"
+msgstr "Altres persones"
+
+#: src/settings_dialog.vala:756
+msgid "Everyone"
+msgstr "Tothom"
+
+#: src/settings_dialog.vala:759
+msgid "Profile pictures"
+msgstr "Fotos de perfil"
+
+#: src/settings_dialog.vala:759
+msgid "Choose whose picture appears beside message bubbles"
+msgstr "Tria de qui apareix la foto al costat de les bombolletes"
+
+#: src/settings_dialog.vala:767
+msgid "Show profile pictures in direct chats"
+msgstr "Mostra les fotos de perfil als xats directes"
+
+#: src/settings_dialog.vala:768
+msgid "Apply the profile picture setting to direct chats too"
+msgstr "Aplica la configuració de fotos de perfil també als xats directes"
+
+#: src/settings_dialog.vala:781
+msgid "Message font"
+msgstr "Tipus de lletra dels missatges"
+
+#: src/settings_dialog.vala:782
+msgid "Use the system font or choose another family, style and size"
+msgstr "Fes servir el tipus de lletra del sistema o tria'n una altra amb estil i mida"
+
+#: src/settings_dialog.vala:786
+msgid "Choose Font"
+msgstr "Tria el tipus de lletra"
+
+#: src/settings_dialog.vala:788 src/settings_dialog.vala:975
+msgid "Choose…"
+msgstr "Tria…"
+
+#: src/settings_dialog.vala:789
+msgid "Choose a font family, style and size"
+msgstr "Tria una família de lletres, un estil i una mida"
+
+#: src/settings_dialog.vala:794
+msgid "Reset font settings to defaults"
+msgstr "Restableix la configuració del tipus de lletra"
+
+#: src/settings_dialog.vala:805
+msgid "Accent color"
+msgstr "Color d'accent"
+
+#: src/settings_dialog.vala:806
+msgid "Override the system accent color"
+msgstr "Substitueix el color d'accent del sistema"
+
+#: src/settings_dialog.vala:817
+msgid "Use system accent color"
+msgstr "Fes servir el color d'accent del sistema"
+
+#: src/settings_dialog.vala:828
+msgid "Solid"
+msgstr "Sòlid"
+
+#: src/settings_dialog.vala:828
+msgid "Gradient"
+msgstr "Degradat"
+
+#: src/settings_dialog.vala:831
+msgid "Background color"
+msgstr "Color de fons"
+
+#: src/settings_dialog.vala:832
+msgid "Tint the window background with a solid color or a gradient"
+msgstr "Tingeix el fons de la finestra amb un color sòlid o un degradat"
+
+#: src/settings_dialog.vala:860
+msgid "Reply to Message"
+msgstr "Resposta al missatge"
+
+#: src/settings_dialog.vala:860
+msgid "React with ❤️"
+msgstr "Reacciona amb ❤️"
+
+#: src/settings_dialog.vala:860
+msgid "React with 👍"
+msgstr "Reacciona amb 👍"
+
+#: src/settings_dialog.vala:861
+msgid "Show Contact Details"
+msgstr "Mostra els detalls del contacte"
+
+#: src/settings_dialog.vala:861
+msgid "Show Message Menu"
+msgstr "Mostra el menú del missatge"
+
+#: src/settings_dialog.vala:861
+msgid "Do Nothing"
+msgstr "No facis res"
+
+#: src/settings_dialog.vala:867
+msgid "Double-click action"
+msgstr "Acció de clic doble"
+
+#: src/settings_dialog.vala:868
+msgid "Action when a message is double-clicked or Enter is pressed on its row"
+msgstr "Acció quan es fa clic doble en un missatge o es prem Ret a la seva fila"
+
+#: src/settings_dialog.vala:875
+msgid "Format Text"
+msgstr "Format del text"
+
+#: src/settings_dialog.vala:875
+msgid "Hide Formatting Marks"
+msgstr "Amaga les marques de format"
+
+#: src/settings_dialog.vala:876
+msgid "Show Original Text"
+msgstr "Mostra el text original"
+
+#: src/settings_dialog.vala:879
+msgid "Message formatting"
+msgstr "Format dels missatges"
+
+#: src/settings_dialog.vala:879
+msgid "Choose how Markdown formatting is displayed"
+msgstr "Tria com es mostra el format Markdown"
+
+#: src/settings_dialog.vala:886
+msgid "Send with Shift+Enter"
+msgstr "Envia amb Maj+Ret"
+
+#: src/settings_dialog.vala:887
+msgid "Enter inserts a new line; Shift+Enter sends the message"
+msgstr "Ret insereix una línia nova; Maj+Ret envia el missatge"
+
+#: src/settings_dialog.vala:892
+msgid "Use External Audio Tools"
+msgstr "Fes servir eines d'àudio externes"
+
+#: src/settings_dialog.vala:893
+msgid "Use installed audio programs for voice playback and recording"
+msgstr "Fes servir els programes d'àudio instal·lats per reproduir i graveu veu"
+
+#: src/settings_dialog.vala:901
+msgid "Keep Running in Background"
+msgstr "Continua en segon pla"
+
+#: src/settings_dialog.vala:903
+msgid "Closing the window keeps Parla running as a menu bar icon; the Dock icon stays visible and notifications still appear"
+msgstr "Si tanques la finestra, Parla continuarà en execució com a icona de la barra de menús; la icona del Dock continuarà visible i les notificacions seguiran apareixent"
+
+#: src/settings_dialog.vala:905
+msgid "Closing the window keeps Parla running in the status bar; notifications still appear"
+msgstr "Si tanques la finestra, Parla continuarà en execució a la barra d'estat; les notificacions seguiran apareixent"
+
+#: src/settings_dialog.vala:911
+msgid "Animate Stickers"
+msgstr "Anima els adhesius"
+
+#: src/settings_dialog.vala:912
+msgid "Play stickers automatically; click a sticker to pause or resume"
+msgstr "Reprodueix els adhesius automàticament; fes clic en un adhesiu per aturar-lo o reprendre'l"
+
+#: src/settings_dialog.vala:922
+msgid "Never"
+msgstr "Mai"
+
+#: src/settings_dialog.vala:923
+msgid "Unlimited"
+msgstr "Sense límit"
+
+#: src/settings_dialog.vala:926
+msgid "Automatic download limit"
+msgstr "Límit de baixada automàtica"
+
+#: src/settings_dialog.vala:927
+msgid "Download attachments up to this size for all profiles; larger files can be downloaded manually"
+msgstr "Baixa els adjunts de fins a aquesta mida per a tots els perfils; els fitxers més grans es poden baixar manualment"
+
+#: src/settings_dialog.vala:937
+msgid "Voice transcription"
+msgstr "Transcripció de veu"
+
+#: src/settings_dialog.vala:938
+msgid "Transcribe voice messages on this device with Whisper"
+msgstr "Transcriu els missatges de veu en aquest dispositiu amb Whisper"
+
+#: src/settings_dialog.vala:938
+msgid "Install Whisper to transcribe voice messages on this device"
+msgstr "Instal·la Whisper per transcrir els missatges de veu en aquest dispositiu"
+
+#: src/settings_dialog.vala:940
+msgid "Available"
+msgstr "Disponible"
+
+#: src/settings_dialog.vala:940
+msgid "Not found"
+msgstr "No s'ha trobat"
+
+#: src/settings_dialog.vala:951
+msgid "Notifications"
+msgstr "Notificacions"
+
+#: src/settings_dialog.vala:953
+msgid "Desktop Notifications"
+msgstr "Notificacions d'escriptori"
+
+#: src/settings_dialog.vala:954
+msgid "Show notifications for new messages when Parla is not the active window"
+msgstr "Mostra notificaciones dels missatges nous quan Parla no és la finestra activa"
+
+#: src/settings_dialog.vala:959
+msgid "Show Message Content"
+msgstr "Mostra el contingut dels missatges"
+
+#: src/settings_dialog.vala:960
+msgid "Include message text and attachment names in notifications"
+msgstr "Inclou el text dels missatges i els noms dels adjunts a les notificacions"
+
+#: src/settings_dialog.vala:966
+msgid "Chatmail Core"
+msgstr "Chatmail Core"
+
+#: src/settings_dialog.vala:968
+msgid "Automatic"
+msgstr "Automàtic"
+
+#: src/settings_dialog.vala:968
+msgid "Custom"
+msgstr "Personalitzat"
+
+#: src/settings_dialog.vala:969
+msgid "Source"
+msgstr "Origen"
+
+#: src/settings_dialog.vala:976 src/settings_dialog.vala:1576
+msgid "Choose a Chatmail Core binary"
+msgstr "Tria un binari de Chatmail Core"
+
+#: src/settings_dialog.vala:980
+msgid "Check for Updates"
+msgstr "Comprova si hi ha actualitzacions"
+
+#: src/settings_dialog.vala:981
+msgid "Check for a new Chatmail Core version"
+msgstr "Comprova si hi ha una versió nova de Chatmail Core"
+
+#: src/settings_dialog.vala:982
+msgid "Check"
+msgstr "Comprova"
+
+#: src/settings_dialog.vala:983
+msgid "Check for the latest Chatmail Core release"
+msgstr "Comprova si hi ha l'última versió de Chatmail Core"
+
+#: src/settings_dialog.vala:990
+msgid "Check for Updates on Startup"
+msgstr "Comprova les actualitzacions en iniciar"
+
+#: src/settings_dialog.vala:991
+msgid "Notify when a newer Chatmail Core version is available"
+msgstr "Avisa quan hi hagi una versió més recent de Chatmail Core"
+
+#: src/settings_dialog.vala:1004
+msgid "Profile Storage Folder"
+msgstr "Carpeta d'emmagatzematge dels perfils"
+
+#: src/settings_dialog.vala:1008
+msgid "Choose a different folder"
+msgstr "Tria una carpeta diferent"
+
+#: src/settings_dialog.vala:1015
+msgid "Use the default folder"
+msgstr "Fes servir la carpeta predeterminada"
+
+#: src/settings_dialog.vala:1028
+msgid "Network"
+msgstr "Xarxa"
+
+#: src/settings_dialog.vala:1031
+msgid "Use Proxy"
+msgstr "Fes servir un intermediari"
+
+#: src/settings_dialog.vala:1032
+msgid "Route this profile through the configured proxy"
+msgstr "Encamina aquest perfil a través de l'intermediari configurat"
+
+#: src/settings_dialog.vala:1040
+msgid "Proxy URL"
+msgstr "Adreça de l'intermediari"
+
+#: src/settings_dialog.vala:1041 src/settings_dialog.vala:1455
+msgid "socks5://, http://, https://, or ss://"
+msgstr "socks5://, http://, https:// o ss://"
+
+#: src/settings_dialog.vala:1060 src/settings_dialog.vala:1062
+#: src/settings_dialog.vala:1856
+msgid "Reset Settings"
+msgstr "Restableix la configuració"
+
+#: src/settings_dialog.vala:1063
+msgid "Restore Parla’s preferences and close the app; profiles and messages are kept"
+msgstr "Restableix les preferències de Parla i tanca l'aplicació; els perfils i els missatges es conserven"
+
+#: src/settings_dialog.vala:1064
+msgid "Reset…"
+msgstr "Restableix…"
+
+#: src/settings_dialog.vala:1067
+msgid "Reset Settings and Close Parla"
+msgstr "Restableix la configuració i tanca Parla"
+
+#: src/settings_dialog.vala:1077 src/settings_dialog.vala:1081
+#: src/settings_dialog.vala:1092
+msgid "In-Chat Apps"
+msgstr "Aplicacions internes del xat"
+
+#: src/settings_dialog.vala:1082
+msgid "In-chat apps are unavailable in this version of Parla"
+msgstr "Les aplicacions internes del xat no estan disponibles en aquesta versió de Parla"
+
+#: src/settings_dialog.vala:1083
+msgid "Unavailable"
+msgstr "No disponible"
+
+#: src/settings_dialog.vala:1093
+msgid "Open interactive apps shared in chats (Webxdc, experimental)"
+msgstr "Obre les aplicacions interactives compartides als xats (Webxdc, experimental)"
+
+#: src/settings_dialog.vala:1098
+msgid "Follow the Current Chat"
+msgstr "Segueix el xat actual"
+
+#: src/settings_dialog.vala:1099
+msgid "Hide app windows when switching to another chat"
+msgstr "Amaga les finestres de les aplicacions quan canvies de xat"
+
+#: src/settings_dialog.vala:1104
+msgid "Realtime Channels"
+msgstr "Canals en temps real"
+
+#: src/settings_dialog.vala:1105
+msgid "Let apps exchange live data with other participants in the chat"
+msgstr "Permet que les aplicacions intercanviïn dades en viu amb altres participants del xat"
+
+#: src/settings_dialog.vala:1110
+msgid "Internet Access"
+msgstr "Accés a internet"
+
+#: src/settings_dialog.vala:1111
+msgid "Allow apps to contact websites, which can reveal your IP address and app data"
+msgstr "Permet que les aplicacions contactin llocs web, cosa que pot revelar la teva adreça IP i les dades de l'aplicació"
+
+#: src/settings_dialog.vala:1116
+msgid "WebAssembly"
+msgstr "WebAssembly"
+
+#: src/settings_dialog.vala:1117
+msgid "Allow apps to compile and run WebAssembly"
+msgstr "Permet que les aplicacions compilin i executin WebAssembly"
+
+#: src/settings_dialog.vala:1122
+msgid "WebGL"
+msgstr "WebGL"
+
+#: src/settings_dialog.vala:1124
+msgid "macOS may still allow 3D graphics when this is turned off"
+msgstr "A macOS potser encara permet gràfics 3D amb això desactivat"
+
+#: src/settings_dialog.vala:1125
+msgid "Allow apps to access accelerated 3D graphics"
+msgstr "Permet que les aplicacions accedeixin a gràfics 3D accelerats"
+
+#: src/settings_dialog.vala:1132
+msgid "Hardware Acceleration"
+msgstr "Acceleració per maquinari"
+
+#: src/settings_dialog.vala:1133
+msgid "Use the graphics processor to display apps"
+msgstr "Fes servir el processador gràfic per mostrar les aplicacions"
+
+#: src/settings_dialog.vala:1140
+msgid "Developer Tools"
+msgstr "Eines de desenvolupament"
+
+#: src/settings_dialog.vala:1141
+msgid "Open the browser inspector and JavaScript console when apps start"
+msgstr "Obre l'inspector del navegador i la consola de JavaScript quan s'inicien les aplicacions"
+
+#: src/settings_dialog.vala:1147
+msgid "Restrict App Permissions"
+msgstr "Restringeix els permisos de les aplicacions"
+
+#: src/settings_dialog.vala:1148
+msgid "Turn off realtime channels, internet access, advanced graphics, WebAssembly, and developer tools; running apps will close"
+msgstr "Desactiva els canals en temps real, l'accés a internet, els gràfics avançats, WebAssembly i les eines de desenvolupament; les aplicacions en execució es tancaran"
+
+#: src/settings_dialog.vala:1149
+msgid "Restrict"
+msgstr "Restringeix"
+
+#: src/settings_dialog.vala:1168
+msgid "In-chat app permissions restricted"
+msgstr "S'han restringit els permisos de les aplicacions internes del xat"
+
+#: src/settings_dialog.vala:1176
+msgid "Links"
+msgstr "Enllaços"
+
+#: src/settings_dialog.vala:1179
+msgid "Link Previews"
+msgstr "Previsualitzacions d'enllaços"
+
+#: src/settings_dialog.vala:1180
+msgid "Attach a preview image when pasting a link. Parla contacts the website from this device; previews can be removed before sending"
+msgstr "Adjunta una imatge de previsualització en enganxar un enllaç. Parla contacta el lloc web des d'aquest dispositiu; les previsualitzacions es poden retirar abans d'enviar"
+
+#: src/settings_dialog.vala:1185
+msgid "Remove Link Tracking"
+msgstr "Elimina el rastreig dels enllaços"
+
+#: src/settings_dialog.vala:1186
+msgid "Remove known tracking information from pasted links"
+msgstr "Elimina la informació de rastreig coneguda dels enllaços enganxats"
+
+#: src/settings_dialog.vala:1194
+msgid "Use a Custom Filter List"
+msgstr "Fes servir una llista de filtratge personalitzada"
+
+#: src/settings_dialog.vala:1195
+msgid "Replace the built-in rules with a uBlock Origin or AdGuard list that supports $removeparam. The list is downloaded through the active profile and refreshed automatically"
+msgstr "Substitueix les regles integrades per una llista d'uBlock Origin o AdGuard compatible amb $removeparam. La llista es baixa a través del perfil actiu i s'actualitza automàticament"
+
+#: src/settings_dialog.vala:1200
+msgid "Filter list address"
+msgstr "Adreça de la llista de filtratge"
+
+#: src/settings_dialog.vala:1204
+msgid "Set Address…"
+msgstr "Defineix l'adreça…"
+
+#: src/settings_dialog.vala:1213
+msgid "Download the list again"
+msgstr "Torna a baixar la llista"
+
+#: src/settings_dialog.vala:1247
+msgid "No list configured"
+msgstr "No s'ha configurat cap llista"
+
+#: src/settings_dialog.vala:1256
+msgid "Not downloaded yet"
+msgstr "Encara no s'ha baixat"
+
+#: src/settings_dialog.vala:1258
+#, c-format
+msgid "%d rules"
+msgstr "%d regles"
+
+#: src/settings_dialog.vala:1260
+#, c-format
+msgid ", version %s"
+msgstr ", versió %s"
+
+#: src/settings_dialog.vala:1263
+#, c-format
+msgid ", updated %s"
+msgstr ", actualitzada el %s"
+
+#: src/settings_dialog.vala:1273
+msgid "Filter List URL"
+msgstr "Adreça de la llista de filtratge"
+
+#: src/settings_dialog.vala:1274
+msgid "Address of a uBlock Origin or AdGuard filter list with $removeparam rules, for example the AdGuard URL Tracking filter."
+msgstr "Adreça d'una llista de filtratge d'uBlock Origin o AdGuard amb regles $removeparam, com ara el filtre AdGuard URL Tracking."
+
+#: src/settings_dialog.vala:1276
+msgid "Download"
+msgstr "Baixa"
+
+#: src/settings_dialog.vala:1282
+msgid "The filter list URL must start with http(s)://"
+msgstr "L'adreça de la llista de filtratge ha de començar per http(s)://"
+
+#: src/settings_dialog.vala:1303
+#, c-format
+msgid "Filter list updated: %d rules"
+msgstr "Llista de filtratge actualitzada: %d regles"
+
+#: src/settings_dialog.vala:1304
+msgid "Filter list updated"
+msgstr "Llista de filtratge actualitzada"
+
+#: src/settings_dialog.vala:1406
+msgid "System default"
+msgstr "Predeterminat del sistema"
+
+#: src/settings_dialog.vala:1433 src/settings_dialog.vala:1434
+#: src/settings_dialog.vala:1500 src/window.vala:3192
+msgid "No active profile"
+msgstr "Cap perfil actiu"
+
+#: src/settings_dialog.vala:1453 src/settings_dialog.vala:1545
+msgid "Enabled for current profile"
+msgstr "Activat per al perfil actual"
+
+#: src/settings_dialog.vala:1454 src/settings_dialog.vala:1546
+msgid "Disabled for current profile"
+msgstr "Desactivat per al perfil actual"
+
+#: src/settings_dialog.vala:1458
+msgid "Unable to read proxy settings"
+msgstr "No s'han pogut llegir els ajustos de l'intermediari"
+
+#: src/settings_dialog.vala:1485
+msgid "Invalid proxy URL: "
+msgstr "Adreça d'intermediari no vàlida: "
+
+#: src/settings_dialog.vala:1490
+#, c-format
+msgid "Invalid proxy URL: %s\\n%s"
+msgstr "Adreça d'intermediari no vàlida: %s\\n%s"
+
+#: src/settings_dialog.vala:1512
+msgid "Enter a proxy URL before enabling the proxy."
+msgstr "Introdueix una adreça d'intermediari abans d'activar-lo."
+
+#: src/settings_dialog.vala:1550
+msgid "Proxy settings saved"
+msgstr "Ajustos de l'intermediari desats"
+
+#: src/settings_dialog.vala:1552
+msgid "Failed to save proxy settings: "
+msgstr "No s'han pogut desar els ajustos de l'intermediari: "
+
+#: src/settings_dialog.vala:1575
+msgid "No custom binary selected"
+msgstr "No s'ha triat cap binari personalitzat"
+
+#: src/settings_dialog.vala:1578
+msgid "Custom path is not executable"
+msgstr "El camí personalitzat no és executable"
+
+#: src/settings_dialog.vala:1581 src/settings_dialog.vala:1588
+msgid "Checking version…"
+msgstr "S'està comprovant la versió…"
+
+#: src/settings_dialog.vala:1589
+msgid "Chatmail Core not found"
+msgstr "No s'ha trobat Chatmail Core"
+
+#: src/settings_dialog.vala:1591
+msgid "Install Chatmail Core or choose a custom binary"
+msgstr "Instal·la Chatmail Core o tria un binari personalitzat"
+
+#: src/settings_dialog.vala:1629 src/settings_dialog.vala:1633
+msgid "Unable to read version"
+msgstr "No s'ha pogut llegir la versió"
+
+#: src/settings_dialog.vala:1641
+msgid "Dismiss"
+msgstr "Descarta"
+
+#: src/settings_dialog.vala:1654
+msgid "Checking for updates…"
+msgstr "S'estan comprovant les actualitzacions…"
+
+#: src/settings_dialog.vala:1661
+msgid "Could not parse the latest Chatmail Core version"
+msgstr "No s'ha pogut interpretar la darrera versió de Chatmail Core"
+
+#: src/settings_dialog.vala:1666
+#, c-format
+msgid "Chatmail Core is up to date: %s"
+msgstr "Chatmail Core està actualitzat: %s"
+
+#. Parla doesn't control the active binary, so it can't
+#. overwrite it — point at the release instead.
+#: src/settings_dialog.vala:1680 src/settings_dialog.vala:1689
+#: src/settings_dialog.vala:1702
+msgid "Update Available"
+msgstr "Hi ha una actualització"
+
+#: src/settings_dialog.vala:1681
+#, c-format
+msgid "Chatmail Core %s is available. Parla doesn't manage the active binary, so open its release page to update it manually."
+msgstr "Està disponible Chatmail Core %s. Parla no gestiona el binari actiu, de manera que obre la pàgina de la versió per actualitzar-lo manualment."
+
+#: src/settings_dialog.vala:1682 src/settings_dialog.vala:1691
+msgid "View Release"
+msgstr "Mostra la versió"
+
+#: src/settings_dialog.vala:1690
+#, c-format
+msgid "Chatmail Core %s is available, but no prebuilt binary exists for this platform."
+msgstr "Està disponible Chatmail Core %s, però no hi ha cap binari precompilat per a aquesta plataforma."
+
+#: src/settings_dialog.vala:1698
+#, c-format
+msgid "Chatmail Core %s is available to install."
+msgstr "Està disponible Chatmail Core %s per instal·lar-lo."
+
+#: src/settings_dialog.vala:1699
+#, c-format
+msgid "Chatmail Core %s is available (installed: %s)."
+msgstr "Està disponible Chatmail Core %s (instal·lat: %s)."
+
+#: src/settings_dialog.vala:1703
+msgid "Install"
+msgstr "Instal·la"
+
+#: src/settings_dialog.vala:1703 src/window.vala:1448
+msgid "Update"
+msgstr "Actualitza"
+
+#: src/settings_dialog.vala:1708
+msgid "Update check failed: "
+msgstr "Ha fallat la comprovació d'actualitzacions: "
+
+#: src/settings_dialog.vala:1732
+msgid "Chatmail Core source saved"
+msgstr "Origen de Chatmail Core desat"
+
+#: src/settings_dialog.vala:1739
+msgid "Locate a Chatmail Core binary"
+msgstr "Localitza un binari de Chatmail Core"
+
+#: src/settings_dialog.vala:1754
+msgid "Chatmail Core binary saved"
+msgstr "Binari de Chatmail Core desat"
+
+#: src/settings_dialog.vala:1757
+msgid "Selected file is not an executable binary."
+msgstr "El fitxer seleccionat no és un binari executable."
+
+#: src/settings_dialog.vala:1771
+msgid "Changing this folder switches the profiles Parla opens; existing data is not moved"
+msgstr "Canviar aquesta carpeta canvia els perfils que obre Parla; les dades existents no es mouen"
+
+#: src/settings_dialog.vala:1778
+msgid "Choose Profile Storage Folder"
+msgstr "Tria la carpeta d'emmagatzematge dels perfils"
+
+#: src/settings_dialog.vala:1793
+msgid "Profile storage folder changed"
+msgstr "Carpeta d'emmagatzematge dels perfils canvjada"
+
+#: src/settings_dialog.vala:1818
+#, c-format
+msgid "Downloading… %.0f%%"
+msgstr "S'està baixant… %.0f%%"
+
+#: src/settings_dialog.vala:1821
+#, c-format
+msgid "Downloading… %.1f MB"
+msgstr "S'està baixant… %.1f MB"
+
+#: src/settings_dialog.vala:1834
+msgid "Chatmail Core installed"
+msgstr "Chatmail Core instal·lat"
+
+#: src/settings_dialog.vala:1838 src/window.vala:1383 src/window.vala:1421
+msgid "Download failed: "
+msgstr "La descàrrega ha fallat: "
+
+#: src/settings_dialog.vala:1851
+msgid "Unable to open download page: "
+msgstr "No s'ha pogut obrir la pàgina de baixada: "
+
+#: src/settings_dialog.vala:1857
+msgid "Restore Parla’s preferences and close the app? Profiles and messages are kept. If a custom profile storage folder is in use, select it again after restarting."
+msgstr "Voleu restableix les preferències de Parla i tancar l'aplicació? Els perfils i els missatges es conserven. Si fas servir una carpeta d'emmagatzematge de perfils personalitzada, torna-la a seleccionar després de reiniciar."
+
+#: src/settings_dialog.vala:1858
+msgid "Reset and Close"
+msgstr "Restableix i tanca"
+
+#: src/sticker_picker.vala:60
+msgid "No stickers yet.\\nRight-click a sticker in a conversation\\nand choose “Add Sticker…”."
+msgstr "Encara no hi ha adhesius.\\nFes clic dret sobre un adhesiu en una conversa\\ni tria «Afegeix un adhesiu…»."
+
+#: src/sticker_picker.vala:143
+msgid "All stickers"
+msgstr "Tots els adhesius"
+
+#: src/webxdc_manager_dialog.vala:60 src/webxdc_manager_dialog.vala:113
+#: src/window.vala:3125
+msgid "Apps"
+msgstr "Aplicacions"
+
+#: src/webxdc_manager_dialog.vala:66
+msgid "Search apps…"
+msgstr "Cerca aplicacions…"
+
+#: src/webxdc_manager_dialog.vala:89
+msgid "No Apps Yet"
+msgstr "Encara no hi ha aplicacions"
+
+#: src/webxdc_manager_dialog.vala:90
+msgid "Webxdc apps shared in any chat of any profile will appear here"
+msgstr "Les aplicacions Webxdc compartides en qualsevol xat de qualsevol perfil apareixeran aquí"
+
+#: src/webxdc_manager_dialog.vala:168
+#, c-format
+msgid "Profile %d"
+msgstr "Perfil %d"
+
+#: src/webxdc_manager_dialog.vala:211
+msgid "App"
+msgstr "Aplicació"
+
+#: src/webxdc_manager_dialog.vala:242
+#, c-format
+msgid "Chat %d"
+msgstr "Xat %d"
+
+#: src/webxdc_manager_dialog.vala:331
+msgid "Unknown"
+msgstr "Desconegut"
+
+#: src/webxdc_manager_dialog.vala:403
+msgid "Remove from favorites"
+msgstr "Surt de les preferides"
+
+#: src/webxdc_manager_dialog.vala:403
+msgid "Add to favorites"
+msgstr "Afegeix a les preferides"
+
+#: src/webxdc_manager_dialog.vala:433
+msgid "No apps match the search"
+msgstr "Cap aplicació coincideix amb la cerca"
+
+#: src/webxdc_manager_dialog.vala:447
+msgid "chat"
+msgstr "xat"
+
+#: src/webxdc_manager_dialog.vala:447
+msgid "chats"
+msgstr "xats"
+
+#: src/webxdc_manager_dialog.vala:500
+#, c-format
+msgid "1 %s"
+msgstr "1 %s"
+
+#: src/webxdc_manager_dialog.vala:500
+#, c-format
+msgid "%u %s"
+msgstr "%u %s"
+
+#: src/webxdc_manager_dialog.vala:527
+#, c-format
+msgid "Shared by %s"
+msgstr "Compartit per %s"
+
+#: src/webxdc_manager_dialog.vala:529
+#, c-format
+msgid "First seen %s"
+msgstr "Vista per primera vegada el %s"
+
+#: src/webxdc_manager_dialog.vala:533
+msgid "Requests internet access"
+msgstr "Sol·licita accés a internet"
+
+#: src/webxdc_manager_dialog.vala:550
+msgid "Run"
+msgstr "Executa"
+
+#: src/webxdc_manager_dialog.vala:556
+msgid "New Chat…"
+msgstr "Xat nou…"
+
+#: src/webxdc_manager_dialog.vala:559
+msgid "Share and start this app in a chat with a contact"
+msgstr "Comparteix i inicia aquesta aplicació en un xat amb un contacte"
+
+#: src/webxdc_manager_dialog.vala:563
+msgid "Save to Disk…"
+msgstr "Desa al disc…"
+
+#: src/webxdc_manager_dialog.vala:574
+msgid "Description"
+msgstr "Descripció"
+
+#: src/webxdc_manager_dialog.vala:577
+msgid "Document"
+msgstr "Documentació"
+
+#: src/webxdc_manager_dialog.vala:580
+msgid "Source Code"
+msgstr "Codi font"
+
+#: src/webxdc_manager_dialog.vala:591
+msgid "Used by"
+msgstr "Feta servir per"
+
+#: src/webxdc_manager_dialog.vala:592
+msgid "person"
+msgstr "persona"
+
+#: src/webxdc_manager_dialog.vala:592
+msgid "people"
+msgstr "persones"
+
+#: src/webxdc_manager_dialog.vala:595 src/window.vala:3129
+msgid "About"
+msgstr "Quant a"
+
+#: src/webxdc_manager_dialog.vala:656
+msgid "Running"
+msgstr "En execució"
+
+#: src/webxdc_manager_dialog.vala:667
+msgid "Run in this chat"
+msgstr "Executa en aquest xat"
+
+#: src/webxdc_manager_dialog.vala:699
+msgid "Start in a new chat…"
+msgstr "Comença en un xat nou…"
+
+#: src/webxdc_manager_dialog.vala:732 src/webxdc_manager_dialog.vala:743
+msgid "The app file has not been downloaded yet"
+msgstr "El fitxer de l'aplicació encara no s'ha baixat"
+
+#: src/webxdc_manager_dialog.vala:747
+msgid "Start App With…"
+msgstr "Inicia l'aplicació amb…"
+
+#: src/webxdc_manager_dialog.vala:767
+msgid "Could not share the app"
+msgstr "No s'ha pogut compartir l'aplicació"
+
+#: src/webxdc_manager_dialog.vala:770
+msgid "App shared into the chat"
+msgstr "Aplicació compartida al xat"
+
+#: src/webxdc_manager_dialog.vala:780
+msgid "Could not share the app: "
+msgstr "No s'ha pogut compartir l'aplicació: "
+
+#: src/webxdc_manager_dialog.vala:790
+msgid "Could not open link: "
+msgstr "No s'ha pogut obrir l'enllaç: "
+
 #: src/window.vala:174
 msgid "RPC not ready"
 msgstr "El RPC no està llest"
@@ -745,12 +2402,8 @@ msgid "RPC server error: "
 msgstr "Error del servidor RPC: "
 
 #: src/window.vala:1047
-msgid ""
-"Failed to start RPC server:\n"
-"\n"
-msgstr ""
-"No s'ha pogut iniciar el servidor RPC:\n"
-"\n"
+msgid "Failed to start RPC server:\\n\\n"
+msgstr "No s'ha pogut iniciar el servidor RPC:\\n\\n"
 
 #: src/window.vala:1048
 msgid "Cannot reach RPC server"
@@ -781,12 +2434,8 @@ msgid "Could not open chat: "
 msgstr "No s'ha pogut obrir el xat: "
 
 #: src/window.vala:1310
-msgid ""
-"Parla needs the Delta Chat engine to connect.\n"
-"Download it once to get started."
-msgstr ""
-"El Parla necessita el motor del Delta Chat per connectar-se.\n"
-"Descarrega'l una vegada per començar."
+msgid "Parla needs the Delta Chat engine to connect.\\nDownload it once to get started."
+msgstr "El Parla necessita el motor del Delta Chat per connectar-se.\\nDescarrega'l una vegada per començar."
 
 #: src/window.vala:1313
 msgid "Delta Chat engine required"
@@ -822,10 +2471,6 @@ msgstr "S'està descarregant el motor del Delta Chat… %.0f%% (%.1f MB)"
 msgid "Downloading Delta Chat engine… %.1f MB"
 msgstr "S'està descarregant el motor del Delta Chat… %.1f MB"
 
-#: src/window.vala:1383 src/window.vala:1421
-msgid "Download failed: "
-msgstr "La descàrrega ha fallat: "
-
 #: src/window.vala:1394
 msgid "Delta Chat engine installed"
 msgstr "Motor del Delta Chat instal·lat"
@@ -849,10 +2494,6 @@ msgstr "El fitxer descarregat no conté cap regla $removeparam"
 #: src/window.vala:1429
 msgid "Could not save the filter list"
 msgstr "No s'ha pogut desar la llista de filtres"
-
-#: src/window.vala:1448
-msgid "Update"
-msgstr "Actualitza"
 
 #: src/window.vala:1459
 msgid "Updating Delta Chat engine…"
@@ -878,7 +2519,7 @@ msgstr "S'està iniciant el motor del Delta Chat…"
 msgid "Reconnecting…"
 msgstr "S'està reconnectant…"
 
-#: src/window.vala:1501 src/window.vala:3377
+#: src/window.vala:1501 src/window.vala:3379
 msgid "Select a chat to start messaging."
 msgstr "Selecciona un xat per començar a xatejar."
 
@@ -925,12 +2566,8 @@ msgstr "No es pot iniciar l'aplicació Webxdc"
 
 #: src/window.vala:2109
 #, c-format
-msgid ""
-"This version of Parla was built without Webxdc support, so it cannot start "
-"“%s”. You can still download the .xdc file."
-msgstr ""
-"Aquesta versió del Parla s'ha compilat sense suport Webxdc, per tant no pot "
-"iniciar “%s”. Pots descarregar igualment el fitxer .xdc."
+msgid "This version of Parla was built without Webxdc support, so it cannot start “%s”. You can still download the .xdc file."
+msgstr "Aquesta versió del Parla s'ha compilat sense suport Webxdc, per tant no pot iniciar “%s”. Pots descarregar igualment el fitxer .xdc."
 
 #: src/window.vala:2113
 msgid "In-Chat Apps Are Disabled"
@@ -938,12 +2575,8 @@ msgstr "Les aplicacions dins del xat estan desactivades"
 
 #: src/window.vala:2114
 #, c-format
-msgid ""
-"In-chat apps are turned off in Settings, so Parla cannot start “%s”. You can "
-"still download the .xdc file."
-msgstr ""
-"Les aplicacions dins del xat estan desactivades a la Configuració, per tant "
-"el Parla no pot iniciar “%s”. Pots descarregar igualment el fitxer .xdc."
+msgid "In-chat apps are turned off in Settings, so Parla cannot start “%s”. You can still download the .xdc file."
+msgstr "Les aplicacions dins del xat estan desactivades a la Configuració, per tant el Parla no pot iniciar “%s”. Pots descarregar igualment el fitxer .xdc."
 
 #: src/window.vala:2118
 msgid "Open Webxdc App?"
@@ -1018,7 +2651,7 @@ msgstr "%s ha reaccionat %s"
 msgid "Reacted %s"
 msgstr "Ha reaccionat %s"
 
-#: src/window.vala:2420 src/window.vala:4013 src/window.vala:4034
+#: src/window.vala:2420 src/window.vala:4018 src/window.vala:4039
 msgid "Not connected"
 msgstr "Sense connexió"
 
@@ -1041,11 +2674,6 @@ msgstr "Error en carregar els comptes"
 #: src/window.vala:2507 src/window.vala:2645
 msgid "Add Profile"
 msgstr "Afegeix un perfil"
-
-#: src/window.vala:2553
-#, c-format
-msgid "Account #%d"
-msgstr "Compte núm. %d"
 
 #: src/window.vala:2555
 msgid "Unconfigured account"
@@ -1099,240 +2727,200 @@ msgstr "Xat creat amb "
 msgid "Failed to create chat: "
 msgstr "No s'ha pogut crear el xat: "
 
-#: src/window.vala:2998
-msgid "Channel created"
-msgstr "Canal creat"
-
-#: src/window.vala:2998
-msgid "Group created"
-msgstr "Grup creat"
-
-#: src/window.vala:3118
+#: src/window.vala:3119
 msgid "New Chat"
 msgstr "Xat nou"
 
-#: src/window.vala:3119
-msgid "New Group"
-msgstr "Grup nou"
-
-#: src/window.vala:3120
-msgid "New Channel"
-msgstr "Canal nou"
-
-#: src/window.vala:3121 src/window.vala:3195
+#: src/window.vala:3122 src/window.vala:3197
 msgid "Use Invite Link"
 msgstr "Usa un enllaç d'invitació"
 
-#: src/window.vala:3123
+#: src/window.vala:3124
 msgid "Stickers"
 msgstr "Adhesius"
 
-#: src/window.vala:3124
-msgid "Apps"
-msgstr "Aplicacions"
-
-#: src/window.vala:3126
-msgid "Settings"
-msgstr "Configuració"
-
-#: src/window.vala:3127 src/window.vala:3931
+#: src/window.vala:3128 src/window.vala:3935
 msgid "Shortcuts"
 msgstr "Dreceres"
 
-#: src/window.vala:3128
-msgid "About"
-msgstr "Quant a"
-
-#: src/window.vala:3130
+#: src/window.vala:3131
 msgid "Quit"
 msgstr "Surt"
 
-#: src/window.vala:3181
+#: src/window.vala:3183
 msgid "Invite link will open once a profile is ready"
 msgstr "L'enllaç d'invitació s'obrirà quan un perfil estigui llest"
 
-#: src/window.vala:3190
-msgid "No active profile"
-msgstr "Cap perfil actiu"
-
-#: src/window.vala:3203
+#: src/window.vala:3205
 msgid "Paste a Delta Chat invite link."
 msgstr "Enganxa un enllaç d'invitació del Delta Chat."
 
-#: src/window.vala:3211
+#: src/window.vala:3213
 msgid "https://i.delta.chat/#..."
 msgstr "https://i.delta.chat/#..."
 
-#: src/window.vala:3231
+#: src/window.vala:3233
 msgid "Add"
 msgstr "Afegeix"
 
-#: src/window.vala:3274
+#: src/window.vala:3276
 msgid "Checking invite link…"
 msgstr "S'està verificant l'enllaç d'invitació…"
 
-#: src/window.vala:3279
+#: src/window.vala:3281
 msgid "This is not a valid invite link."
 msgstr "Aquest enllaç d'invitació no és vàlid."
 
-#: src/window.vala:3296
+#: src/window.vala:3298
 msgid "Accepting invite link…"
 msgstr "S'està acceptant l'enllaç d'invitació…"
 
-#: src/window.vala:3301
+#: src/window.vala:3303
 msgid "Invite link accepted"
 msgstr "S'ha acceptat l'enllaç d'invitació"
 
 #. Our own link, currently inactive — activate it so others
 #. can join.
-#: src/window.vala:3310
+#: src/window.vala:3312
 msgid "Activating your invite link…"
 msgstr "S'està activant el teu enllaç d'invitació…"
 
-#: src/window.vala:3312
-msgid ""
-"This is your own invite link. It is now active — share it with others so "
-"they can join."
-msgstr ""
-"Aquest és el teu enllaç d'invitació. Ara està actiu: comparteix-lo amb "
-"d'altres perquè s'hi puguin unir."
+#: src/window.vala:3314
+msgid "This is your own invite link. It is now active — share it with others so they can join."
+msgstr "Aquest és el teu enllaç d'invitació. Ara està actiu: comparteix-lo amb d'altres perquè s'hi puguin unir."
 
 #. Our own link, already active. Nothing to join — just tell
 #. the user it is ready to share.
-#: src/window.vala:3321
-msgid ""
-"This is your own invite link and it is active. Share it with others so they "
-"can join."
-msgstr ""
-"Aquest és el teu enllaç d'invitació i està actiu. Comparteix-lo amb d'altres "
-"perquè s'hi puguin unir."
+#: src/window.vala:3323
+msgid "This is your own invite link and it is active. Share it with others so they can join."
+msgstr "Aquest és el teu enllaç d'invitació i està actiu. Comparteix-lo amb d'altres perquè s'hi puguin unir."
 
-#: src/window.vala:3326
+#: src/window.vala:3328
 msgid "This is not a contact, group, or channel invite link."
 msgstr "Aquest no és un enllaç d'invitació de contacte, grup o canal."
 
-#: src/window.vala:3330
+#: src/window.vala:3332
 msgid "Invite link failed: "
 msgstr "L'enllaç d'invitació ha fallat: "
 
-#: src/window.vala:3510
+#: src/window.vala:3512
 #, c-format
 msgid "Show Sidebar (%s)"
 msgstr "Mostra la barra lateral (%s)"
 
-#: src/window.vala:3510
+#: src/window.vala:3512
 #, c-format
 msgid "Hide Sidebar (%s)"
 msgstr "Amaga la barra lateral (%s)"
 
-#: src/window.vala:3883
+#: src/window.vala:3886
 msgid "New chat"
 msgstr "Xat nou"
 
-#: src/window.vala:3884
+#: src/window.vala:3887
 msgid "New group"
 msgstr "Grup nou"
 
-#: src/window.vala:3885
+#: src/window.vala:3888
 msgid "New channel"
 msgstr "Canal nou"
 
-#: src/window.vala:3886
+#: src/window.vala:3889
 msgid "Open settings"
 msgstr "Obre la configuració"
 
-#: src/window.vala:3887
+#: src/window.vala:3890
 msgid "Increase font size"
 msgstr "Augmenta la mida de la lletra"
 
-#: src/window.vala:3888
+#: src/window.vala:3891
 msgid "Decrease font size"
 msgstr "Redueix la mida de la lletra"
 
-#: src/window.vala:3889
+#: src/window.vala:3892
 msgid "Reset font size"
 msgstr "Restableix la mida de la lletra"
 
-#: src/window.vala:3890
+#: src/window.vala:3893
 msgid "Open chat info"
 msgstr "Obre la informació del xat"
 
-#: src/window.vala:3891
+#: src/window.vala:3894
 msgid "Apps and media gallery"
 msgstr "Galeria d'aplicacions i multimèdia"
 
-#: src/window.vala:3892
+#: src/window.vala:3895
 msgid "Search in conversation"
 msgstr "Cerca a la conversa"
 
-#: src/window.vala:3893
+#: src/window.vala:3896
 msgid "Search chats and messages"
 msgstr "Cerca xats i missatges"
 
-#: src/window.vala:3894
+#: src/window.vala:3897
 msgid "Quick switch chat"
 msgstr "Canvi ràpid de xat"
 
-#: src/window.vala:3895 src/window.vala:3904
+#: src/window.vala:3898 src/window.vala:3907
 msgid "Focus message entry"
 msgstr "Focus a l'entrada de missatges"
 
-#: src/window.vala:3896
+#: src/window.vala:3899
 msgid "Message action (from Settings)"
 msgstr "Acció de missatge (de la Configuració)"
 
-#: src/window.vala:3897
+#: src/window.vala:3900
 msgid "Menu for focused message"
 msgstr "Menú per al missatge amb focus"
 
-#: src/window.vala:3898
+#: src/window.vala:3901
 msgid "Account menu"
 msgstr "Menú del compte"
 
-#: src/window.vala:3899
+#: src/window.vala:3902
 msgid "Focus next chat"
 msgstr "Focus al xat següent"
 
-#: src/window.vala:3900
+#: src/window.vala:3903
 msgid "Focus previous chat"
 msgstr "Focus al xat anterior"
 
-#: src/window.vala:3901
+#: src/window.vala:3904
 msgid "Refresh messages"
 msgstr "Actualitza els missatges"
 
-#: src/window.vala:3902
+#: src/window.vala:3905
 msgid "Toggle sidebar"
 msgstr "Commuta la barra lateral"
 
-#: src/window.vala:3903
+#: src/window.vala:3906
 msgid "Compact sidebar"
 msgstr "Barra lateral compacta"
 
-#: src/window.vala:3905
+#: src/window.vala:3908
 msgid "Select or deselect focused message"
 msgstr "Selecciona o desselecciona el missatge amb focus"
 
-#: src/window.vala:3906
+#: src/window.vala:3909
 msgid "Focus message selection actions"
 msgstr "Focus a les accions de selecció de missatges"
 
-#: src/window.vala:3907
+#: src/window.vala:3910
 msgid "Cancel reply/edit/image/selection"
 msgstr "Cancel·la resposta/edició/imatge/selecció"
 
-#: src/window.vala:3908
+#: src/window.vala:3911
 msgid "Close window"
 msgstr "Tanca la finestra"
 
-#: src/window.vala:3909
+#: src/window.vala:3912
 msgid "Quit application"
 msgstr "Surt de l'aplicació"
 
-#: src/window.vala:3956
+#: src/window.vala:3961
 msgid "Change font size"
 msgstr "Canvia la mida de la lletra"
 
-#: src/window.vala:3967
+#: src/window.vala:3972
 msgid "Emoji picker"
 msgstr "Selector d'emojis"

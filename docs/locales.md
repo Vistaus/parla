@@ -4,10 +4,10 @@ Parla uses the standard GNU gettext stack that is already shipped with GLib,
 GTK and libadwaita. The build system is Meson and the translation domain is
 `parla`.
 
-This is currently a **proof of concept**: the infrastructure is in place and
-a small but visible subset of the UI is translated to **Catalan** (`ca`). The
-goal is to expand the catalog file by file until the whole app is covered,
-without changing the architecture.
+The infrastructure is in place and a substantial part of the UI is translated
+to **Catalan** (`ca`), the only language shipped today. Coverage grows by
+wrapping more strings with `_()` and adding the source file to `po/POTFILES`; no
+architecture change is needed for that.
 
 ## How it works
 
@@ -80,6 +80,19 @@ po/
 └── ca.po            # Catalan catalog (add more .po files here)
 ```
 
+`po/ca.po` is an ordinary PO file: edit it in place with any PO editor. After
+`parla-update-po` marks entries as fuzzy, review them rather than accepting the
+suggestion blindly, since gettext matches on similar English text and the
+existing translation often belongs to a different string.
+
+Check a catalog before committing:
+
+```sh
+msgfmt -c --statistics po/ca.po -o /dev/null
+```
+
+A clean run reports no untranslated and no fuzzy messages.
+
 ### Add a new language
 
 1. Add the language code to `po/LINGUAS`, for example `de` for German.
@@ -111,7 +124,24 @@ meson compile -C builddir parla-pot
 meson compile -C builddir parla-update-po
 ```
 
-Translators should then fill in the new or fuzzy entries.
+`parla-update-po` rewrites `po/parla.pot` as well, so running only the second
+command is enough in most cases. It preserves the existing `msgstr` values,
+marks near-matches as `#, fuzzy` and appends genuinely new entries as empty.
+
+Translators should then fill in the new or fuzzy entries. Entries that are no
+longer in the sources end up commented out at the bottom of the file; delete
+them when editing by hand.
+
+### Adding a source file to POTFILES
+
+A Vala file only becomes translatable once it is listed in `po/POTFILES`. Keep
+the list alphabetical:
+
+```sh
+echo 'src/new_dialog.vala' >> po/POTFILES
+sort -o po/POTFILES po/POTFILES
+meson compile -C builddir parla-update-po
+```
 
 ### Marking strings in Vala
 
@@ -124,12 +154,12 @@ label.label = _("Select a chat");
 // String with context (same English word, different meaning)
 row.title = C_("Connection state", "Not connected");
 
-// Plural forms
-status_label.label = ngettext ("%d rule", "%d rules", count).printf (count);
+// Plural forms (never build plurals by appending "s")
+status_label.label = ngettext ("%u chat", "%u chats", n).printf (n);
 
-// Delayed translation inside a constant/struct
+// Delayed translation: const arrays hold N_(), translate at the point of use
 const string[] hints = { N_("Add a profile"), N_("Set up account") };
-string translated = _(hints[0]);
+label.label = _(hints[0]);
 ```
 
 Translator comments can be added with the `/// TRANSLATORS:` convention so
@@ -137,15 +167,73 @@ xgettext copies them into the `.pot` file.
 
 ### What is translated today
 
-Only a representative subset of the UI is marked for translation in this POC:
+All files listed in `po/POTFILES` are translated; run
 
-* Command-line option descriptions (`src/application.vala`).
-* Main chrome strings in `src/window.vala`: welcome page, empty states,
-  connection banner, account menu rows, header-bar tooltips, etc.
+```sh
+cat po/POTFILES
+```
 
-The rest of the app still uses literal English strings. Expanding coverage is a
-matter of wrapping more strings with `_()` and adding their source files to
-`po/POTFILES` if they are not already included.
+for the current list. It covers the whole chat surface and most of the settings
+surface:
+
+* Command-line options (`src/application.vala`) and the main window, including
+  its app menu and keyboard shortcut menu (`src/window.vala`).
+* Chat list, message rows, composer and the media bar
+  (`src/chat_row.vala`, `src/message_row.vala`, `src/compose_bar.vala`,
+  `src/conversation_media_bar.vala`, `src/conversation_view.vala`,
+  `src/message_actions.vala`, `src/full_message_dialog.vala`).
+* Shared destructive-action confirmations, used by the message, chat and group
+  flows (`src/models.vala`).
+* Dialogs: chat info, new group/channel, contact picker, search results, image
+  viewer, sticker picker and the in-chat app manager
+  (`src/chat_info_dialog.vala`, `src/new_group_dialog.vala`,
+  `src/contact_picker_dialog.vala`, `src/search_results_view.vala`,
+  `src/image_viewer.vala`, `src/sticker_picker.vala`,
+  `src/webxdc_manager_dialog.vala`).
+* The settings dialog (`src/settings_dialog.vala`), including the Chatmail Core
+  updater, proxy configuration and link-tracking filter list.
+* Voice message playback and transcription (`src/audio_player.vala`) and the
+  storage-quota explanation dialog in `src/profile_dialog.vala`.
+
+The remaining unwrapped strings live in files that are not yet in `POTFILES`,
+mainly the profile/account setup flow, the gallery, the pinned-message and
+sticker managers, the message details dialog, the webxdc bar and the tray icon.
+Expanding coverage is a matter of wrapping more strings with `_()` and adding
+their source files to `po/POTFILES`.
+
+### Plurals and composed strings
+
+Catalan, like most languages, needs plural forms, so avoid English `+ "s"`
+pluralisation. Use `ngettext()` for a plain count:
+
+```vala
+label = ngettext ("%u chat", "%u chats", n).printf (n);
+```
+
+When a plural noun is embedded in a longer sentence, pass the noun in as a
+parameter instead, as `webxdc_manager_dialog.vala` does with its `count_label()`
+helper. That keeps the plural in one translatable place.
+
+Long sentences that are built by concatenating string literals should be joined
+*inside* the `_()` call, not outside it, otherwise translators get a fragment
+they cannot reorder:
+
+```vala
+// Wrong: the parts cannot be reordered in the target language
+var body = _("First half of the sentence.") + _("Second half.");
+
+// Right: one translatable unit
+var body = _("First half of the sentence. Second half.");
+```
+
+The same applies to sentence fragments that are concatenated depending on
+context (for example the group/channel variants): use `_("Full text for a "
++ "group")` and `_("Full text for a channel")` rather than a translated prefix
+plus an untranslated suffix.
+
+When a sentence is built from a translated prefix and a value, keep the
+punctuation and spacing next to the placeholder so the format string is
+self-contained: `_("Remove failed: %s").printf (reason)`.
 
 ### Desktop and AppData files
 

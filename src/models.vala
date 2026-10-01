@@ -4,10 +4,13 @@ namespace Dc {
     public enum LeaveChoice { CANCEL, KEEP_HISTORY, DELETE_HISTORY }
 
     // Manual deletion is synced by core; it is not a device-only cache purge.
-    public const string DELETE_FOR_ME_DESCRIPTION =
-        "Messages and their attachments, including in-chat apps, are removed from this history. Deletion is also requested on the server and linked devices using this profile. Other participants keep their copies.";
-    public const string DELETE_COPIES_DESCRIPTION =
-        "Files saved elsewhere, forwarded copies and backups are not removed. This cannot be undone.";
+    /* Long explanations shared by the delete/clear confirmations and the
+       storage page. Marked with N_ so xgettext picks them up from this const
+       initializer; call sites wrap them with _() at display time. */
+    public const string DELETE_FOR_ME_DESCRIPTION = N_(
+        "Messages and their attachments, including in-chat apps, are removed from this history. Deletion is also requested on the server and linked devices using this profile. Other participants keep their copies.");
+    public const string DELETE_COPIES_DESCRIPTION = N_(
+        "Files saved elsewhere, forwarded copies and backups are not removed. This cannot be undone.");
 
     /** Flat, left-aligned button for hand-built popover menus. It closes
         its popover before emitting selected from an idle. */
@@ -67,7 +70,7 @@ namespace Dc {
     }
 
     public static void show_error (Gtk.Widget parent, string message) {
-        var d = new Adw.AlertDialog ("Error", message);
+        var d = new Adw.AlertDialog (_("Error"), message);
         d.add_response ("ok", "OK");
         d.present (parent);
     }
@@ -101,7 +104,7 @@ namespace Dc {
                                              string body, string action_id,
                                              string action_label) {
         var d = new Adw.AlertDialog (title, body);
-        d.add_response ("cancel", "Cancel");
+        d.add_response ("cancel", _("Cancel"));
         d.add_response (action_id, action_label);
         d.set_response_appearance (action_id, Adw.ResponseAppearance.DESTRUCTIVE);
         d.default_response = "cancel";
@@ -116,7 +119,7 @@ namespace Dc {
                                              string initial = "",
                                              string? placeholder = null) {
         var d = new Adw.AlertDialog (title, body);
-        d.add_response ("cancel", "Cancel");
+        d.add_response ("cancel", _("Cancel"));
         d.add_response ("ok", action_label);
         d.set_response_appearance ("ok", Adw.ResponseAppearance.SUGGESTED);
         d.default_response = "ok";
@@ -142,23 +145,23 @@ namespace Dc {
             allow_delete_for_everyone = yield can_delete_messages_for_everyone (
                 rpc, ids);
         } catch (Error e) {
-            show_error (parent, "Could not check message deletion options: " + e.message);
+            show_error (parent, _("Could not check message deletion options: ") + e.message);
             return DeleteChoice.CANCEL;
         }
         if (rpc.account_id != account_id) return DeleteChoice.CANCEL;
-        string title = ids.length == 1 ? "Delete Message?"
-            : "Delete %d Messages?".printf (ids.length);
-        string body = "Delete for Me: " + DELETE_FOR_ME_DESCRIPTION;
+        string title = ids.length == 1 ? _("Delete Message?")
+            : _("Delete %d Messages?").printf (ids.length);
+        string body = _("Delete for Me: ") + _(DELETE_FOR_ME_DESCRIPTION);
         if (allow_delete_for_everyone) {
-            body += "\n\nDelete for Everyone also asks other participants’ apps to delete these messages. Saved or forwarded copies may remain.";
+            body += "\n\n" + _("Delete for Everyone also asks other participants’ apps to delete these messages. Saved or forwarded copies may remain.");
         }
-        body += "\n\n" + DELETE_COPIES_DESCRIPTION;
+        body += "\n\n" + _(DELETE_COPIES_DESCRIPTION);
         var d = new Adw.AlertDialog (title, body);
-        d.add_response ("cancel", "Cancel");
-        d.add_response ("delete_me", "Delete for Me");
+        d.add_response ("cancel", _("Cancel"));
+        d.add_response ("delete_me", _("Delete for Me"));
         d.set_response_appearance ("delete_me", Adw.ResponseAppearance.DESTRUCTIVE);
         if (allow_delete_for_everyone) {
-            d.add_response ("delete_all", "Delete for Everyone");
+            d.add_response ("delete_all", _("Delete for Everyone"));
             d.set_response_appearance ("delete_all",
                 Adw.ResponseAppearance.DESTRUCTIVE);
         }
@@ -185,27 +188,27 @@ namespace Dc {
 
     public static async bool confirm_chat_deletion (Gtk.Widget parent,
                                                     string name) {
-        return yield confirm_action (parent, "Delete Chat?",
-            "Delete \"%s\" and its messages?\n\n".printf (name)
-            + DELETE_FOR_ME_DESCRIPTION
-            + "\n\nAny draft in this chat is also deleted. This does not leave a group or channel, unsubscribe from a mailing list, or block a contact. New messages may make the chat appear again.\n\n"
-            + DELETE_COPIES_DESCRIPTION,
-            "delete", "Delete Chat");
+        return yield confirm_action (parent, _("Delete Chat?"),
+            _("Delete “%s” and its messages?\n\n").printf (name)
+            + _(DELETE_FOR_ME_DESCRIPTION)
+            + "\n\n" + _("Any draft in this chat is also deleted. This does not leave a group or channel, unsubscribe from a mailing list, or block a contact. New messages may make the chat appear again.")
+            + "\n\n" + _(DELETE_COPIES_DESCRIPTION),
+            "delete", _("Delete Chat"));
     }
 
     public static async bool confirm_chat_clear (Gtk.Widget parent,
                                                 string name, bool for_all,
                                                 int count) {
-        string body = (count == 1 ? "Delete 1 message in \"%s\"?".printf (name)
-            : "Delete %d messages in \"%s\"?".printf (count, name)) + "\n\n";
+        string body = (count == 1 ? _("Delete 1 message in “%s”?").printf (name)
+            : _("Delete %d messages in “%s”?").printf (count, name)) + "\n\n";
         body += for_all
-            ? "Only encrypted messages sent by this profile are selected. They and their attachments, including in-chat apps, are removed from this history, and deletion is requested on the server, linked devices and other participants’ apps. Messages from other people, unencrypted messages and status messages are kept."
-            : DELETE_FOR_ME_DESCRIPTION;
+            ? _("Only encrypted messages sent by this profile are selected. They and their attachments, including in-chat apps, are removed from this history, and deletion is requested on the server, linked devices and other participants’ apps. Messages from other people, unencrypted messages and status messages are kept.")
+            : _(DELETE_FOR_ME_DESCRIPTION);
         return yield confirm_action (parent,
-            for_all ? "Delete Sent Messages for Everyone?" : "Clear Chat?",
-            body + "\n\nThe chat, its draft and messages arriving after this confirmation opens are kept.\n\n"
-                + DELETE_COPIES_DESCRIPTION,
-            "clear", for_all ? "Delete for Everyone" : "Clear for Me");
+            for_all ? _("Delete Sent Messages for Everyone?") : _("Clear Chat?"),
+            body + "\n\n" + _("The chat, its draft and messages arriving after this confirmation opens are kept.")
+                + "\n\n" + _(DELETE_COPIES_DESCRIPTION),
+            "clear", for_all ? _("Delete for Everyone") : _("Clear for Me"));
     }
 
     public static bool can_leave_chat (Json.Object chat) {
@@ -223,26 +226,26 @@ namespace Dc {
         try {
             chat = yield rpc.get_full_chat_by_id_for (account_id, chat_id);
         } catch (Error e) {
-            show_error (parent, "Could not check group membership: " + e.message);
+            show_error (parent, _("Could not check group membership: ") + e.message);
             return LeaveChoice.CANCEL;
         }
         if (account_id != rpc.account_id) return LeaveChoice.CANCEL;
         if (chat == null || !can_leave_chat (chat)) {
-            show_error (parent, "This group or channel can no longer be left.");
+            show_error (parent, _("This group or channel can no longer be left."));
             return LeaveChoice.CANCEL;
         }
         bool channel = json_str (chat, "chatType") == "InBroadcast";
-        string leave_label = channel ? "Leave Channel" : "Leave Group";
-        string body = "Leave \"%s\" and stop receiving new messages?".printf (
-            json_str (chat, "name") ?? "this chat");
+        string leave_label = channel ? _("Leave Channel") : _("Leave Group");
+        string body = _("Leave “%s” and stop receiving new messages?").printf (
+            json_str (chat, "name") ?? _("this chat"));
         if (!channel && !json_bool (chat, "isUnpromoted"))
-            body += " Other members will be notified.";
-        body += "\n\n" + leave_label + " keeps the chat history. Leave and Delete also deletes the chat, its draft, messages and attachments for this profile. Deletion is requested on the server and linked devices. Other participants keep their history.\n\n"
-            + DELETE_COPIES_DESCRIPTION;
-        var d = new Adw.AlertDialog (channel ? "Leave Channel?" : "Leave Group?", body);
-        d.add_response ("cancel", "Cancel");
+            body += _(" Other members will be notified.");
+        body += "\n\n" + (_("%s keeps the chat history. Leave and Delete also deletes the chat, its draft, messages and attachments for this profile. Deletion is requested on the server and linked devices. Other participants keep their history.").printf (leave_label))
+            + "\n\n" + _(DELETE_COPIES_DESCRIPTION);
+        var d = new Adw.AlertDialog (channel ? _("Leave Channel?") : _("Leave Group?"), body);
+        d.add_response ("cancel", _("Cancel"));
         d.add_response ("leave", leave_label);
-        d.add_response ("delete", "Leave and Delete");
+        d.add_response ("delete", _("Leave and Delete"));
         d.set_response_appearance ("leave", Adw.ResponseAppearance.DESTRUCTIVE);
         d.set_response_appearance ("delete", Adw.ResponseAppearance.DESTRUCTIVE);
         d.default_response = "cancel";
@@ -256,13 +259,15 @@ namespace Dc {
 
     public static async bool confirm_chat_block (Gtk.Widget parent,
                                                  string name, bool contact) {
-        return yield confirm_action (parent, contact ? "Block Contact?" : "Block Chat?",
-            "Block \"%s\"? The chat is hidden and its history is kept. Blocking syncs to linked devices using this profile.\n\n".printf (name)
+        return yield confirm_action (parent,
+            contact ? _("Block Contact?") : _("Block Chat?"),
+            _("Block “%s”? The chat is hidden and its history is kept. Blocking syncs to linked devices using this profile.").printf (name)
+            + "\n\n"
             + (contact
-                ? "Direct messages from this contact will be blocked. Their messages in shared groups can still appear. The contact is not notified."
-                : "New messages in this chat will be hidden. This does not leave a channel or unsubscribe from a mailing list.")
-            + "\n\nUnblock it later from Profile → Blocked Contacts.",
-            "block", contact ? "Block Contact" : "Block Chat");
+                ? _("Direct messages from this contact will be blocked. Their messages in shared groups can still appear. The contact is not notified.")
+                : _("New messages in this chat will be hidden. This does not leave a channel or unsubscribe from a mailing list."))
+            + "\n\n" + _("Unblock it later from Profile → Blocked Contacts."),
+            "block", contact ? _("Block Contact") : _("Block Chat"));
     }
 
     /** Skeleton for hand-built popover menus: a no-arrow popover pointing

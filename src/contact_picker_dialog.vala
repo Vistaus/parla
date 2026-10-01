@@ -40,7 +40,7 @@ namespace Dc {
             this.account_selector_enabled = enable_account_selector;
             this.selected_account_id = rpc.account_id;
             this.title = title ?? (chat_store != null
-                ? "Select Destination" : "Select Contact");
+                ? _("Select Destination") : _("Select Contact"));
             this.content_width = 360;
             this.content_height = 500;
 
@@ -61,7 +61,7 @@ namespace Dc {
             if (account_selector_enabled) {
                 account_dropdown = new Gtk.DropDown (new Gtk.StringList (null), null);
                 account_dropdown.hexpand = true;
-                account_dropdown.tooltip_text = "Destination account";
+                account_dropdown.tooltip_text = _("Destination account");
                 account_dropdown.notify["selected"].connect (on_account_changed);
                 content.append (account_dropdown);
             }
@@ -69,8 +69,8 @@ namespace Dc {
             /* Search / filter entry */
             search_entry = new Gtk.SearchEntry ();
             search_entry.placeholder_text = chat_store != null
-                ? "Search chats, contacts or enter email\u2026"
-                : "Search or enter email\u2026";
+                ? _("Search chats, contacts or enter email\u2026")
+                : _("Search or enter email\u2026");
             search_entry.hexpand = true;
             search_entry.search_changed.connect (on_search_changed);
             search_entry.activate.connect (on_activate_search);
@@ -90,7 +90,7 @@ namespace Dc {
 
             var list_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 8);
 
-            chats_header = new Gtk.Label ("Chats");
+            chats_header = new Gtk.Label (_("Chats"));
             chats_header.add_css_class ("heading");
             chats_header.add_css_class ("dim-label");
             chats_header.halign = Gtk.Align.START;
@@ -104,7 +104,7 @@ namespace Dc {
             chat_listbox.visible = false;
             list_box.append (chat_listbox);
 
-            contacts_header = new Gtk.Label ("Contacts");
+            contacts_header = new Gtk.Label (_("Contacts"));
             contacts_header.add_css_class ("heading");
             contacts_header.add_css_class ("dim-label");
             contacts_header.halign = Gtk.Align.START;
@@ -162,7 +162,7 @@ namespace Dc {
                         string? name = yield rpc.get_config ("displayname", id);
                         string? addr = yield rpc.get_account_address (id);
                         string label = (name != null && name.length > 0)
-                            ? name : (addr ?? "Account #%d".printf (id));
+                            ? name : (addr ?? _("Account #%d").printf (id));
                         if (name != null && name.length > 0
                             && addr != null && addr.length > 0)
                             label = "%s (%s)".printf (name, addr);
@@ -248,7 +248,7 @@ namespace Dc {
                 all_contacts = collected;
                 rebuild_contact_list (search_entry.text.strip ());
             } catch (Error e) {
-                var lbl = new Gtk.Label ("Failed to load contacts: " + e.message);
+                var lbl = new Gtk.Label (_("Failed to load contacts: ") + e.message);
                 lbl.add_css_class ("dim-label");
                 lbl.wrap = true;
                 contact_listbox.append (lbl);
@@ -328,7 +328,7 @@ namespace Dc {
                         break;
                     }
                 }
-                use_email_btn.label = "Start chat with %s".printf (text);
+                use_email_btn.label = _("Start chat with %s").printf (text);
                 use_email_btn.visible = !already_listed;
             } else {
                 use_email_btn.visible = false;

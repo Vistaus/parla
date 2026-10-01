@@ -16,7 +16,7 @@ int main (string[] args) {
     Environment.set_application_name ("Parla");
 
     /* Initialize gettext before any UI string is constructed. The locale is
-       picked from the usual envvars (LANG, LC_ALL, ...); see doc/locales.md
+       picked from the usual envvars (LANG, LC_ALL, ...); see docs/locales.md
        for how to override it per-launch. */
     GLib.Intl.setlocale (LocaleCategory.ALL, "");
     GLib.Intl.bindtextdomain (Parla.GETTEXT_PACKAGE, Parla.LOCALEDIR);

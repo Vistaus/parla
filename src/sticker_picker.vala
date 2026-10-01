@@ -57,8 +57,8 @@ namespace Dc {
             var content = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
             placeholder = new Gtk.Label (
-                "No stickers yet.\nRight-click a sticker in a conversation\n" +
-                "and choose \"Add Sticker…\".");
+                _("No stickers yet.\nRight-click a sticker in a conversation\n"
+                  + "and choose “Add Sticker…”."));
             placeholder.add_css_class ("dim-label");
             placeholder.justify = Gtk.Justification.CENTER;
             placeholder.margin_top = 24;
@@ -140,7 +140,7 @@ namespace Dc {
 
             var all_btn = new Gtk.ToggleButton ();
             all_btn.icon_name = "view-grid-symbolic";
-            all_btn.tooltip_text = "All stickers";
+            all_btn.tooltip_text = _("All stickers");
             all_btn.add_css_class ("flat");
             all_btn.active = true;
             all_btn.toggled.connect (() => {

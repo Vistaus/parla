@@ -16,15 +16,15 @@ namespace Dc {
         public NewGroupDialog (RpcClient rpc, bool is_channel = false) {
             this.rpc = rpc;
             this.is_channel = is_channel;
-            this.kind_label = is_channel ? "Channel" : "Group";
-            this.title = is_channel ? "New Channel" : "New Group";
+            this.kind_label = is_channel ? _("Channel") : _("Group");
+            this.title = is_channel ? _("New Channel") : _("New Group");
             this.content_width = 360;
             this.content_height = 480;
 
             var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
             var header = new Adw.HeaderBar ();
-            var create_btn = new Gtk.Button.with_label ("Create");
+            var create_btn = new Gtk.Button.with_label (_("Create"));
             create_btn.add_css_class ("suggested-action");
             create_btn.clicked.connect (() => {
                 do_create.begin ();
@@ -43,7 +43,7 @@ namespace Dc {
             avatar_widget.halign = Gtk.Align.CENTER;
             content.append (avatar_widget);
 
-            var avatar_btn = new Gtk.Button.with_label ("Set Avatar");
+            var avatar_btn = new Gtk.Button.with_label (_("Set Avatar"));
             avatar_btn.halign = Gtk.Align.CENTER;
             avatar_btn.add_css_class ("flat");
             avatar_btn.clicked.connect (() => {
@@ -52,13 +52,14 @@ namespace Dc {
             content.append (avatar_btn);
 
             /* Name */
-            var name_lbl = new Gtk.Label (kind_label + " Name");
+            var name_lbl = new Gtk.Label (is_channel ? _("Channel Name") : _("Group Name"));
             name_lbl.add_css_class ("heading");
             name_lbl.halign = Gtk.Align.START;
             content.append (name_lbl);
 
             name_entry = new Gtk.Entry ();
-            name_entry.placeholder_text = "My " + kind_label;
+            name_entry.placeholder_text = is_channel ? _("My Channel")
+                                                     : _("My Group");
             name_entry.changed.connect (() => {
                 avatar_widget.text = name_entry.text.length > 0
                     ? name_entry.text : kind_label;
@@ -67,7 +68,7 @@ namespace Dc {
 
             if (is_channel) {
                 var hint = new Gtk.Label (
-                    "Only you can write in a channel. Members read messages without seeing each other.");
+                    _("Only you can write in a channel. Members read messages without seeing each other."));
                 hint.wrap = true;
                 hint.xalign = 0;
                 hint.add_css_class ("dim-label");
@@ -79,7 +80,7 @@ namespace Dc {
 
             /* Members */
             var members_header = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
-            var members_lbl = new Gtk.Label ("Members");
+            var members_lbl = new Gtk.Label (_("Members"));
             members_lbl.add_css_class ("heading");
             members_lbl.halign = Gtk.Align.START;
             members_lbl.hexpand = true;
@@ -87,7 +88,7 @@ namespace Dc {
             content.append (members_header);
 
             /* Add member button — opens contact picker */
-            var add_btn = new Gtk.Button.with_label ("Add Member\u2026");
+            var add_btn = new Gtk.Button.with_label (_("Add Member…"));
             add_btn.add_css_class ("suggested-action");
             add_btn.clicked.connect (on_pick_member);
             content.append (add_btn);
@@ -191,7 +192,8 @@ namespace Dc {
 
         private async void pick_avatar () {
             string? path = yield pick_image_file (
-                (Gtk.Window) this.get_root (), "Select " + kind_label + " Avatar");
+                (Gtk.Window) this.get_root (),
+                is_channel ? _("Select Channel Avatar") : _("Select Group Avatar"));
             if (path != null) {
                 avatar_path = path;
                 avatar_widget.custom_image = load_avatar (path);
