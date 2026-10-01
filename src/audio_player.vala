@@ -546,7 +546,7 @@ namespace Dc {
             string size = message.file_bytes > 0
                 ? " (%s)".printf (format_size (message.file_bytes))
                 : "";
-            var label = new Gtk.Label ("Voice Message" + size);
+            var label = new Gtk.Label (_("Voice Message") + size);
             label.add_css_class ("message-audio-name");
             label.xalign = 0;
             label.valign = Gtk.Align.CENTER;
@@ -557,7 +557,7 @@ namespace Dc {
                 transcribe_btn.add_css_class ("flat");
                 transcribe_btn.add_css_class ("message-transcribe-button");
                 transcribe_btn.valign = Gtk.Align.CENTER;
-                transcribe_btn.tooltip_text = "Transcribe voice message";
+                transcribe_btn.tooltip_text = _("Transcribe voice message");
                 transcribe_btn.clicked.connect (() => {
                     transcriber.transcribe (message.file_path);
                 });
@@ -597,14 +597,14 @@ namespace Dc {
                 transcribe_btn.sensitive = !in_progress && text == null;
             }
             if (in_progress) {
-                transcription_label.set_markup ("<i>Transcribing…</i>");
+                transcription_label.set_markup ("<i>" + _("Transcribing…") + "</i>");
                 transcription_label.visible = true;
             } else if (text != null) {
                 string quoted = text.length > 0
                     ? "“" + Markup.escape_text (text) + "”"
-                    : "(no speech detected)";
+                    : _("(no speech detected)");
                 transcription_label.set_markup (
-                    "Transcription: <i>" + quoted + "</i>");
+                    _("Transcription: ") + "<i>" + quoted + "</i>");
                 transcription_label.visible = true;
             } else {
                 transcription_label.visible = false;
@@ -616,7 +616,7 @@ namespace Dc {
             btn.icon_name = is_playing
                 ? "media-playback-pause-symbolic"
                 : "media-playback-start-symbolic";
-            btn.tooltip_text = is_playing ? "Pause" : "Play";
+            btn.tooltip_text = is_playing ? _("Pause") : _("Play");
         }
 
         private bool is_current_message () {

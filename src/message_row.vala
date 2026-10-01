@@ -466,7 +466,7 @@ namespace Dc {
         private void append_meta_indicators (Gtk.Box box, Message msg,
                                              Gtk.Align align = Gtk.Align.START) {
             if (msg.is_edited) {
-                var edited = build_edited_indicator ("(edited)");
+                var edited = build_edited_indicator (_("(edited)"));
                 edited.valign = align;
                 box.append (edited);
             }
@@ -537,7 +537,7 @@ namespace Dc {
             var footer = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 4);
             footer.halign = Gtk.Align.END;
             if (msg.is_edited) {
-                footer.append (build_edited_indicator ("Edited"));
+                footer.append (build_edited_indicator (_("Edited")));
             }
             var time_lbl = new Gtk.Label (format_timestamp (msg.timestamp));
             time_lbl.add_css_class ("message-time");
@@ -724,11 +724,11 @@ namespace Dc {
             bar.halign = Gtk.Align.END;
             bar.valign = Gtk.Align.START;
             string[,] actions = {
-                { "react", "face-smile-symbolic", "React" },
-                { "reply", "mail-reply-sender-symbolic", "Reply" },
-                { "forward", "mail-forward-symbolic", "Forward" },
-                { "pin", "view-pin-symbolic", "Pin / Unpin" },
-                { "more", "view-more-symbolic", "More actions" }
+                { "react", "face-smile-symbolic", _("React") },
+                { "reply", "mail-reply-sender-symbolic", _("Reply") },
+                { "forward", "mail-forward-symbolic", _("Forward") },
+                { "pin", "view-pin-symbolic", _("Pin / Unpin") },
+                { "more", "view-more-symbolic", _("More actions") }
             };
             for (int i = 0; i < actions.length[0]; i++) {
                 string action = actions[i, 0];
@@ -768,7 +768,7 @@ namespace Dc {
             /* Name the checkbox so a screen reader says which message it
                selects, not just "checkbox" (#57). */
             check.update_property (Gtk.AccessibleProperty.LABEL,
-                "Select message, " + accessible_summary (msg), -1);
+                _("Select message, ") + accessible_summary (msg), -1);
 #endif
             Signal.connect_object (check, "toggled",
                 (Callback) on_selection_toggled, this, (ConnectFlags) 0);
@@ -827,7 +827,7 @@ namespace Dc {
             var btn = new Gtk.Button ();
             btn.add_css_class ("webxdc-card");
             btn.focus_on_click = false;
-            btn.tooltip_text = "Webxdc app options";
+            btn.tooltip_text = _("Webxdc app options");
 
             var inner = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var icon = new Gtk.Image.from_icon_name (
@@ -846,10 +846,10 @@ namespace Dc {
             name.max_width_chars = 24;
             text.append (name);
             string status = !Webxdc.AVAILABLE
-                ? "Webxdc app · download only"
+                ? _("Webxdc app · download only")
                 : !Webxdc.enabled ()
-                ? "Webxdc app · disabled in Settings"
-                : "Webxdc app · choose an action";
+                ? _("Webxdc app · disabled in Settings")
+                : _("Webxdc app · choose an action");
             var subtitle = make_label (status, "webxdc-card-subtitle");
             subtitle.max_width_chars = 30;
             text.append (subtitle);
@@ -1138,8 +1138,8 @@ namespace Dc {
         private static Gtk.Label build_forwarded_indicator (Message msg) {
             string? author = msg.is_outgoing ? null : effective_author_name (msg);
             var lbl = new Gtk.Label (author != null
-                ? "↪ Forwarded by " + author
-                : "↪ Forwarded");
+                ? _("↪ Forwarded by ") + author
+                : _("↪ Forwarded"));
             lbl.add_css_class ("message-forwarded");
             lbl.halign = Gtk.Align.START;
             lbl.xalign = 0;
@@ -1154,7 +1154,7 @@ namespace Dc {
         private static Gtk.Label build_edited_indicator (string text) {
             var lbl = new Gtk.Label (text);
             lbl.add_css_class ("message-edited");
-            lbl.tooltip_text = "This message was edited";
+            lbl.tooltip_text = _("This message was edited");
             return lbl;
         }
 
@@ -1184,7 +1184,7 @@ namespace Dc {
             play_box.add_css_class ("message-video-play");
             play_box.halign = Gtk.Align.CENTER;
             play_box.valign = Gtk.Align.CENTER;
-            play_box.tooltip_text = "Play video";
+            play_box.tooltip_text = _("Play video");
 
             var play = new Gtk.Image.from_icon_name ("media-playback-start-symbolic");
             play.pixel_size = 20;
@@ -1258,19 +1258,19 @@ namespace Dc {
             if (msg.is_failed) {
                 glyph = "⚠";
                 extra_class = "message-tick-failed";
-                tooltip = "Sending failed";
+                tooltip = _("Sending failed");
             } else if (msg.is_read) {
                 glyph = "✓✓";
                 extra_class = "message-tick-read";
-                tooltip = "Read";
+                tooltip = _("Read");
             } else if (msg.is_delivered) {
                 glyph = "✓";
                 extra_class = "message-tick";
-                tooltip = "Delivered";
+                tooltip = _("Delivered");
             } else if (msg.is_pending) {
                 glyph = "⧖";
                 extra_class = "message-tick";
-                tooltip = "Sending…";
+                tooltip = _("Sending…");
             } else {
                 return null;
             }
@@ -1285,7 +1285,7 @@ namespace Dc {
         private static Gtk.Label build_pin_indicator (Message msg) {
             var pin = new Gtk.Label ("📌");
             pin.add_css_class ("message-pin");
-            pin.tooltip_text = "Pinned";
+            pin.tooltip_text = _("Pinned");
             msg.bind_property ("is-pinned", pin, "visible",
                                BindingFlags.SYNC_CREATE);
             return pin;
@@ -1385,10 +1385,10 @@ namespace Dc {
 
             if (msg.is_downloading_full_message || msg.full_message_loading) {
                 string status_text = msg.full_message_loading
-                    ? "Loading full message…"
+                    ? _("Loading full message…")
                     : (msg.has_file
-                        ? "Downloading attachment..."
-                        : "Downloading full message...");
+                        ? _("Downloading attachment...")
+                        : _("Downloading full message..."));
                 var status = new Gtk.Label (status_text);
                 status.add_css_class ("message-full-text-status");
                 status.halign = Gtk.Align.START;
@@ -1402,11 +1402,11 @@ namespace Dc {
                 var toggle_btn = new Gtk.Button.with_label (
                     msg.can_download_full_message
                         ? (msg.has_file
-                            ? "Download attachment"
-                            : "Download full message")
+                            ? _("Download attachment")
+                            : _("Download full message"))
                         : (msg.full_message_expanded
-                            ? "Collapse"
-                            : "Expand"));
+                            ? _("Collapse")
+                            : _("Expand")));
                 toggle_btn.add_css_class ("flat");
                 toggle_btn.add_css_class ("message-full-text-button");
                 toggle_btn.halign = Gtk.Align.START;
@@ -1985,7 +1985,7 @@ namespace Dc {
                                     : "%s %s".printf (reaction.emoji, count));
             badge.add_css_class ("flat");
             badge.add_css_class ("reaction-badge");
-            badge.tooltip_text = "Show reactions";
+            badge.tooltip_text = _("Show reactions");
 
             var popover = build_reaction_popover (msg, reaction);
             badge.set_data<Gtk.Popover> (REACTION_POPOVER_DATA, popover);
@@ -2228,7 +2228,7 @@ namespace Dc {
             var after = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
             after.hexpand = true;
             after.valign = Gtk.Align.CENTER;
-            var label = new Gtk.Label ("Unread messages");
+            var label = new Gtk.Label (_("Unread messages"));
             label.add_css_class ("accent");
             label.add_css_class ("heading");
             label.add_css_class ("caption");

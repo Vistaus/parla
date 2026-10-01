@@ -645,7 +645,7 @@ namespace Dc {
             message_scroll.child = message_listview;
 
             message_search_entry = new Gtk.SearchEntry ();
-            message_search_entry.placeholder_text = "Search in conversation\u2026";
+            message_search_entry.placeholder_text = _("Search in conversation…");
             message_search_entry.hexpand = true;
             message_search_entry.margin_start = 8;
             message_search_entry.margin_end = 8;
@@ -654,11 +654,11 @@ namespace Dc {
             message_search = new MessageSearch (rpc);
             search_position = new Gtk.Label ("");
             search_previous = new Gtk.Button.from_icon_name ("go-up-symbolic");
-            search_previous.tooltip_text = "Previous match (Shift+Enter)";
+            search_previous.tooltip_text = _("Previous match (Shift+Enter)");
             search_next = new Gtk.Button.from_icon_name ("go-down-symbolic");
-            search_next.tooltip_text = "Next match (Enter)";
+            search_next.tooltip_text = _("Next match (Enter)");
             var close_search = new Gtk.Button.from_icon_name ("window-close-symbolic");
-            close_search.tooltip_text = "Close search (Escape)";
+            close_search.tooltip_text = _("Close search (Escape)");
             track_signal (close_search, close_search.clicked.connect (() => { close_search_if_active (); }));
             track_signal (search_previous, search_previous.clicked.connect (() => { navigate_search (-1); }));
             track_signal (search_next, search_next.clicked.connect (() => { navigate_search (1); }));
@@ -727,7 +727,7 @@ namespace Dc {
             loading_pill.add_css_class ("loading-pill");
             loading_more_spinner = new Gtk.Spinner ();
             loading_pill.append (loading_more_spinner);
-            loading_pill_label = new Gtk.Label ("Loading…");
+            loading_pill_label = new Gtk.Label (_("Loading…"));
             loading_pill.append (loading_pill_label);
 
             loading_more_revealer = new Gtk.Revealer ();
@@ -918,7 +918,7 @@ namespace Dc {
             } catch (Error e) {
                 finish_loading_earlier ();
                 if (!closed && history == history_generation)
-                    window.show_toast ("Failed to load voice message: " + e.message);
+                    window.show_toast (_("Failed to load voice message: ") + e.message);
             }
         }
 
@@ -1030,7 +1030,7 @@ namespace Dc {
             bar.hexpand = true;
             bar.visible = false;
 
-            selection_delete_btn = new Gtk.Button.with_label ("Delete…");
+            selection_delete_btn = new Gtk.Button.with_label (_("Delete…"));
             selection_delete_btn.add_css_class ("destructive-action");
             selection_delete_btn.hexpand = true;
             track_signal (selection_delete_btn,
@@ -1039,7 +1039,7 @@ namespace Dc {
             }));
             bar.append (selection_delete_btn);
 
-            selection_forward_btn = new Gtk.Button.with_label ("Forward");
+            selection_forward_btn = new Gtk.Button.with_label (_("Forward"));
             selection_forward_btn.hexpand = true;
             track_signal (selection_forward_btn,
                 selection_forward_btn.clicked.connect (() => {
@@ -1047,7 +1047,7 @@ namespace Dc {
             }));
             bar.append (selection_forward_btn);
 
-            var cancel_btn = new Gtk.Button.with_label ("Cancel");
+            var cancel_btn = new Gtk.Button.with_label (_("Cancel"));
             cancel_btn.hexpand = true;
             track_signal (cancel_btn, cancel_btn.clicked.connect (() => {
                 end_selection_mode ();
@@ -1088,7 +1088,7 @@ namespace Dc {
             }));
             buttons.append (request_block_btn);
 
-            var accept_btn = new Gtk.Button.with_label ("Accept");
+            var accept_btn = new Gtk.Button.with_label (_("Accept"));
             accept_btn.add_css_class ("suggested-action");
             accept_btn.add_css_class ("pill");
             track_signal (accept_btn, accept_btn.clicked.connect (() => {
@@ -1108,8 +1108,8 @@ namespace Dc {
             is_contact_request = is_request;
             request_block_btn.label = ChatActions.request_action (type);
             request_notice.label = type == "Group"
-                ? "Accept this group invitation to reply, or delete the request."
-                : "Accept this chat request, or block it and keep its history.";
+                ? _("Accept this group invitation to reply, or delete the request.")
+                : _("Accept this chat request, or block it and keep its history.");
             sync_bottom_bars ();
         }
 
@@ -1215,7 +1215,7 @@ namespace Dc {
                 update_conversation_media_bar ();
                 end_selection_mode ();
             } catch (Error e) {
-                window.show_toast ("Delete failed: " + e.message);
+                window.show_toast (_("Delete failed: ") + e.message);
             }
         }
 
@@ -1232,7 +1232,7 @@ namespace Dc {
                 compose_bar.grab_entry_focus ();
                 window.request_reload_chats ();
             } catch (Error e) {
-                window.show_toast ("Failed to accept request: " + e.message);
+                window.show_toast (_("Failed to accept request: ") + e.message);
             }
         }
 
@@ -1244,7 +1244,7 @@ namespace Dc {
                 if (closed || rpc.account_id != account_id || chat == null
                         || !json_bool (chat, "isContactRequest")) return;
                 string type = json_str (chat, "chatType") ?? "";
-                string name = json_str (chat, "name") ?? "this chat";
+                string name = json_str (chat, "name") ?? _("this chat");
                 bool delete_request = type == "Group";
                 bool confirmed = delete_request
                     ? yield confirm_chat_deletion (window, name)
@@ -1257,7 +1257,7 @@ namespace Dc {
                 }
                 window.request_reload_chats ();
             } catch (Error e) {
-                window.show_toast ("Could not dismiss request: " + e.message);
+                window.show_toast (_("Could not dismiss request: ") + e.message);
             } finally {
                 request_block_btn.sensitive = true;
             }
@@ -1463,11 +1463,11 @@ namespace Dc {
         }
 
         private void update_search_position () {
-            if (message_search.busy) search_position.label = "Searching…";
-            else if (message_search.error_message != null) search_position.label = "Search failed";
+            if (message_search.busy) search_position.label = _("Searching…");
+            else if (message_search.error_message != null) search_position.label = _("Search failed");
             else if (message_search.query == "") search_position.label = "";
-            else if (message_search.ids.length == 0) search_position.label = "No matches";
-            else search_position.label = "%d of %d".printf (search_index + 1, message_search.ids.length);
+            else if (message_search.ids.length == 0) search_position.label = _("No matches");
+            else search_position.label = _("%d of %d").printf (search_index + 1, message_search.ids.length);
             search_position.tooltip_text = message_search.error_message;
             search_previous.sensitive = search_next.sensitive = search_index >= 0;
         }
@@ -1579,10 +1579,10 @@ namespace Dc {
                 }
 
                 clear_full_message_loading (msg_id);
-                window.show_toast ("Full message unavailable");
+                window.show_toast (_("Full message unavailable"));
             } catch (Error e) {
                 clear_full_message_loading (msg_id);
-                window.show_toast ("Full message failed: " + e.message);
+                window.show_toast (_("Full message failed: ") + e.message);
             }
         }
 
@@ -1605,9 +1605,9 @@ namespace Dc {
                     return;
                 }
 
-                window.show_toast ("Full message unavailable");
+                window.show_toast (_("Full message unavailable"));
             } catch (Error e) {
-                window.show_toast ("Full message failed: " + e.message);
+                window.show_toast (_("Full message failed: ") + e.message);
             }
         }
 
@@ -2003,7 +2003,7 @@ namespace Dc {
             } catch (Error e) {
                 messages_loaded = false;
                 messages_stale = true;
-                if (!closed) window.show_toast ("Failed to load messages: " + e.message);
+                if (!closed) window.show_toast (_("Failed to load messages: ") + e.message);
             } finally {
                 loading_messages = false;
                 if (!closed) {
@@ -2188,7 +2188,7 @@ namespace Dc {
                 finish_loading_earlier ();
             } catch (Error e) {
                 if (!closed && history == history_generation)
-                    window.show_toast ("Failed to load earlier messages: " + e.message);
+                    window.show_toast (_("Failed to load earlier messages: ") + e.message);
                 finish_loading_earlier ();
             }
         }
@@ -2211,7 +2211,7 @@ namespace Dc {
                 }
             } catch (Error e) {
                 if (!closed && history == history_generation)
-                    window.show_toast ("Failed to load messages: " + e.message);
+                    window.show_toast (_("Failed to load messages: ") + e.message);
             }
             finish_loading_earlier ();
         }
@@ -2261,7 +2261,7 @@ namespace Dc {
             } catch (Error e) {
                 if (!closed && history == history_generation) {
                     pending_scroll_message_id = 0;
-                    window.show_toast ("Failed to load message: " + e.message);
+                    window.show_toast (_("Failed to load message: ") + e.message);
                 }
             }
             finish_loading_earlier ();
@@ -2277,7 +2277,7 @@ namespace Dc {
                 search_index = int.min (search_index, remaining.length - 1);
                 update_search_position ();
             }
-            window.show_toast ("Message is no longer available");
+            window.show_toast (_("Message is no longer available"));
         }
 
         /* Find a row by ID, or the top visible row when message_id is zero. */
@@ -2358,7 +2358,7 @@ namespace Dc {
             loading_more_spinner.visible = visible;
             loading_more_spinner.spinning = visible;
             if (visible) {
-                loading_pill_label.label = "Loading…";
+                loading_pill_label.label = _("Loading…");
             }
             loading_more_revealer.reveal_child = visible;
         }
@@ -2476,13 +2476,13 @@ namespace Dc {
                 try {
                     msg = yield rpc.fetch_message (msg_id);
                 } catch (Error e) {
-                    window.show_toast ("Failed to load app: " + e.message);
+                    window.show_toast (_("Failed to load app: ") + e.message);
                     return;
                 }
             }
             if (msg == null || msg.file_path == null
                 || msg.file_path.length == 0) {
-                window.show_toast ("The app file is not downloaded");
+                window.show_toast (_("The app file is not downloaded"));
                 return;
             }
             yield window.save_attachment (msg.file_path, msg.file_name);
@@ -2567,7 +2567,7 @@ namespace Dc {
                     }
                 }
             } catch (Error e) {
-                window.show_toast ("Send failed: " + e.message);
+                window.show_toast (_("Send failed: ") + e.message);
             } finally {
                 if (job.owns_file && job.file_path != null)
                     FileUtils.unlink (job.file_path);
@@ -2718,12 +2718,12 @@ namespace Dc {
 
         private void attach_local_file (string path, string name) {
             if (!can_accept_file_attachment ()) {
-                window.show_toast ("Attach failed: cannot attach here");
+                window.show_toast (_("Attach failed: cannot attach here"));
                 return;
             }
             if (path.strip ().length == 0 ||
                 !GLib.FileUtils.test (path, GLib.FileTest.EXISTS)) {
-                window.show_toast ("Attach failed: file not found");
+                window.show_toast (_("Attach failed: file not found"));
                 return;
             }
             compose_bar.set_pending_attachment (path, name);
@@ -2737,7 +2737,7 @@ namespace Dc {
             track_signal (file_drop_target, file_drop_target.dropped.connect (
                 attach_local_file));
             track_signal (file_drop_target, file_drop_target.failed.connect ((message) => {
-                window.show_toast ("Attach failed: " + message);
+                window.show_toast (_("Attach failed: ") + message);
             }));
         }
 
@@ -2949,7 +2949,7 @@ namespace Dc {
                 return;
             }
             if (!msg.has_local_file) {
-                window.show_toast ("File not available");
+                window.show_toast (_("File not available"));
                 return;
             }
             if (msg.is_video_sticker_file ()) {
@@ -2982,7 +2982,7 @@ namespace Dc {
             try {
                 FileUtils.get_contents (path, out content, out length);
             } catch (Error e) {
-                window.show_toast ("Preview failed: " + e.message);
+                window.show_toast (_("Preview failed: ") + e.message);
                 return;
             }
             if (length > TEXT_PREVIEW_MAX_BYTES) {
@@ -2992,7 +2992,7 @@ namespace Dc {
             if (!content.validate ()) content = content.make_valid ();
             if (msg.is_html_file ()) content = html_to_text (content);
             if (content.strip ().length == 0) {
-                window.show_toast ("File is empty");
+                window.show_toast (_("File is empty"));
                 return;
             }
             var dialog = new FullMessageDialog.for_file (window,

@@ -3,7 +3,7 @@ namespace Dc {
     /* Mute presets; seconds < 0 means forever (matches the official
        app's set). */
     public const string[] MUTE_DURATION_LABELS = {
-        "For 1 hour", "For 8 hours", "For 1 day", "For 7 days", "Forever"
+        N_("For 1 hour"), N_("For 8 hours"), N_("For 1 day"), N_("For 7 days"), N_("Forever")
     };
     public const int[] MUTE_DURATION_SECONDS = {
         3600, 28800, 86400, 604800, -1
@@ -77,7 +77,7 @@ namespace Dc {
             this.app_window = window;
             this.rpc = rpc;
             this.chat_id = chat_id;
-            this.title = "Chat Details";
+            this.title = _("Chat Details");
             this.content_width = 360;
             this.content_height = 500;
 
@@ -146,7 +146,7 @@ namespace Dc {
 
                 spinner.visible = false;
 
-                string name = json_str (chat, "name") ?? "Chat";
+                string name = json_str (chat, "name") ?? _("Chat");
                 string chat_type = json_str (chat, "chatType") ?? "";
                 string? profile_image = json_str (chat, "profileImage");
                 bool encrypted = json_bool (chat, "isEncrypted");
@@ -181,7 +181,7 @@ namespace Dc {
                     avatar_btn.add_css_class ("flat");
                     avatar_btn.add_css_class ("circular");
                     avatar_btn.halign = Gtk.Align.CENTER;
-                    avatar_btn.tooltip_text = "View image";
+                    avatar_btn.tooltip_text = _("View image");
                     avatar_btn.clicked.connect (() => {
                         viewer.show_list ({ img }, 0);
                     });
@@ -192,7 +192,7 @@ namespace Dc {
                 }
 
                 if (can_edit_members) {
-                    var change_avatar_btn = flat_button ("Change Avatar");
+                    var change_avatar_btn = flat_button (_("Change Avatar"));
                     change_avatar_btn.clicked.connect (() => pick_avatar.begin ());
                     change_avatar_btn.halign = Gtk.Align.CENTER;
                     content.append (change_avatar_btn);
@@ -209,13 +209,13 @@ namespace Dc {
 
                 if (is_dm_chat && dm_contact_id > 1) {
                     var edit_contact_btn = flat_icon_button (
-                        "document-edit-symbolic", "Edit contact name");
+                        "document-edit-symbolic", _("Edit contact name"));
                     edit_contact_btn.clicked.connect (() =>
                         show_edit_contact_name_dialog.begin (dm_contact_id, name_lbl));
                     name_box.append (edit_contact_btn);
                 } else if (can_edit_members) {
                     var edit_group_btn = flat_icon_button (
-                        "document-edit-symbolic", is_channel ? "Edit channel name" : "Edit group name");
+                        "document-edit-symbolic", is_channel ? _("Edit channel name") : _("Edit group name"));
                     edit_group_btn.clicked.connect (() =>
                         show_edit_group_name_dialog.begin (name_lbl));
                     name_box.append (edit_group_btn);
@@ -224,13 +224,13 @@ namespace Dc {
                 content.append (name_box);
 
                 string type_str = chat_type == "Broadcast" || chat_type == "OutBroadcast"
-                        || chat_type == "InBroadcast" ? "Channel"
-                    : chat_type == "Group" ? "Group"
-                    : chat_type == "Mailinglist" ? "Mailing List"
-                    : json_bool (chat, "isSelfTalk") ? "Saved Messages"
-                    : json_bool (chat, "isDeviceChat") ? "Device Messages"
-                    : chat_type == "Single" ? "Direct Chat" : "Chat";
-                if (encrypted) type_str += " · End-to-end encrypted";
+                        || chat_type == "InBroadcast" ? _("Channel")
+                    : chat_type == "Group" ? _("Group")
+                    : chat_type == "Mailinglist" ? _("Mailing List")
+                    : json_bool (chat, "isSelfTalk") ? _("Saved Messages")
+                    : json_bool (chat, "isDeviceChat") ? _("Device Messages")
+                    : chat_type == "Single" ? _("Direct Chat") : _("Chat");
+                if (encrypted) type_str += _(" · End-to-end encrypted");
                 var type_lbl = new Gtk.Label (type_str);
                 type_lbl.add_css_class ("dim-label");
                 type_lbl.halign = Gtk.Align.CENTER;
@@ -238,8 +238,8 @@ namespace Dc {
 
                 if (can_edit_members) {
                     var invite_list = boxed_list ();
-                    add_action_row (invite_list, "Invite Link",
-                        "Share a link or QR code for others to join",
+                    add_action_row (invite_list, _("Invite Link"),
+                        _("Share a link or QR code for others to join"),
                         "mail-forward-symbolic", () => {
                         var dialog = new InviteCodeDialog (rpc, rpc.account_id, chat_id);
                         dialog.present (this);
@@ -251,8 +251,8 @@ namespace Dc {
 
                 int[] timer_values = { 0, 60, 300, 1800, 3600, 21600, 86400, 604800, 2419200 };
                 string[] timer_labels = {
-                    "Off", "1 minute", "5 minutes", "30 minutes",
-                    "1 hour", "6 hours", "1 day", "1 week", "4 weeks"
+                    _("Off"), _("1 minute"), _("5 minutes"), _("30 minutes"),
+                    _("1 hour"), _("6 hours"), _("1 day"), _("1 week"), _("4 weeks")
                 };
                 int active_idx = 0;
                 for (int i = 0; i < timer_values.length; i++) {
@@ -260,7 +260,7 @@ namespace Dc {
                         active_idx = i;
                     }
                 }
-                var ephem_row = dropdown_row ("Disappearing messages",
+                var ephem_row = dropdown_row (_("Disappearing messages"),
                     timer_labels, active_idx, (idx) => {
                     if (idx < timer_values.length) {
                         rpc.set_chat_ephemeral_timer.begin (
@@ -269,18 +269,18 @@ namespace Dc {
                 });
                 ephem_row.sensitive = encrypted && json_bool (chat, "canSend")
                     && chat_type != "Mailinglist" && chat_type != "InBroadcast";
-                ephem_row.subtitle = "Applies to new messages for everyone in this chat";
+                ephem_row.subtitle = _("Applies to new messages for everyone in this chat");
 
                 /* Mute selector. Core only reports the boolean isMuted, not
                    the remaining time, so a timed mute shows as "Forever"
                    here; picking any entry always applies that duration. */
                 bool is_muted = json_bool (chat, "isMuted");
                 string[] mute_labels = new string[MUTE_DURATION_LABELS.length + 1];
-                mute_labels[0] = "Off";
+                mute_labels[0] = _("Off");
                 for (int i = 0; i < MUTE_DURATION_LABELS.length; i++) {
-                    mute_labels[i + 1] = MUTE_DURATION_LABELS[i];
+                    mute_labels[i + 1] = _(MUTE_DURATION_LABELS[i]);
                 }
-                var mute_row = dropdown_row ("Mute notifications", mute_labels,
+                var mute_row = dropdown_row (_("Mute notifications"), mute_labels,
                     is_muted ? mute_labels.length - 1 : 0, (idx) => {
                     if (idx < mute_labels.length) {
                         int secs = idx == 0
@@ -291,7 +291,7 @@ namespace Dc {
 
                 var ephem_list = boxed_list ();
                 int account_id = rpc.account_id;
-                add_action_row (ephem_list, "Open Chat", "Open this conversation",
+                add_action_row (ephem_list, _("Open Chat"), _("Open this conversation"),
                     "mail-message-new-symbolic", () => {
                     var dialogs = app_window.get_dialogs ();
                     for (uint i = dialogs.get_n_items (); i > 0; i--) {
@@ -301,8 +301,8 @@ namespace Dc {
                     app_window.open_chat_from_notification.begin (account_id, chat_id);
                 });
                 add_action_row (ephem_list,
-                    "View Media",
-                    "Browse apps and media shared in this chat",
+                    _("View Media"),
+                    _("Browse apps and media shared in this chat"),
                     "view-grid-symbolic", () => {
                     var dialog = new GalleryDialog (
                         app_window, rpc, chat_id, chat_name);
@@ -321,7 +321,7 @@ namespace Dc {
                     var header_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
 
                     var members_lbl = new Gtk.Label (
-                        is_group ? "Members (%u)".printf (ids.get_length ()) : "Contact");
+                        is_group ? _("Members (%u)").printf (ids.get_length ()) : _("Contact"));
                     members_lbl.add_css_class ("heading");
                     members_lbl.halign = Gtk.Align.START;
                     members_lbl.hexpand = true;
@@ -329,7 +329,7 @@ namespace Dc {
 
                     if (can_edit_members) {
                         var add_member_btn = flat_icon_button (
-                            "list-add-symbolic", "Add member");
+                            "list-add-symbolic", _("Add member"));
                         add_member_btn.clicked.connect (() =>
                             add_member_dialog.begin ());
                         header_box.append (add_member_btn);
@@ -363,9 +363,9 @@ namespace Dc {
 
                 if (is_group && chat_type != "InBroadcast") {
                     add_action_row (actions_list,
-                        is_channel ? "New Channel with Same Members"
-                                   : "New Group with Same Members",
-                        "Start a new one without picking members again",
+                        is_channel ? _("New Channel with Same Members")
+                                   : _("New Group with Same Members"),
+                        _("Start a new one without picking members again"),
                         "system-users-symbolic",
                         () => show_duplicate_group_dialog.begin ());
                 }
@@ -373,44 +373,44 @@ namespace Dc {
                 if (dm_contact != null) {
                     actions_list.append (build_contact_block_row (dm_contact));
                 } else if (chat_type == "Mailinglist" || chat_type == "InBroadcast") {
-                    add_action_row (actions_list, "Block Chat…",
-                        "Hide this chat and new messages; keep the history",
+                    add_action_row (actions_list, _("Block Chat…"),
+                        _("Hide this chat and new messages; keep the history"),
                         "action-unavailable-symbolic", () => confirm_block_chat.begin ());
                 }
                 if (actions_list.get_first_child () != null) content.append (actions_list);
 
                 var deletion_list = boxed_list ();
 
-                add_action_row (deletion_list, "Clear Chat…",
-                    "Delete messages for this profile and keep the chat",
+                add_action_row (deletion_list, _("Clear Chat…"),
+                    _("Delete messages for this profile and keep the chat"),
                     "edit-clear-symbolic",
                     () => confirm_clear_history.begin (false));
 
                 if (MessageDeletion.can_delete_in_chat (chat)) {
                     add_action_row (deletion_list,
-                        "Delete Sent Messages for Everyone…",
-                        "Ask other participants to delete messages sent by this profile",
+                        _("Delete Sent Messages for Everyone…"),
+                        _("Ask other participants to delete messages sent by this profile"),
                         "edit-delete-symbolic",
                         () => confirm_clear_history.begin (true));
                 }
 
                 if (can_leave_chat (chat)) {
                     add_action_row (deletion_list,
-                        is_channel ? "Leave Channel…" : "Leave Group…",
-                        "Stop receiving messages, with the option to keep the history",
+                        is_channel ? _("Leave Channel…") : _("Leave Group…"),
+                        _("Stop receiving messages, with the option to keep the history"),
                         "system-log-out-symbolic",
                         () => confirm_leave_group.begin ());
                 }
 
-                add_action_row (deletion_list, "Delete Chat…",
-                    "Delete the chat and its messages for this profile", "user-trash-symbolic",
+                add_action_row (deletion_list, _("Delete Chat…"),
+                    _("Delete the chat and its messages for this profile"), "user-trash-symbolic",
                     () => confirm_delete_chat.begin ());
 
                 content.append (deletion_list);
 
             } catch (Error e) {
                 spinner.visible = false;
-                var err = new Gtk.Label ("Failed to load: " + e.message);
+                var err = new Gtk.Label (_("Failed to load: ") + e.message);
                 err.add_css_class ("dim-label");
                 err.wrap = true;
                 content.append (err);
@@ -430,7 +430,7 @@ namespace Dc {
             var row = contact_row (contact, is_group && contact.id > 0, false);
 
             if (is_group) {
-                row.tooltip_text = "View contact details";
+                row.tooltip_text = _("View contact details");
                 row.activated.connect (() => show_contact_details.begin (contact));
 
                 var right_click = new Gtk.GestureClick ();
@@ -458,7 +458,7 @@ namespace Dc {
             if (contact.address.length > 0) {
                 string addr = contact.address;
                 var copy_btn = flat_icon_button (
-                    "edit-copy-symbolic", "Copy email address");
+                    "edit-copy-symbolic", _("Copy email address"));
                 copy_btn.clicked.connect (() =>
                     this.get_clipboard ().set_text (addr));
                 row.add_suffix (copy_btn);
@@ -467,7 +467,7 @@ namespace Dc {
             if (can_edit_members && contact.id > 1) {
                 var remove_btn = flat_icon_button (
                     "user-trash-symbolic",
-                    is_channel ? "Remove from channel…" : "Remove from group…", true);
+                    is_channel ? _("Remove from channel…") : _("Remove from group…"), true);
                 remove_btn.clicked.connect (() => confirm_remove_member.begin (contact, row));
                 row.add_suffix (remove_btn);
             }
@@ -480,13 +480,13 @@ namespace Dc {
             Gtk.Box box;
             var popover = popover_menu (row, x, y, out box);
 
-            var details_btn = new PopoverButton (popover, "View Contact Details");
+            var details_btn = new PopoverButton (popover, _("View Contact Details"));
             details_btn.sensitive = contact.id > 0;
             details_btn.selected.connect (() => show_contact_details.begin (contact));
             box.append (details_btn);
 
             if (contact.address.length > 0) {
-                var copy_btn = new PopoverButton (popover, "Copy Email Address");
+                var copy_btn = new PopoverButton (popover, _("Copy Email Address"));
                 copy_btn.selected.connect (() =>
                     this.get_clipboard ().set_text (contact.address));
                 box.append (copy_btn);
@@ -495,7 +495,7 @@ namespace Dc {
             if (can_edit_members && contact.id > 1) {
                 box.append (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
                 var remove_btn = new PopoverButton (popover,
-                    is_channel ? "Remove from Channel…" : "Remove from Group…", true);
+                    is_channel ? _("Remove from Channel…") : _("Remove from Group…"), true);
                 remove_btn.selected.connect (() => confirm_remove_member.begin (contact, row));
                 box.append (remove_btn);
             }
@@ -512,7 +512,7 @@ namespace Dc {
                 if (rpc.account_id != account_id || contact_chat_id <= 0) return;
                 app_window.show_chat_info (contact_chat_id);
             } catch (Error e) {
-                show_error (this, "Could not open contact details: " + e.message);
+                show_error (this, _("Could not open contact details: ") + e.message);
             }
         }
 

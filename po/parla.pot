@@ -1,0 +1,1325 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the parla package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: parla\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-01 12:31+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/application.vala:76
+msgid "Start in the background without opening a window"
+msgstr ""
+
+#: src/application.vala:79
+msgid "Show the main window"
+msgstr ""
+
+#: src/audio_player.vala:549
+msgid "Voice Message"
+msgstr ""
+
+#: src/audio_player.vala:560
+msgid "Transcribe voice message"
+msgstr ""
+
+#: src/audio_player.vala:600 src/compose_bar.vala:822
+msgid "Transcribing…"
+msgstr ""
+
+#: src/audio_player.vala:605
+msgid "(no speech detected)"
+msgstr ""
+
+#: src/audio_player.vala:607
+msgid "Transcription: "
+msgstr ""
+
+#: src/audio_player.vala:619
+msgid "Pause"
+msgstr ""
+
+#: src/audio_player.vala:619
+msgid "Play"
+msgstr ""
+
+#: src/chat_row.vala:89
+msgid "You were mentioned"
+msgstr ""
+
+#: src/chat_row.vala:103 src/window.vala:853
+msgid "Notifications muted"
+msgstr ""
+
+#: src/chat_row.vala:132
+msgid "Request"
+msgstr ""
+
+#: src/chat_row.vala:204
+msgid ", contact request"
+msgstr ""
+
+#: src/chat_row.vala:206
+#, c-format
+msgid ", %d unread"
+msgstr ""
+
+#: src/chat_row.vala:207
+msgid ", mentioned you"
+msgstr ""
+
+#: src/chat_row.vala:208
+msgid ", pinned"
+msgstr ""
+
+#: src/chat_row.vala:209
+msgid ", muted"
+msgstr ""
+
+#: src/chat_row.vala:290 src/message_actions.vala:60
+msgid "Unpin"
+msgstr ""
+
+#: src/chat_row.vala:290 src/message_actions.vala:60
+msgid "Pin"
+msgstr ""
+
+#: src/chat_row.vala:295
+msgid "Unarchive"
+msgstr ""
+
+#: src/chat_row.vala:295
+msgid "Archive"
+msgstr ""
+
+#: src/chat_row.vala:304
+msgid "Unmute"
+msgstr ""
+
+#: src/chat_row.vala:304 src/chat_row.vala:369
+msgid "Mute"
+msgstr ""
+
+#: src/chat_row.vala:309
+msgid "Mark as Read"
+msgstr ""
+
+#: src/chat_row.vala:309
+msgid "Mark as Unread"
+msgstr ""
+
+#: src/chat_row.vala:313
+msgid "View Media"
+msgstr ""
+
+#: src/chat_row.vala:315
+msgid "Chat Details"
+msgstr ""
+
+#: src/chat_row.vala:318
+msgid "Clear Chat…"
+msgstr ""
+
+#: src/chat_row.vala:324
+msgid "Leave Channel…"
+msgstr ""
+
+#: src/chat_row.vala:324
+msgid "Leave Group…"
+msgstr ""
+
+#: src/chat_row.vala:327
+msgid "Delete Chat…"
+msgstr ""
+
+#: src/chat_row.vala:350
+msgid "Failed to update pin: "
+msgstr ""
+
+#: src/chat_row.vala:361
+msgid "Chat unarchived"
+msgstr ""
+
+#: src/chat_row.vala:363
+msgid "Chat archived"
+msgstr ""
+
+#: src/chat_row.vala:368
+msgid "Chat archived. New messages will unarchive it."
+msgstr ""
+
+#: src/chat_row.vala:372
+msgid "Muted. Chat will stay archived."
+msgstr ""
+
+#: src/chat_row.vala:377
+msgid "Failed to update archive: "
+msgstr ""
+
+#: src/chat_row.vala:386
+msgid "Chat muted"
+msgstr ""
+
+#: src/chat_row.vala:386
+msgid "Chat unmuted"
+msgstr ""
+
+#: src/chat_row.vala:389
+msgid "Failed to update mute: "
+msgstr ""
+
+#: src/chat_row.vala:401
+msgid "Marked unread"
+msgstr ""
+
+#: src/chat_row.vala:401
+msgid "Marked read"
+msgstr ""
+
+#: src/chat_row.vala:403
+msgid "Failed to update unread marker: "
+msgstr ""
+
+#: src/chat_row.vala:418 src/chat_row.vala:519
+msgid "Chat deleted"
+msgstr ""
+
+#: src/chat_row.vala:431
+msgid "Chat blocked"
+msgstr ""
+
+#: src/chat_row.vala:442 src/chat_row.vala:495 src/conversation_view.vala:1247
+msgid "this chat"
+msgstr ""
+
+#: src/chat_row.vala:450
+msgid "No messages to clear"
+msgstr ""
+
+#: src/chat_row.vala:458
+msgid "Could not load messages: "
+msgstr ""
+
+#: src/chat_row.vala:477
+msgid "Chat left and deleted"
+msgstr ""
+
+#: src/chat_row.vala:477
+msgid "Chat left; history kept"
+msgstr ""
+
+#: src/chat_row.vala:485
+msgid "Chat left, but its history could not be deleted: "
+msgstr ""
+
+#: src/chat_row.vala:486
+msgid "Could not finish leaving; chat history was kept: "
+msgstr ""
+
+#: src/chat_row.vala:507
+msgid "Chat cleared for this profile"
+msgstr ""
+
+#: src/chat_row.vala:512
+msgid "Clear failed: "
+msgstr ""
+
+#: src/chat_row.vala:524 src/conversation_view.vala:1218
+#: src/message_actions.vala:244
+msgid "Delete failed: "
+msgstr ""
+
+#: src/compose_bar.vala:40
+msgid "Type a message"
+msgstr ""
+
+#: src/compose_bar.vala:41
+msgid "Type a reply"
+msgstr ""
+
+#: src/compose_bar.vala:161
+msgid "Cancel reply"
+msgstr ""
+
+#: src/compose_bar.vala:209 src/compose_bar.vala:268
+msgid "Remove attachment"
+msgstr ""
+
+#: src/compose_bar.vala:224
+msgid ""
+"Long message: recipients get a shortened preview with a “Show Full Message” "
+"button, and it cannot be edited after sending"
+msgstr ""
+
+#: src/compose_bar.vala:241
+msgid "Attach file"
+msgstr ""
+
+#: src/compose_bar.vala:249
+msgid "Insert emoji"
+msgstr ""
+
+#: src/compose_bar.vala:263 src/message_actions.vala:220
+msgid "Emoji picker unavailable"
+msgstr ""
+
+#: src/compose_bar.vala:275
+msgid "Cancel editing"
+msgstr ""
+
+#: src/compose_bar.vala:349
+msgid "Send message"
+msgstr ""
+
+#: src/compose_bar.vala:356
+msgid "Send a sticker"
+msgstr ""
+
+#: src/compose_bar.vala:365
+msgid "Record a voice message"
+msgstr ""
+
+#: src/compose_bar.vala:385
+msgid "Cancel voice message"
+msgstr ""
+
+#: src/compose_bar.vala:395 src/compose_bar.vala:790
+msgid "Stop recording"
+msgstr ""
+
+#: src/compose_bar.vala:399 src/compose_bar.vala:871
+#: src/message_actions.vala:102
+msgid "Transcribe"
+msgstr ""
+
+#: src/compose_bar.vala:403
+msgid "Transcribe the recording into the message text"
+msgstr ""
+
+#: src/compose_bar.vala:409
+msgid "Send voice message"
+msgstr ""
+
+#: src/compose_bar.vala:808
+msgid "Finishing recording…"
+msgstr ""
+
+#: src/compose_bar.vala:839
+msgid "Transcription is unavailable"
+msgstr ""
+
+#: src/compose_bar.vala:865
+msgid "No speech detected; the voice message is still attached"
+msgstr ""
+
+#: src/compose_bar.vala:915
+msgid "Recording failed: "
+msgstr ""
+
+#: src/compose_bar.vala:959 src/compose_bar.vala:1113
+#, c-format
+msgid "%d attachments"
+msgstr ""
+
+#: src/compose_bar.vala:960 src/compose_bar.vala:1114
+#, c-format
+msgid "%s + %d more"
+msgstr ""
+
+#: src/compose_bar.vala:1000
+msgid "Link preview"
+msgstr ""
+
+#: src/compose_bar.vala:1371
+msgid "Edit message…"
+msgstr ""
+
+#: src/conversation_view.vala:648
+msgid "Search in conversation…"
+msgstr ""
+
+#: src/conversation_view.vala:657
+msgid "Previous match (Shift+Enter)"
+msgstr ""
+
+#: src/conversation_view.vala:659
+msgid "Next match (Enter)"
+msgstr ""
+
+#: src/conversation_view.vala:661
+msgid "Close search (Escape)"
+msgstr ""
+
+#: src/conversation_view.vala:730 src/conversation_view.vala:2361
+msgid "Loading…"
+msgstr ""
+
+#: src/conversation_view.vala:921
+msgid "Failed to load voice message: "
+msgstr ""
+
+#: src/conversation_view.vala:1033 src/message_actions.vala:119
+msgid "Delete…"
+msgstr ""
+
+#: src/conversation_view.vala:1042 src/message_row.vala:729
+msgid "Forward"
+msgstr ""
+
+#: src/conversation_view.vala:1050 src/window.vala:2124 src/window.vala:3227
+msgid "Cancel"
+msgstr ""
+
+#: src/conversation_view.vala:1091
+msgid "Accept"
+msgstr ""
+
+#: src/conversation_view.vala:1111
+msgid "Accept this group invitation to reply, or delete the request."
+msgstr ""
+
+#: src/conversation_view.vala:1112
+msgid "Accept this chat request, or block it and keep its history."
+msgstr ""
+
+#: src/conversation_view.vala:1235
+msgid "Failed to accept request: "
+msgstr ""
+
+#: src/conversation_view.vala:1260
+msgid "Could not dismiss request: "
+msgstr ""
+
+#: src/conversation_view.vala:1466
+msgid "Searching…"
+msgstr ""
+
+#: src/conversation_view.vala:1467
+msgid "Search failed"
+msgstr ""
+
+#: src/conversation_view.vala:1469
+msgid "No matches"
+msgstr ""
+
+#: src/conversation_view.vala:1470
+#, c-format
+msgid "%d of %d"
+msgstr ""
+
+#: src/conversation_view.vala:1582 src/conversation_view.vala:1608
+msgid "Full message unavailable"
+msgstr ""
+
+#: src/conversation_view.vala:1585 src/conversation_view.vala:1610
+msgid "Full message failed: "
+msgstr ""
+
+#: src/conversation_view.vala:2006 src/conversation_view.vala:2214
+msgid "Failed to load messages: "
+msgstr ""
+
+#: src/conversation_view.vala:2191
+msgid "Failed to load earlier messages: "
+msgstr ""
+
+#: src/conversation_view.vala:2264
+msgid "Failed to load message: "
+msgstr ""
+
+#: src/conversation_view.vala:2280 src/window.vala:2000
+msgid "Message is no longer available"
+msgstr ""
+
+#: src/conversation_view.vala:2479
+msgid "Failed to load app: "
+msgstr ""
+
+#: src/conversation_view.vala:2485
+msgid "The app file is not downloaded"
+msgstr ""
+
+#: src/conversation_view.vala:2570
+msgid "Send failed: "
+msgstr ""
+
+#: src/conversation_view.vala:2721 src/window.vala:1849
+msgid "Attach failed: cannot attach here"
+msgstr ""
+
+#: src/conversation_view.vala:2726
+msgid "Attach failed: file not found"
+msgstr ""
+
+#: src/conversation_view.vala:2740 src/window.vala:1732
+msgid "Attach failed: "
+msgstr ""
+
+#: src/conversation_view.vala:2952
+msgid "File not available"
+msgstr ""
+
+#: src/conversation_view.vala:2985
+msgid "Preview failed: "
+msgstr ""
+
+#: src/conversation_view.vala:2995
+msgid "File is empty"
+msgstr ""
+
+#: src/message_actions.vala:49 src/message_row.vala:728
+msgid "Reply"
+msgstr ""
+
+#: src/message_actions.vala:53
+msgid "Forward…"
+msgstr ""
+
+#: src/message_actions.vala:65
+msgid "Edit"
+msgstr ""
+
+#: src/message_actions.vala:71
+msgid "Retry"
+msgstr ""
+
+#: src/message_actions.vala:78
+msgid "Select Messages"
+msgstr ""
+
+#: src/message_actions.vala:83
+msgid "Details..."
+msgstr ""
+
+#: src/message_actions.vala:92
+msgid "Save file"
+msgstr ""
+
+#: src/message_actions.vala:111
+msgid "Add Sticker…"
+msgstr ""
+
+#: src/message_actions.vala:154
+msgid "More emojis…"
+msgstr ""
+
+#: src/message_actions.vala:212
+msgid "Reaction failed: "
+msgstr ""
+
+#: src/message_actions.vala:265
+msgid "You"
+msgstr ""
+
+#: src/message_actions.vala:266
+msgid "(attachment)"
+msgstr ""
+
+#: src/message_actions.vala:289
+msgid "Forward To"
+msgstr ""
+
+#: src/message_actions.vala:326
+msgid "Message forwarded"
+msgstr ""
+
+#: src/message_actions.vala:326
+msgid "Messages forwarded"
+msgstr ""
+
+#: src/message_actions.vala:328 src/message_actions.vala:370
+msgid "Forward failed: "
+msgstr ""
+
+#: src/message_actions.vala:382
+msgid "Edit failed: "
+msgstr ""
+
+#: src/message_actions.vala:408
+msgid "Could not refresh message: "
+msgstr ""
+
+#: src/message_actions.vala:422
+msgid "Could not retry message: "
+msgstr ""
+
+#: src/message_actions.vala:509
+msgid "Could not open contact details: "
+msgstr ""
+
+#: src/message_row.vala:469
+msgid "(edited)"
+msgstr ""
+
+#: src/message_row.vala:540
+msgid "Edited"
+msgstr ""
+
+#: src/message_row.vala:727
+msgid "React"
+msgstr ""
+
+#: src/message_row.vala:730
+msgid "Pin / Unpin"
+msgstr ""
+
+#: src/message_row.vala:731
+msgid "More actions"
+msgstr ""
+
+#: src/message_row.vala:771
+msgid "Select message, "
+msgstr ""
+
+#: src/message_row.vala:830
+msgid "Webxdc app options"
+msgstr ""
+
+#: src/message_row.vala:849
+msgid "Webxdc app · download only"
+msgstr ""
+
+#: src/message_row.vala:851
+msgid "Webxdc app · disabled in Settings"
+msgstr ""
+
+#: src/message_row.vala:852
+msgid "Webxdc app · choose an action"
+msgstr ""
+
+#: src/message_row.vala:1141
+msgid "↪ Forwarded by "
+msgstr ""
+
+#: src/message_row.vala:1142
+msgid "↪ Forwarded"
+msgstr ""
+
+#: src/message_row.vala:1157
+msgid "This message was edited"
+msgstr ""
+
+#: src/message_row.vala:1187
+msgid "Play video"
+msgstr ""
+
+#: src/message_row.vala:1261
+msgid "Sending failed"
+msgstr ""
+
+#: src/message_row.vala:1265
+msgid "Read"
+msgstr ""
+
+#: src/message_row.vala:1269
+msgid "Delivered"
+msgstr ""
+
+#: src/message_row.vala:1273
+msgid "Sending…"
+msgstr ""
+
+#: src/message_row.vala:1288
+msgid "Pinned"
+msgstr ""
+
+#: src/message_row.vala:1388
+msgid "Loading full message…"
+msgstr ""
+
+#: src/message_row.vala:1390
+msgid "Downloading attachment..."
+msgstr ""
+
+#: src/message_row.vala:1391
+msgid "Downloading full message..."
+msgstr ""
+
+#: src/message_row.vala:1405
+msgid "Download attachment"
+msgstr ""
+
+#: src/message_row.vala:1406
+msgid "Download full message"
+msgstr ""
+
+#: src/message_row.vala:1408
+msgid "Collapse"
+msgstr ""
+
+#: src/message_row.vala:1409
+msgid "Expand"
+msgstr ""
+
+#: src/message_row.vala:1988
+msgid "Show reactions"
+msgstr ""
+
+#: src/message_row.vala:2231
+msgid "Unread messages"
+msgstr ""
+
+#: src/window.vala:174
+msgid "RPC not ready"
+msgstr ""
+
+#: src/window.vala:207 src/window.vala:216 src/window.vala:846
+#: src/window.vala:1498
+msgid "Select a chat"
+msgstr ""
+
+#. Reset any error widget left from a previous failed attempt.
+#: src/window.vala:231 src/window.vala:897 src/window.vala:1017
+#: src/window.vala:1308
+msgid "Welcome to Parla"
+msgstr ""
+
+#: src/window.vala:232
+msgid "Create a profile or bring an existing one to this device."
+msgstr ""
+
+#: src/window.vala:234
+msgid "Set Up Profile"
+msgstr ""
+
+#: src/window.vala:458
+msgid "Select a chat before dropping a file"
+msgstr ""
+
+#: src/window.vala:652
+#, c-format
+msgid "Profile Menu (%s)"
+msgstr ""
+
+#: src/window.vala:663
+msgid "Main Menu"
+msgstr ""
+
+#: src/window.vala:674
+msgid "Search chats or messages…"
+msgstr ""
+
+#: src/window.vala:873
+#, c-format
+msgid "Apps and media (%s)"
+msgstr ""
+
+#: src/window.vala:879
+#, c-format
+msgid "Search in conversation (%s)"
+msgstr ""
+
+#: src/window.vala:898 src/window.vala:1018
+msgid "Select a chat to start messaging"
+msgstr ""
+
+#: src/window.vala:996
+msgid "Profiles"
+msgstr ""
+
+#: src/window.vala:1026 src/window.vala:1298
+msgid "RPC server not found"
+msgstr ""
+
+#: src/window.vala:1040
+msgid "Cannot connect - account store is already in use"
+msgstr ""
+
+#: src/window.vala:1044
+msgid "Account store is already in use"
+msgstr ""
+
+#: src/window.vala:1046
+msgid "RPC server error: "
+msgstr ""
+
+#: src/window.vala:1047
+msgid ""
+"Failed to start RPC server:\n"
+"\n"
+msgstr ""
+
+#: src/window.vala:1048
+msgid "Cannot reach RPC server"
+msgstr ""
+
+#: src/window.vala:1059
+msgid "Disconnected — "
+msgstr ""
+
+#: src/window.vala:1080
+msgid "Connection setup error: "
+msgstr ""
+
+#: src/window.vala:1094
+msgid "Syncing…"
+msgstr ""
+
+#: src/window.vala:1095
+msgid "Connecting…"
+msgstr ""
+
+#: src/window.vala:1095
+msgid "Offline"
+msgstr ""
+
+#: src/window.vala:1256 src/window.vala:1266
+msgid "Could not open chat: "
+msgstr ""
+
+#: src/window.vala:1310
+msgid ""
+"Parla needs the Delta Chat engine to connect.\n"
+"Download it once to get started."
+msgstr ""
+
+#: src/window.vala:1313
+msgid "Delta Chat engine required"
+msgstr ""
+
+#: src/window.vala:1325
+msgid "Download & start"
+msgstr ""
+
+#: src/window.vala:1332 src/window.vala:1340
+msgid "Open Settings…"
+msgstr ""
+
+#: src/window.vala:1346
+msgid "deltachat-rpc-server not found"
+msgstr ""
+
+#: src/window.vala:1360
+msgid "Downloading Delta Chat engine…"
+msgstr ""
+
+#: src/window.vala:1364
+msgid "Setting up Parla"
+msgstr ""
+
+#: src/window.vala:1372
+#, c-format
+msgid "Downloading Delta Chat engine… %.0f%% (%.1f MB)"
+msgstr ""
+
+#: src/window.vala:1375
+#, c-format
+msgid "Downloading Delta Chat engine… %.1f MB"
+msgstr ""
+
+#: src/window.vala:1383 src/window.vala:1421
+msgid "Download failed: "
+msgstr ""
+
+#: src/window.vala:1394
+msgid "Delta Chat engine installed"
+msgstr ""
+
+#: src/window.vala:1405
+msgid "Filter list disabled"
+msgstr ""
+
+#: src/window.vala:1407
+msgid "No filter list URL configured"
+msgstr ""
+
+#: src/window.vala:1409
+msgid "Not connected: the list is downloaded through the active account"
+msgstr ""
+
+#: src/window.vala:1427
+msgid "The downloaded file contains no $removeparam rules"
+msgstr ""
+
+#: src/window.vala:1429
+msgid "Could not save the filter list"
+msgstr ""
+
+#: src/window.vala:1448
+msgid "Update"
+msgstr ""
+
+#: src/window.vala:1459
+msgid "Updating Delta Chat engine…"
+msgstr ""
+
+#: src/window.vala:1463
+msgid "Update installed"
+msgstr ""
+
+#: src/window.vala:1466
+msgid "Update failed: "
+msgstr ""
+
+#: src/window.vala:1487
+msgid "Connecting"
+msgstr ""
+
+#: src/window.vala:1488
+msgid "Starting Delta Chat engine…"
+msgstr ""
+
+#: src/window.vala:1489
+msgid "Reconnecting…"
+msgstr ""
+
+#: src/window.vala:1501 src/window.vala:3377
+msgid "Select a chat to start messaging."
+msgstr ""
+
+#: src/window.vala:1600 src/window.vala:1601
+msgid "Back to Chats"
+msgstr ""
+
+#: src/window.vala:1605
+#, c-format
+msgid "Archived Chats (%d)"
+msgstr ""
+
+#: src/window.vala:1606
+msgid "Show Archived Chats"
+msgstr ""
+
+#: src/window.vala:1757
+msgid "Failed to load chats: "
+msgstr ""
+
+#: src/window.vala:1853 src/window.vala:1859
+msgid "Attach failed: chat is unavailable"
+msgstr ""
+
+#: src/window.vala:2005
+msgid "Chat is no longer available"
+msgstr ""
+
+#: src/window.vala:2010
+msgid "Cannot open search result: "
+msgstr ""
+
+#: src/window.vala:2086
+msgid "File saved"
+msgstr ""
+
+#: src/window.vala:2089
+msgid "Save failed: "
+msgstr ""
+
+#: src/window.vala:2108
+msgid "Cannot Start Webxdc App"
+msgstr ""
+
+#: src/window.vala:2109
+#, c-format
+msgid ""
+"This version of Parla was built without Webxdc support, so it cannot start "
+"“%s”. You can still download the .xdc file."
+msgstr ""
+
+#: src/window.vala:2113
+msgid "In-Chat Apps Are Disabled"
+msgstr ""
+
+#: src/window.vala:2114
+#, c-format
+msgid ""
+"In-chat apps are turned off in Settings, so Parla cannot start “%s”. You can "
+"still download the .xdc file."
+msgstr ""
+
+#: src/window.vala:2118
+msgid "Open Webxdc App?"
+msgstr ""
+
+#: src/window.vala:2119
+#, c-format
+msgid "Start “%s” in Parla, or download its .xdc file without opening it."
+msgstr ""
+
+#: src/window.vala:2125
+msgid "Download File"
+msgstr ""
+
+#: src/window.vala:2127
+msgid "Start App"
+msgstr ""
+
+#: src/window.vala:2156
+msgid "This build of Parla has no Webxdc support"
+msgstr ""
+
+#: src/window.vala:2160
+msgid "In-chat apps are disabled in Settings"
+msgstr ""
+
+#: src/window.vala:2177
+msgid "The app file is still downloading"
+msgstr ""
+
+#: src/window.vala:2181
+msgid "The app file is not available for download"
+msgstr ""
+
+#: src/window.vala:2186
+msgid "Downloading app…"
+msgstr ""
+
+#: src/window.vala:2192
+msgid "The app file has not finished downloading"
+msgstr ""
+
+#: src/window.vala:2194
+msgid "App download failed: "
+msgstr ""
+
+#: src/window.vala:2276 src/window.vala:2319
+#, c-format
+msgid "%d new messages"
+msgstr ""
+
+#: src/window.vala:2278
+#, c-format
+msgid "In %d chats"
+msgstr ""
+
+#: src/window.vala:2316 src/window.vala:2317 src/window.vala:2333
+msgid "New message"
+msgstr ""
+
+#: src/window.vala:2317
+msgid "New reaction"
+msgstr ""
+
+#: src/window.vala:2345
+#, c-format
+msgid "%s reacted %s"
+msgstr ""
+
+#: src/window.vala:2346
+#, c-format
+msgid "Reacted %s"
+msgstr ""
+
+#: src/window.vala:2420 src/window.vala:4013 src/window.vala:4034
+msgid "Not connected"
+msgstr ""
+
+#: src/window.vala:2421
+msgid "Open Settings to configure the RPC server"
+msgstr ""
+
+#: src/window.vala:2455
+msgid "No profiles"
+msgstr ""
+
+#: src/window.vala:2456
+msgid "Add a profile to get started"
+msgstr ""
+
+#: src/window.vala:2467
+msgid "Error loading accounts"
+msgstr ""
+
+#: src/window.vala:2507 src/window.vala:2645
+msgid "Add Profile"
+msgstr ""
+
+#: src/window.vala:2553
+#, c-format
+msgid "Account #%d"
+msgstr ""
+
+#: src/window.vala:2555
+msgid "Unconfigured account"
+msgstr ""
+
+#: src/window.vala:2589
+msgid "Edit profile"
+msgstr ""
+
+#: src/window.vala:2598
+msgid "Not configured"
+msgstr ""
+
+#: src/window.vala:2647
+msgid "Choose how you want to add a profile."
+msgstr ""
+
+#: src/window.vala:2724 src/window.vala:2746
+msgid "Profile created"
+msgstr ""
+
+#: src/window.vala:2745
+msgid "Profile created and invitation accepted"
+msgstr ""
+
+#: src/window.vala:2761
+msgid "Profile imported"
+msgstr ""
+
+#: src/window.vala:2780
+msgid "Unable to update attachment downloads: "
+msgstr ""
+
+#: src/window.vala:2849
+msgid "Profile deleted; switched profile"
+msgstr ""
+
+#: src/window.vala:2850
+msgid "Profile deleted"
+msgstr ""
+
+#: src/window.vala:2875
+msgid "Failed to select another profile: "
+msgstr ""
+
+#: src/window.vala:2971
+msgid "Chat created with "
+msgstr ""
+
+#: src/window.vala:2973
+msgid "Failed to create chat: "
+msgstr ""
+
+#: src/window.vala:2998
+msgid "Channel created"
+msgstr ""
+
+#: src/window.vala:2998
+msgid "Group created"
+msgstr ""
+
+#: src/window.vala:3118
+msgid "New Chat"
+msgstr ""
+
+#: src/window.vala:3119
+msgid "New Group"
+msgstr ""
+
+#: src/window.vala:3120
+msgid "New Channel"
+msgstr ""
+
+#: src/window.vala:3121 src/window.vala:3195
+msgid "Use Invite Link"
+msgstr ""
+
+#: src/window.vala:3123
+msgid "Stickers"
+msgstr ""
+
+#: src/window.vala:3124
+msgid "Apps"
+msgstr ""
+
+#: src/window.vala:3126
+msgid "Settings"
+msgstr ""
+
+#: src/window.vala:3127 src/window.vala:3931
+msgid "Shortcuts"
+msgstr ""
+
+#: src/window.vala:3128
+msgid "About"
+msgstr ""
+
+#: src/window.vala:3130
+msgid "Quit"
+msgstr ""
+
+#: src/window.vala:3181
+msgid "Invite link will open once a profile is ready"
+msgstr ""
+
+#: src/window.vala:3190
+msgid "No active profile"
+msgstr ""
+
+#: src/window.vala:3203
+msgid "Paste a Delta Chat invite link."
+msgstr ""
+
+#: src/window.vala:3211
+msgid "https://i.delta.chat/#..."
+msgstr ""
+
+#: src/window.vala:3231
+msgid "Add"
+msgstr ""
+
+#: src/window.vala:3274
+msgid "Checking invite link…"
+msgstr ""
+
+#: src/window.vala:3279
+msgid "This is not a valid invite link."
+msgstr ""
+
+#: src/window.vala:3296
+msgid "Accepting invite link…"
+msgstr ""
+
+#: src/window.vala:3301
+msgid "Invite link accepted"
+msgstr ""
+
+#. Our own link, currently inactive — activate it so others
+#. can join.
+#: src/window.vala:3310
+msgid "Activating your invite link…"
+msgstr ""
+
+#: src/window.vala:3312
+msgid ""
+"This is your own invite link. It is now active — share it with others so "
+"they can join."
+msgstr ""
+
+#. Our own link, already active. Nothing to join — just tell
+#. the user it is ready to share.
+#: src/window.vala:3321
+msgid ""
+"This is your own invite link and it is active. Share it with others so they "
+"can join."
+msgstr ""
+
+#: src/window.vala:3326
+msgid "This is not a contact, group, or channel invite link."
+msgstr ""
+
+#: src/window.vala:3330
+msgid "Invite link failed: "
+msgstr ""
+
+#: src/window.vala:3510
+#, c-format
+msgid "Show Sidebar (%s)"
+msgstr ""
+
+#: src/window.vala:3510
+#, c-format
+msgid "Hide Sidebar (%s)"
+msgstr ""
+
+#: src/window.vala:3883
+msgid "New chat"
+msgstr ""
+
+#: src/window.vala:3884
+msgid "New group"
+msgstr ""
+
+#: src/window.vala:3885
+msgid "New channel"
+msgstr ""
+
+#: src/window.vala:3886
+msgid "Open settings"
+msgstr ""
+
+#: src/window.vala:3887
+msgid "Increase font size"
+msgstr ""
+
+#: src/window.vala:3888
+msgid "Decrease font size"
+msgstr ""
+
+#: src/window.vala:3889
+msgid "Reset font size"
+msgstr ""
+
+#: src/window.vala:3890
+msgid "Open chat info"
+msgstr ""
+
+#: src/window.vala:3891
+msgid "Apps and media gallery"
+msgstr ""
+
+#: src/window.vala:3892
+msgid "Search in conversation"
+msgstr ""
+
+#: src/window.vala:3893
+msgid "Search chats and messages"
+msgstr ""
+
+#: src/window.vala:3894
+msgid "Quick switch chat"
+msgstr ""
+
+#: src/window.vala:3895 src/window.vala:3904
+msgid "Focus message entry"
+msgstr ""
+
+#: src/window.vala:3896
+msgid "Message action (from Settings)"
+msgstr ""
+
+#: src/window.vala:3897
+msgid "Menu for focused message"
+msgstr ""
+
+#: src/window.vala:3898
+msgid "Account menu"
+msgstr ""
+
+#: src/window.vala:3899
+msgid "Focus next chat"
+msgstr ""
+
+#: src/window.vala:3900
+msgid "Focus previous chat"
+msgstr ""
+
+#: src/window.vala:3901
+msgid "Refresh messages"
+msgstr ""
+
+#: src/window.vala:3902
+msgid "Toggle sidebar"
+msgstr ""
+
+#: src/window.vala:3903
+msgid "Compact sidebar"
+msgstr ""
+
+#: src/window.vala:3905
+msgid "Select or deselect focused message"
+msgstr ""
+
+#: src/window.vala:3906
+msgid "Focus message selection actions"
+msgstr ""
+
+#: src/window.vala:3907
+msgid "Cancel reply/edit/image/selection"
+msgstr ""
+
+#: src/window.vala:3908
+msgid "Close window"
+msgstr ""
+
+#: src/window.vala:3909
+msgid "Quit application"
+msgstr ""
+
+#: src/window.vala:3956
+msgid "Change font size"
+msgstr ""
+
+#: src/window.vala:3967
+msgid "Emoji picker"
+msgstr ""

@@ -36,7 +36,7 @@ namespace Dc {
             this.actions = actions;
             this.msg = msg;
             this.render_markdown = Markdown.mode == MarkdownMode.ENABLED;
-            build_ui ("Message %d".printf (msg.id), full_text,
+            build_ui (_("Message %d").printf (msg.id), full_text,
                       initial_font_size, msg.can_edit_text);
         }
 
@@ -76,16 +76,16 @@ namespace Dc {
                 edit_button = new Gtk.Button.from_icon_name (
                     "document-edit-symbolic");
                 edit_button.add_css_class ("flat");
-                edit_button.tooltip_text = "Edit message";
+                edit_button.tooltip_text = _("Edit message");
                 edit_button.clicked.connect (enter_edit_mode);
                 header.pack_end (edit_button);
 
-                cancel_button = new Gtk.Button.with_label ("Cancel");
+                cancel_button = new Gtk.Button.with_label (_("Cancel"));
                 cancel_button.visible = false;
                 cancel_button.clicked.connect (leave_edit_mode);
                 header.pack_end (cancel_button);
 
-                save_button = new Gtk.Button.with_label ("Save");
+                save_button = new Gtk.Button.with_label (_("Save"));
                 save_button.add_css_class ("suggested-action");
                 save_button.visible = false;
                 save_button.clicked.connect (() => { save_edit.begin (); });
@@ -169,7 +169,7 @@ namespace Dc {
             button_label.add_css_class ("heading");
             button.child = button_label;
             button.add_css_class ("flat");
-            button.tooltip_text = "Reading settings";
+            button.tooltip_text = _("Reading settings");
 
             var settings_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 12);
             settings_box.margin_start = 16;
@@ -178,13 +178,13 @@ namespace Dc {
             settings_box.margin_bottom = 14;
             settings_box.width_request = 280;
 
-            var heading = new Gtk.Label ("Reading settings");
+            var heading = new Gtk.Label (_("Reading settings"));
             heading.add_css_class ("heading");
             heading.halign = Gtk.Align.START;
             heading.xalign = 0;
             settings_box.append (heading);
 
-            var size_label = new Gtk.Label ("Text size");
+            var size_label = new Gtk.Label (_("Text size"));
             size_label.halign = Gtk.Align.START;
             size_label.xalign = 0;
             settings_box.append (size_label);
@@ -218,12 +218,12 @@ namespace Dc {
             var markdown_row = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var markdown_labels = new Gtk.Box (Gtk.Orientation.VERTICAL, 2);
             markdown_labels.hexpand = true;
-            var markdown_title = new Gtk.Label ("Render Markdown");
+            var markdown_title = new Gtk.Label (_("Render Markdown"));
             markdown_title.halign = Gtk.Align.START;
             markdown_title.xalign = 0;
             markdown_labels.append (markdown_title);
             var markdown_hint = new Gtk.Label (
-                "Format headings, emphasis, code, and links");
+                _("Format headings, emphasis, code, and links"));
             markdown_hint.add_css_class ("dim-label");
             markdown_hint.add_css_class ("caption");
             markdown_hint.halign = Gtk.Align.START;
@@ -266,7 +266,7 @@ namespace Dc {
             editor.buffer.text = message_text;
             if (edit_status != null) edit_status.label = "";
             content_stack.visible_child_name = "editor";
-            title = "Edit Message";
+            title = _("Edit Message");
             reading_button.visible = false;
             edit_button.visible = false;
             cancel_button.visible = true;
@@ -313,7 +313,7 @@ namespace Dc {
             save_button.sensitive = false;
             cancel_button.sensitive = false;
             editor.editable = false;
-            if (edit_status != null) edit_status.label = "Saving…";
+            if (edit_status != null) edit_status.label = _("Saving…");
 
             try {
                 yield rpc.send_edit_request (msg.id, text);
@@ -327,9 +327,9 @@ namespace Dc {
                 leave_edit_mode ();
             } catch (Error e) {
                 if (edit_status != null) {
-                    edit_status.label = "Edit failed: " + e.message;
+                    edit_status.label = _("Edit failed: ") + e.message;
                 }
-                window.show_toast ("Edit failed: " + e.message);
+                window.show_toast (_("Edit failed: ") + e.message);
             }
 
             editor.editable = true;

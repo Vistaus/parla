@@ -37,8 +37,8 @@ namespace Dc {
 
         private Gtk.TextView text_view;
         private Gtk.Label placeholder_label;
-        private string placeholder_default = "Type a message";
-        private string placeholder_reply = "Type a reply";
+        private string placeholder_default = N_("Type a message");
+        private string placeholder_reply = N_("Type a reply");
         private Gtk.Button attach_button;
         private Gtk.MenuButton emoji_button;
         private const string EMOJI_TRIGGER_START_MARK = "parla-emoji-trigger-start";
@@ -158,7 +158,7 @@ namespace Dc {
             reply_bar.append (reply_label);
 
             var cancel_reply_button = icon_button (
-                "window-close-symbolic", "Cancel reply", true);
+                "window-close-symbolic", _("Cancel reply"), true);
             cancel_reply_button.clicked.connect (cancel_reply);
             reply_bar.append (cancel_reply_button);
 
@@ -206,7 +206,7 @@ namespace Dc {
             attachment_bar.append (attachment_info);
 
             var remove_attachment_button = icon_button (
-                "window-close-symbolic", "Remove attachment", true);
+                "window-close-symbolic", _("Remove attachment"), true);
             remove_attachment_button.clicked.connect (clear_attachment);
             attachment_bar.append (remove_attachment_button);
 
@@ -221,9 +221,9 @@ namespace Dc {
                 "dialog-information-symbolic");
             long_msg_bar.append (long_msg_icon);
             var long_msg_label = new Gtk.Label (
-                "Long message: recipients get a shortened preview with a "
+                _("Long message: recipients get a shortened preview with a "
                 + "“Show Full Message” button, and it cannot be "
-                + "edited after sending");
+                + "edited after sending"));
             long_msg_label.add_css_class ("long-message-label");
             long_msg_label.halign = Gtk.Align.START;
             long_msg_label.xalign = 0;
@@ -238,7 +238,7 @@ namespace Dc {
             input_row.halign = Gtk.Align.FILL;
 
             attach_button = icon_button (
-                "mail-attachment-symbolic", "Attach file");
+                "mail-attachment-symbolic", _("Attach file"));
             attach_button.clicked.connect (on_attach_clicked);
             attach_button.valign = Gtk.Align.END;
             input_row.append (attach_button);
@@ -246,7 +246,7 @@ namespace Dc {
             emoji_button = new Gtk.MenuButton ();
             emoji_button.icon_name = "face-smile-symbolic";
             emoji_button.add_css_class ("flat");
-            emoji_button.tooltip_text = "Insert emoji";
+            emoji_button.tooltip_text = _("Insert emoji");
             emoji_button.valign = Gtk.Align.END;
             var emoji_chooser = create_emoji_chooser ();
             if (emoji_chooser != null) {
@@ -260,19 +260,19 @@ namespace Dc {
                 emoji_button.set_popover (emoji_chooser);
             } else {
                 emoji_button.sensitive = false;
-                emoji_button.tooltip_text = "Emoji picker unavailable";
+                emoji_button.tooltip_text = _("Emoji picker unavailable");
             }
             input_row.append (emoji_button);
 
             cancel_attach_button = icon_button (
-                "edit-clear-symbolic", "Remove attachment");
+                "edit-clear-symbolic", _("Remove attachment"));
             cancel_attach_button.clicked.connect (clear_attachment);
             cancel_attach_button.visible = false;
             cancel_attach_button.valign = Gtk.Align.END;
             input_row.append (cancel_attach_button);
 
             cancel_edit_button = icon_button (
-                "edit-undo-symbolic", "Cancel editing");
+                "edit-undo-symbolic", _("Cancel editing"));
             cancel_edit_button.clicked.connect (cancel_edit);
             cancel_edit_button.visible = false;
             cancel_edit_button.valign = Gtk.Align.END;
@@ -294,7 +294,7 @@ namespace Dc {
             text_view.valign = Gtk.Align.CENTER;
             text_view.add_css_class ("compose-entry");
 
-            placeholder_label = new Gtk.Label (placeholder_default);
+            placeholder_label = new Gtk.Label (_(placeholder_default));
             placeholder_label.add_css_class ("compose-placeholder");
             placeholder_label.halign = Gtk.Align.START;
             placeholder_label.valign = Gtk.Align.CENTER;
@@ -346,14 +346,14 @@ namespace Dc {
             input_row.append (entry_overlay);
 
             var send_button = icon_button (
-                "go-up-symbolic", "Send message", true, "suggested-action");
+                "go-up-symbolic", _("Send message"), true, "suggested-action");
             send_button.clicked.connect (on_send);
 
             sticker_button = new Gtk.MenuButton ();
             sticker_button.icon_name = "sticker-symbolic";
             sticker_button.add_css_class ("flat");
             sticker_button.add_css_class ("circular");
-            sticker_button.tooltip_text = "Send a sticker";
+            sticker_button.tooltip_text = _("Send a sticker");
             sticker_button.valign = Gtk.Align.CENTER;
             var sticker_picker = new StickerPicker ();
             sticker_picker.sticker_picked.connect (on_sticker_picked);
@@ -362,7 +362,7 @@ namespace Dc {
             var idle_actions = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 2);
             idle_actions.append (sticker_button);
             var record_button = icon_button (
-                "audio-input-microphone-symbolic", "Record a voice message", true);
+                "audio-input-microphone-symbolic", _("Record a voice message"), true);
             record_button.clicked.connect (start_audio_recording);
             idle_actions.append (record_button);
 
@@ -382,7 +382,7 @@ namespace Dc {
             recording_row.hexpand = true;
 
             var cancel_recording_button = icon_button (
-                "window-close-symbolic", "Cancel voice message", true);
+                "window-close-symbolic", _("Cancel voice message"), true);
             cancel_recording_button.clicked.connect (cancel_audio_recording);
             recording_row.append (cancel_recording_button);
 
@@ -392,21 +392,21 @@ namespace Dc {
             recording_row.append (recording_time_label);
 
             recording_stop_button = icon_button (
-                "media-playback-stop-symbolic", "Stop recording", true,
+                "media-playback-stop-symbolic", _("Stop recording"), true,
                 "destructive-action");
             recording_stop_button.clicked.connect (stop_audio_recording);
 
-            transcribe_button = new Gtk.Button.with_label ("Transcribe");
+            transcribe_button = new Gtk.Button.with_label (_("Transcribe"));
             transcribe_button.add_css_class ("flat");
             transcribe_button.valign = Gtk.Align.CENTER;
             transcribe_button.tooltip_text =
-                "Transcribe the recording into the message text";
+                _("Transcribe the recording into the message text");
             transcribe_button.visible = false;
             transcribe_button.clicked.connect (transcribe_audio_recording);
             recording_row.append (transcribe_button);
 
             var recording_send_button = icon_button (
-                "go-up-symbolic", "Send voice message", true,
+                "go-up-symbolic", _("Send voice message"), true,
                 "suggested-action");
             recording_send_button.clicked.connect (send_audio_recording);
 
@@ -787,7 +787,7 @@ namespace Dc {
             recording_time_label.label = "00:00";
             recording_action_stack.visible_child_name = "stop";
             recording_stop_button.sensitive = true;
-            recording_stop_button.tooltip_text = "Stop recording";
+            recording_stop_button.tooltip_text = _("Stop recording");
             compose_mode_stack.visible_child_name = "recording";
             recording_timer = Timeout.add_seconds (1, update_recording_time);
         }
@@ -805,7 +805,7 @@ namespace Dc {
             stop_recording_timer ();
             update_recording_time ();
             recording_stop_button.sensitive = false;
-            recording_stop_button.tooltip_text = "Finishing recording…";
+            recording_stop_button.tooltip_text = _("Finishing recording…");
             audio_recorder.stop ();
         }
 
@@ -819,7 +819,7 @@ namespace Dc {
             var transcriber = Transcriber.shared ();
             transcribing_path = path;
             transcribe_button.sensitive = false;
-            transcribe_button.label = "Transcribing…";
+            transcribe_button.label = _("Transcribing…");
             if (transcriber_handler == 0) {
                 transcriber_handler = transcriber.updated.connect (
                     on_transcription_updated);
@@ -836,7 +836,7 @@ namespace Dc {
             transcribing_path = null;
             reset_transcribe_button ();
             if (text == null) {
-                show_compose_toast ("Transcription is unavailable");
+                show_compose_toast (_("Transcription is unavailable"));
                 return;
             }
             attach_recording_with_text (text);
@@ -862,13 +862,13 @@ namespace Dc {
             text_view.grab_focus ();
             if (text.length == 0) {
                 show_compose_toast (
-                    "No speech detected; the voice message is still attached");
+                    _("No speech detected; the voice message is still attached"));
             }
         }
 
         private void reset_transcribe_button () {
             transcribe_button.sensitive = true;
-            transcribe_button.label = "Transcribe";
+            transcribe_button.label = _("Transcribe");
         }
 
         private void send_audio_recording () {
@@ -912,7 +912,7 @@ namespace Dc {
         }
 
         private void show_recording_error (string message) {
-            show_compose_toast ("Recording failed: " + message);
+            show_compose_toast (_("Recording failed: ") + message);
         }
 
         private void show_compose_toast (string message) {
@@ -956,8 +956,8 @@ namespace Dc {
                 attachment_picture.visible = false;
                 attachment_icon.icon_name = "mail-attachment-symbolic";
                 attachment_icon.visible = true;
-                attachment_name_label.label = "%d attachments".printf (count);
-                attachment_meta_label.label = "%s + %d more".printf (
+                attachment_name_label.label = _("%d attachments").printf (count);
+                attachment_meta_label.label = _("%s + %d more").printf (
                     pending_file_name, count - 1);
                 attachment_bar.visible = true;
             }
@@ -997,7 +997,7 @@ namespace Dc {
                 if (description != null && description.length > 0)
                     attachment_meta_label.label = description;
                 else if (title != null && title.length > 0)
-                    attachment_meta_label.label = "Link preview";
+                    attachment_meta_label.label = _("Link preview");
             }
             return true;
         }
@@ -1110,8 +1110,8 @@ namespace Dc {
                 attachment_picture.visible = false;
                 attachment_icon.icon_name = "mail-attachment-symbolic";
                 attachment_icon.visible = true;
-                attachment_name_label.label = "%d attachments".printf (count);
-                attachment_meta_label.label = "%s + %d more".printf (
+                attachment_name_label.label = _("%d attachments").printf (count);
+                attachment_meta_label.label = _("%s + %d more").printf (
                     pending_file_name, count - 1);
                 attachment_bar.visible = true;
             }
@@ -1256,7 +1256,7 @@ namespace Dc {
             attachment_picture.paintable = null;
             attachment_name_label.label = "";
             attachment_meta_label.label = "";
-            placeholder_label.label = placeholder_default;
+            placeholder_label.label = _(placeholder_default);
             update_send_stack ();
             notify_draft_changed ();
         }
@@ -1339,7 +1339,7 @@ namespace Dc {
             cancel_edit ();
             replying_msg_id = msg_id;
             reply_label.label = "%s: %s".printf (sender_name, shorten_preview (preview));
-            placeholder_label.label = placeholder_reply;
+            placeholder_label.label = _(placeholder_reply);
             reply_bar.visible = true;
             text_view.grab_focus ();
             notify_draft_changed ();
@@ -1368,7 +1368,7 @@ namespace Dc {
             editing_msg_id = msg_id;
             set_entry_text (current_text);
             suppress_draft_signal = false;
-            placeholder_label.label = "Edit message…";
+            placeholder_label.label = _("Edit message…");
             cancel_edit_button.visible = true;
             attach_button.sensitive = false;
             update_send_stack ();
@@ -1380,7 +1380,7 @@ namespace Dc {
             suppress_draft_signal = true;
             editing_msg_id = 0;
             text_view.buffer.text = "";
-            placeholder_label.label = placeholder_default;
+            placeholder_label.label = _(placeholder_default);
             cancel_edit_button.visible = false;
             attach_button.sensitive = true;
             restore_suspended_draft ();

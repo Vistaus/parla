@@ -107,3 +107,7 @@ Parla downloads the upstream Linux release asset named
 If no prebuilt asset matches the host architecture, Parla skips the one-click
 download and points the user at manual installation
 (see [`rpc-server.md`](rpc-server.md)).
+
+## See also
+
+- [`locales.md`](locales.md) — running Parla in another language and contributing translations.

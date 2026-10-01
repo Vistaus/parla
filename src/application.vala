@@ -73,10 +73,18 @@ namespace Dc {
             rpc = new RpcClient ();
             add_main_option (
                 "background", 'b', OptionFlags.NONE, OptionArg.NONE,
-                "Start in the background without opening a window", null);
+                _("Start in the background without opening a window"), null);
             add_main_option (
                 "show", 's', OptionFlags.NONE, OptionArg.NONE,
-                "Present the main window of the running instance", null);
+                _("Show the main window"), null);
+
+            /* GApplication builds its option context internally. Adding an
+               empty option group with our translation domain propagates the
+               domain to the context, translating our option descriptions in
+               --help output. */
+            var group = new GLib.OptionGroup ("", "", "");
+            group.set_translation_domain (Parla.GETTEXT_PACKAGE);
+            add_option_group (group);
         }
 
         public void apply_theme_override (ThemeOverride theme) {

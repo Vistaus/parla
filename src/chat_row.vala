@@ -86,7 +86,7 @@ namespace Dc {
             if (has_mention) {
                 var at = new Gtk.Label ("@");
                 at.add_css_class ("mention-marker");
-                at.tooltip_text = "You were mentioned";
+                at.tooltip_text = _("You were mentioned");
                 top.append (at);
             }
 
@@ -100,7 +100,7 @@ namespace Dc {
                     "notifications-disabled-symbolic");
                 mute_icon.pixel_size = 12;
                 mute_icon.add_css_class ("dim-label");
-                mute_icon.tooltip_text = "Notifications muted";
+                mute_icon.tooltip_text = _("Notifications muted");
                 top.append (mute_icon);
             }
 
@@ -129,7 +129,7 @@ namespace Dc {
             /* Contact requests get a "Request" label instead of a count badge */
             if (is_request || has_unread) {
                 var badge_label = new Gtk.Label (
-                    is_request ? "Request" : entry.unread_count.to_string ());
+                    is_request ? _("Request") : entry.unread_count.to_string ());
                 badge_label.add_css_class (is_request ? "contact-request-badge"
                     : is_muted ? "unread-badge-muted" : "unread-badge");
                 badge_label.halign = Gtk.Align.END;
@@ -201,12 +201,12 @@ namespace Dc {
         // List items need an explicit name, including in compact mode (#57).
         private string accessible_summary (bool compact) {
             var sb = new StringBuilder (entry.name);
-            if (entry.is_contact_request) sb.append (", contact request");
+            if (entry.is_contact_request) sb.append (_(", contact request"));
             else if (entry.unread_count > 0)
-                sb.append_printf (", %d unread", entry.unread_count);
-            if (entry.has_mention) sb.append (", mentioned you");
-            if (entry.is_pinned) sb.append (", pinned");
-            if (entry.is_muted) sb.append (", muted");
+                sb.append_printf (_(", %d unread"), entry.unread_count);
+            if (entry.has_mention) sb.append (_(", mentioned you"));
+            if (entry.is_pinned) sb.append (_(", pinned"));
+            if (entry.is_muted) sb.append (_(", muted"));
             if (compact) return sb.str;
             string time = format_time (entry.timestamp);
             if (time.length > 0) sb.append (", ").append (time);
@@ -287,12 +287,12 @@ namespace Dc {
                chat only offers Unarchive (pinning would unarchive it). */
             if (!is_archived) {
                 append_menu_button (box, popover,
-                    is_pinned ? "Unpin" : "Pin").selected.connect (() => {
+                    is_pinned ? _("Unpin") : _("Pin")).selected.connect (() => {
                         toggle_pin.begin (chat_id, is_pinned);
                     });
             }
             append_menu_button (box, popover,
-                is_archived ? "Unarchive" : "Archive").selected.connect (() => {
+                is_archived ? _("Unarchive") : _("Archive")).selected.connect (() => {
                     toggle_archive.begin (chat_id, is_archived);
                 });
             /* Mute is normally managed from the Details dialog, but for
@@ -301,30 +301,30 @@ namespace Dc {
                earns a direct entry here. */
             if (is_archived) {
                 append_menu_button (box, popover,
-                    is_muted ? "Unmute" : "Mute").selected.connect (() => {
+                    is_muted ? _("Unmute") : _("Mute")).selected.connect (() => {
                         set_mute_state.begin (chat_id, !is_muted, null);
                     });
             }
             append_menu_button (box, popover,
-                has_unread ? "Mark as Read" : "Mark as Unread")
+                has_unread ? _("Mark as Read") : _("Mark as Unread"))
                 .selected.connect (() => {
                     set_unread_state.begin (chat_id, !has_unread);
                 });
-            append_menu_button (box, popover, "View Media")
+            append_menu_button (box, popover, _("View Media"))
                 .selected.connect (() => { show_media (chat_id); });
-            append_menu_button (box, popover, "Chat Details")
+            append_menu_button (box, popover, _("Chat Details"))
                 .selected.connect (() => { show_info (chat_id); });
             box.append (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
-            append_menu_button (box, popover, "Clear Chat…", true)
+            append_menu_button (box, popover, _("Clear Chat…"), true)
                 .selected.connect (() => {
                     confirm_clear_history.begin (chat_id);
                 });
             if (entry != null && entry.can_leave_chat) {
                 append_menu_button (box, popover,
-                    entry.chat_type == "InBroadcast" ? "Leave Channel…" : "Leave Group…", true)
+                    entry.chat_type == "InBroadcast" ? _("Leave Channel…") : _("Leave Group…"), true)
                     .selected.connect (() => { confirm_leave.begin (chat_id); });
             }
-            append_menu_button (box, popover, "Delete Chat…", true)
+            append_menu_button (box, popover, _("Delete Chat…"), true)
                 .selected.connect (() => { confirm_delete.begin (chat_id); });
 
             popover.child = box;
@@ -347,7 +347,7 @@ namespace Dc {
                 yield rpc.set_chat_visibility (chat_id, visibility);
                 yield window.load_chats ();
             } catch (Error e) {
-                window.show_toast ("Failed to update pin: " + e.message);
+                window.show_toast (_("Failed to update pin: ") + e.message);
             }
         }
 
@@ -358,23 +358,23 @@ namespace Dc {
                 yield rpc.set_chat_visibility (chat_id,
                     currently_archived ? "Normal" : "Archived");
                 if (currently_archived) {
-                    window.show_toast ("Chat unarchived");
+                    window.show_toast (_("Chat unarchived"));
                 } else if (already_muted) {
-                    window.show_toast ("Chat archived");
+                    window.show_toast (_("Chat archived"));
                 } else {
                     /* Unmuted chats pop back on the next message; offer the
                        one-click way to make the archive stick. */
                     var toast = window.show_action_toast (
-                        "Chat archived. New messages will unarchive it.",
-                        "Mute");
+                        _("Chat archived. New messages will unarchive it."),
+                        _("Mute"));
                     toast.button_clicked.connect (() => {
                         set_mute_state.begin (chat_id, true,
-                            "Muted. Chat will stay archived.");
+                            _("Muted. Chat will stay archived."));
                     });
                 }
                 yield window.load_chats ();
             } catch (Error e) {
-                window.show_toast ("Failed to update archive: " + e.message);
+                window.show_toast (_("Failed to update archive: ") + e.message);
             }
         }
 
@@ -383,10 +383,10 @@ namespace Dc {
             try {
                 yield rpc.set_chat_mute_duration (chat_id, mute ? -1 : 0);
                 window.show_toast (done_message ??
-                    (mute ? "Chat muted" : "Chat unmuted"));
+                    (mute ? _("Chat muted") : _("Chat unmuted")));
                 window.request_reload_chats ();
             } catch (Error e) {
-                window.show_toast ("Failed to update mute: " + e.message);
+                window.show_toast (_("Failed to update mute: ") + e.message);
             }
         }
 
@@ -398,9 +398,9 @@ namespace Dc {
                     yield rpc.marknoticed_chat (chat_id);
                 }
                 window.request_reload_chats ();
-                window.show_toast (unread ? "Marked unread" : "Marked read");
+                window.show_toast (unread ? _("Marked unread") : _("Marked read"));
             } catch (Error e) {
-                window.show_toast ("Failed to update unread marker: " + e.message);
+                window.show_toast (_("Failed to update unread marker: ") + e.message);
             }
         }
 
@@ -415,7 +415,7 @@ namespace Dc {
             var dialog = new ChatInfoDialog (window, rpc, chat_id);
 
             dialog.chat_deleted.connect ((cid) => {
-                window.show_toast ("Chat deleted");
+                window.show_toast (_("Chat deleted"));
                 if (window.current_chat_id == cid)
                     window.clear_chat_view ();
                 window.request_reload_chats ();
@@ -428,7 +428,7 @@ namespace Dc {
             });
 
             dialog.contact_blocked.connect ((cid) => {
-                window.show_toast ("Chat blocked");
+                window.show_toast (_("Chat blocked"));
                 if (window.current_chat_id == cid)
                     window.clear_chat_view ();
                 window.request_reload_chats ();
@@ -439,7 +439,7 @@ namespace Dc {
 
         private async void confirm_clear_history (int chat_id) {
             int account_id = rpc.account_id;
-            string chat_name = "this chat";
+            string chat_name = _("this chat");
             var entry = find_chat_entry (chat_store, chat_id);
             if (entry != null) chat_name = entry.name;
 
@@ -447,7 +447,7 @@ namespace Dc {
                 int[] ids = yield chat_message_ids_for_clear (rpc, account_id, chat_id, false);
                 if (rpc.account_id != account_id) return;
                 if (ids.length == 0) {
-                    window.show_toast ("No messages to clear");
+                    window.show_toast (_("No messages to clear"));
                     return;
                 }
                 if (yield confirm_chat_clear (window, chat_name, false, ids.length)) {
@@ -455,7 +455,7 @@ namespace Dc {
                         do_clear_history.begin (chat_id, ids);
                 }
             } catch (Error e) {
-                window.show_toast ("Could not load messages: " + e.message);
+                window.show_toast (_("Could not load messages: ") + e.message);
             }
         }
 
@@ -474,7 +474,7 @@ namespace Dc {
                 if (delete_history) yield rpc.delete_chat (chat_id, account_id);
                 if (rpc.account_id != account_id) return;
                 window.show_toast (delete_history
-                    ? "Chat left and deleted" : "Chat left; history kept");
+                    ? _("Chat left and deleted") : _("Chat left; history kept"));
                 if (delete_history && window.current_chat_id == chat_id)
                     window.clear_chat_view ();
                 else if (window.current_chat_id == chat_id)
@@ -482,8 +482,8 @@ namespace Dc {
                 yield window.load_chats ();
             } catch (Error e) {
                 window.show_toast ((left
-                    ? "Chat left, but its history could not be deleted: "
-                    : "Could not finish leaving; chat history was kept: ") + e.message);
+                    ? _("Chat left, but its history could not be deleted: ")
+                    : _("Could not finish leaving; chat history was kept: ")) + e.message);
                 window.request_reload_chats ();
                 if (window.current_chat_id == chat_id)
                     window.request_messages_reload ();
@@ -492,7 +492,7 @@ namespace Dc {
 
         private async void confirm_delete (int chat_id) {
             int account_id = rpc.account_id;
-            string chat_name = "this chat";
+            string chat_name = _("this chat");
             var entry = find_chat_entry (chat_store, chat_id);
             if (entry != null) chat_name = entry.name;
 
@@ -504,24 +504,24 @@ namespace Dc {
         private async void do_clear_history (int chat_id, int[] ids) {
             try {
                 yield rpc.delete_messages (ids);
-                window.show_toast ("Chat cleared for this profile");
+                window.show_toast (_("Chat cleared for this profile"));
                 if (window.current_chat_id == chat_id)
                     window.request_messages_reload ();
                 window.request_reload_chats ();
             } catch (Error e) {
-                window.show_toast ("Clear failed: " + e.message);
+                window.show_toast (_("Clear failed: ") + e.message);
             }
         }
 
         private async void do_delete (int chat_id) {
             try {
                 yield rpc.delete_chat (chat_id);
-                window.show_toast ("Chat deleted");
+                window.show_toast (_("Chat deleted"));
                 if (window.current_chat_id == chat_id)
                     window.clear_chat_view ();
                 yield window.load_chats ();
             } catch (Error e) {
-                window.show_toast ("Delete failed: " + e.message);
+                window.show_toast (_("Delete failed: ") + e.message);
             }
         }
     }

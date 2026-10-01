@@ -4,4 +4,9 @@ namespace Parla {
     /* Build-time pinned deltachat-rpc-server path (meson -Drpc_server_path=...).
        Empty unless a packager fixes the engine to a specific binary. */
     public const string RPC_SERVER_PATH = "@RPC_SERVER_PATH@";
+
+    /* Gettext domain and locale directory used by the i18n setup in main().
+       LOCALEDIR is normally <prefix>/share/locale. */
+    public const string GETTEXT_PACKAGE = "@GETTEXT_PACKAGE@";
+    public const string LOCALEDIR = "@LOCALEDIR@";
 }

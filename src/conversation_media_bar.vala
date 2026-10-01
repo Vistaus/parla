@@ -50,23 +50,23 @@ namespace Dc {
             content.margin_top = 6;
             content.margin_bottom = 6;
 
-            avatar = new Adw.Avatar (40, "Voice message", true);
+            avatar = new Adw.Avatar (40, _("Voice message"), true);
             avatar.valign = Gtk.Align.CENTER;
             content.append (avatar);
 
             previous_button = media_button (
-                "media-skip-backward-symbolic", "Previous voice message");
+                "media-skip-backward-symbolic", _("Previous voice message"));
             previous_button.clicked.connect (() => { previous_requested (); });
             content.append (previous_button);
 
             play_button = media_button (
-                "media-playback-start-symbolic", "Play");
+                "media-playback-start-symbolic", _("Play"));
             play_button.add_css_class ("suggested-action");
             play_button.clicked.connect (() => { playback.toggle (); });
             content.append (play_button);
 
             next_button = media_button (
-                "media-skip-forward-symbolic", "Next voice message");
+                "media-skip-forward-symbolic", _("Next voice message"));
             next_button.clicked.connect (() => { next_requested (); });
             content.append (next_button);
 
@@ -93,10 +93,10 @@ namespace Dc {
             });
             speed_dropdown.add_css_class ("conversation-media-speed");
             speed_dropdown.valign = Gtk.Align.CENTER;
-            speed_dropdown.tooltip_text = "Playback speed";
+            speed_dropdown.tooltip_text = _("Playback speed");
 #if A11Y
             speed_dropdown.update_property (
-                Gtk.AccessibleProperty.LABEL, "Playback speed", -1);
+                Gtk.AccessibleProperty.LABEL, _("Playback speed"), -1);
 #endif
             speed_dropdown.notify["selected"].connect (() => {
                 if (syncing_speed) return;
@@ -149,7 +149,7 @@ namespace Dc {
             content.append (time_label);
 
             close_button = media_button (
-                "window-close-symbolic", "Close player");
+                "window-close-symbolic", _("Close player"));
             close_button.clicked.connect (() => { playback.stop (); });
             content.append (close_button);
 
@@ -212,7 +212,7 @@ namespace Dc {
             play_button.icon_name = is_playing
                 ? "media-playback-pause-symbolic"
                 : "media-playback-start-symbolic";
-            play_button.tooltip_text = is_playing ? "Pause" : "Play";
+            play_button.tooltip_text = is_playing ? _("Pause") : _("Play");
 
             int64 position = matches ? playback.position_us : 0;
             int64 duration = matches ? playback.duration_us : 0;
@@ -222,10 +222,10 @@ namespace Dc {
             progress.visible = !playback.external_backend;
             progress.sensitive = matches && playback.can_seek;
             progress.tooltip_text = progress.sensitive
-                ? "Drag to seek"
+                ? _("Drag to seek")
                 : (playback.external_backend
-                    ? "Seeking is unavailable with the system audio player"
-                    : "Seeking will be available after the audio loads");
+                    ? _("Seeking is unavailable with the system audio player")
+                    : _("Seeking will be available after the audio loads"));
             time_label.label = format_playing_time (position, duration);
             sync_speed ();
         }
@@ -250,8 +250,8 @@ namespace Dc {
             speed_dropdown.sensitive = message_id > 0
                 && playback.can_change_speed;
             speed_dropdown.tooltip_text = playback.can_change_speed
-                ? "Playback speed"
-                : "Install GstPlay, mpv, or ffplay to change playback speed";
+                ? _("Playback speed")
+                : _("Install GstPlay, mpv, or ffplay to change playback speed");
         }
 
         private void sync_item () {
@@ -298,7 +298,7 @@ namespace Dc {
 
         private static string format_sent_timestamp (int64 timestamp) {
             var when = format_date_time (timestamp);
-            return when.length > 0 ? "Sent " + when : "";
+            return when.length > 0 ? _("Sent ") + when : "";
         }
 
         internal static string format_playing_time (int64 position_us,

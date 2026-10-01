@@ -15,6 +15,14 @@ int main (string[] args) {
     }
     Environment.set_application_name ("Parla");
 
+    /* Initialize gettext before any UI string is constructed. The locale is
+       picked from the usual envvars (LANG, LC_ALL, ...); see doc/locales.md
+       for how to override it per-launch. */
+    GLib.Intl.setlocale (LocaleCategory.ALL, "");
+    GLib.Intl.bindtextdomain (Parla.GETTEXT_PACKAGE, Parla.LOCALEDIR);
+    GLib.Intl.bind_textdomain_codeset (Parla.GETTEXT_PACKAGE, "UTF-8");
+    GLib.Intl.textdomain (Parla.GETTEXT_PACKAGE);
+
     var app = new Dc.Application ();
     return app.run (args);
 }

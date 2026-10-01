@@ -171,7 +171,7 @@ namespace Dc {
         private bool can_show_rpc_modal () {
             if (active_modal != null) return false;
             if (events != null) return true;
-            show_toast ("RPC not ready");
+            show_toast (_("RPC not ready"));
             return false;
         }
 
@@ -204,7 +204,7 @@ namespace Dc {
             showing_archived = false;
             archived_count = 0;
             update_archived_toggle ();
-            content_title_label.label = "Select a chat";
+            content_title_label.label = _("Select a chat");
             content_mute_icon.visible = false;
         }
 
@@ -213,7 +213,7 @@ namespace Dc {
                                         Gtk.Widget? child = null) {
             if (showing_profile_setup) {
                 showing_profile_setup = false;
-                content_title_label.label = "Select a chat";
+                content_title_label.label = _("Select a chat");
                 apply_sidebar_mode (true);
             }
             empty_status.child = child;
@@ -228,10 +228,10 @@ namespace Dc {
             var clamp = new Adw.Clamp ();
             clamp.maximum_size = 460;
             clamp.child = list;
-            show_empty_status ("parla-welcome", "Welcome to Parla",
-                "Create a profile or bring an existing one to this device.", clamp);
+            show_empty_status ("parla-welcome", _("Welcome to Parla"),
+                _("Create a profile or bring an existing one to this device."), clamp);
             showing_profile_setup = true;
-            content_title_label.label = "Set Up Profile";
+            content_title_label.label = _("Set Up Profile");
             split_view.show_sidebar = false;
             set_sidebar_toggle_tooltip (true);
             list.get_row_at_index (0).grab_focus ();
@@ -269,7 +269,7 @@ namespace Dc {
                 default_height: 640,
                 width_request: 360,
                 height_request: 320,
-                title: "Parla"
+                title: Parla.AppData.NAME
             );
         }
 
@@ -455,7 +455,7 @@ namespace Dc {
 
             var v = current_view ();
             if (v == null) {
-                show_toast ("Select a chat before dropping a file");
+                show_toast (_("Select a chat before dropping a file"));
                 return;
             }
             v.attach_dropped_file_path (path);
@@ -622,7 +622,7 @@ namespace Dc {
 
             sidebar_header = new Adw.HeaderBar ();
             configure_phone_header (sidebar_header);
-            sidebar_title = new Adw.WindowTitle ("Parla", "");
+            sidebar_title = new Adw.WindowTitle (Parla.AppData.NAME, "");
             sidebar_header.title_widget = sidebar_title;
 
             /* Profile/account menu button in header */
@@ -649,7 +649,7 @@ namespace Dc {
             account_menu_button.child = avatar_overlay;
             account_menu_button.add_css_class ("flat");
             account_menu_button.add_css_class ("circular");
-            account_menu_button.tooltip_text = "Profile Menu (%s)".printf (
+            account_menu_button.tooltip_text = _("Profile Menu (%s)").printf (
                 Platform.primary_shortcut_text ("Shift+A"));
             /* GTK 4.22 widened the C setter from GtkPopover* to GtkWidget*,
                while Vala 0.56 still emits the old pointer type. The GObject
@@ -660,7 +660,7 @@ namespace Dc {
             /* Hamburger menu button on the right */
             sidebar_menu_button = new Gtk.MenuButton ();
             sidebar_menu_button.icon_name = "open-menu-symbolic";
-            sidebar_menu_button.tooltip_text = "Main Menu";
+            sidebar_menu_button.tooltip_text = _("Main Menu");
             sidebar_menu_button.add_css_class ("flat");
             sidebar_menu_button.set ("popover", build_app_menu ());
             sidebar_menu_button.primary = true;
@@ -671,7 +671,7 @@ namespace Dc {
 
             /* Search */
             search_entry = new Gtk.SearchEntry ();
-            search_entry.placeholder_text = "Search chats or messages…";
+            search_entry.placeholder_text = _("Search chats or messages…");
             search_entry.margin_start = 8;
             search_entry.margin_end = 8;
             search_entry.margin_top = 4;
@@ -843,14 +843,14 @@ namespace Dc {
 
             content_header = new Adw.HeaderBar ();
             configure_phone_header (content_header);
-            content_title_label = new Gtk.Label ("Select a chat");
+            content_title_label = new Gtk.Label (_("Select a chat"));
             content_title_label.add_css_class ("heading");
             content_title_label.ellipsize = Pango.EllipsizeMode.END;
             content_mute_icon = new Gtk.Image.from_icon_name (
                 "notifications-disabled-symbolic");
             content_mute_icon.pixel_size = 14;
             content_mute_icon.add_css_class ("dim-label");
-            content_mute_icon.tooltip_text = "Notifications muted";
+            content_mute_icon.tooltip_text = _("Notifications muted");
             content_mute_icon.visible = false;
             var content_title_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
             content_title_box.append (content_title_label);
@@ -870,13 +870,13 @@ namespace Dc {
                places the first-packed child rightmost, so the gallery
                button ends up to the right of the search button. */
             gallery_btn = new Gtk.Button.from_icon_name ("view-grid-symbolic");
-            gallery_btn.tooltip_text = "Apps and media (%s)".printf (
+            gallery_btn.tooltip_text = _("Apps and media (%s)").printf (
                 Platform.primary_shortcut_text ("M"));
             gallery_btn.clicked.connect (() => { show_gallery_dialog (); });
             content_header.pack_end (gallery_btn);
 
             message_search_btn = new Gtk.Button.from_icon_name ("edit-find-symbolic");
-            message_search_btn.tooltip_text = "Search in conversation (%s)".printf (
+            message_search_btn.tooltip_text = _("Search in conversation (%s)").printf (
                 Platform.primary_shortcut_text ("F"));
             message_search_btn.clicked.connect (() => { toggle_message_search (); });
             content_header.pack_end (message_search_btn);
@@ -894,8 +894,8 @@ namespace Dc {
 
             empty_status = new Adw.StatusPage ();
             empty_status.icon_name = "parla-welcome";
-            empty_status.title = "Welcome to Parla";
-            empty_status.description = "Select a chat to start messaging";
+            empty_status.title = _("Welcome to Parla");
+            empty_status.description = _("Select a chat to start messaging");
             content_stack.add_named (empty_status, "empty");
             content_stack.visible_child_name = "empty";
             content_box.append (content_stack);
@@ -993,7 +993,7 @@ namespace Dc {
             box.margin_bottom = 10;
             box.width_request = 300;
 
-            var title = new Gtk.Label ("Profiles");
+            var title = new Gtk.Label (_("Profiles"));
             title.add_css_class ("heading");
             title.halign = Gtk.Align.START;
             title.xalign = 0;
@@ -1014,8 +1014,8 @@ namespace Dc {
             message_results.set_rpc (rpc);
 
             /* Reset any error widget left from a previous failed attempt. */
-            show_empty_status ("parla-welcome", "Welcome to Parla",
-                "Select a chat to start messaging");
+            show_empty_status ("parla-welcome", _("Welcome to Parla"),
+                _("Select a chat to start messaging"));
 
             /* Find the RPC server binary. Auto mode uses Parla/distro-owned
                standalone servers; Custom uses the explicit configured path. */
@@ -1023,7 +1023,7 @@ namespace Dc {
                 settings.effective_rpc_server_path (),
                 settings.effective_rpc_server_source ());
             if (rpc_path == null) {
-                set_connection_status (false, "RPC server not found");
+                set_connection_status (false, _("RPC server not found"));
                 show_rpc_not_found ();
                 return;
             }
@@ -1037,15 +1037,15 @@ namespace Dc {
             } catch (Error e) {
                 string msg = e.message;
                 if ("already running" in msg.down () || "accounts.lock" in msg.down ()) {
-                    show_toast ("Cannot connect - account store is already in use");
+                    show_toast (_("Cannot connect - account store is already in use"));
                     empty_status.description =
                         "The Delta Chat account store is already in use.\n\n" +
                         "Close the other Delta Chat or Parla process, then restart this app.";
-                    set_connection_status (false, "Account store is already in use");
+                    set_connection_status (false, _("Account store is already in use"));
                 } else {
-                    show_toast ("RPC server error: " + msg);
-                    empty_status.description = "Failed to start RPC server:\n\n" + Markup.escape_text (msg);
-                    set_connection_status (false, "Cannot reach RPC server");
+                    show_toast (_("RPC server error: ") + msg);
+                    empty_status.description = _("Failed to start RPC server:\n\n") + Markup.escape_text (msg);
+                    set_connection_status (false, _("Cannot reach RPC server"));
                 }
                 return;
             }
@@ -1056,7 +1056,7 @@ namespace Dc {
             rpc.disconnected.connect ((reason) => {
                 sidebar_title.subtitle = "";
                 sidebar_header.tooltip_text = null;
-                set_connection_status (false, "Disconnected — " + reason);
+                set_connection_status (false, _("Disconnected — ") + reason);
             });
 
             /* If we're running Parla's own downloaded server, optionally check
@@ -1077,7 +1077,7 @@ namespace Dc {
                     yield apply_auto_download_limit ();
                     yield rpc.start_io_for_all_accounts ();
                 } catch (Error e) {
-                    show_toast ("Connection setup error: " + e.message);
+                    show_toast (_("Connection setup error: ") + e.message);
                 }
                 refresh_tracking_filter.begin (false);
             }
@@ -1091,8 +1091,8 @@ namespace Dc {
                 else load_chats.begin ();
             });
             events.connectivity_changed.connect ((state) => {
-                sidebar_title.subtitle = state == 3000 ? "Syncing…"
-                    : state == 2000 ? "Connecting…" : state == 1000 ? "Offline" : "";
+                sidebar_title.subtitle = state == 3000 ? _("Syncing…")
+                    : state == 2000 ? _("Connecting…") : state == 1000 ? _("Offline") : "";
                 sidebar_header.tooltip_text = sidebar_title.subtitle;
             });
             events.refresh_connectivity ();
@@ -1253,7 +1253,7 @@ namespace Dc {
                 yield load_chats ();
                 select_chat_by_id (chat_id);
             } catch (Error e) {
-                show_toast ("Could not open chat: " + e.message);
+                show_toast (_("Could not open chat: ") + e.message);
             }
         }
 
@@ -1263,7 +1263,7 @@ namespace Dc {
                 if (contact_id <= 0) return;
                 yield open_mention_contact (contact_id);
             } catch (Error e) {
-                show_toast ("Could not open chat: " + e.message);
+                show_toast (_("Could not open chat: ") + e.message);
             }
         }
 
@@ -1295,7 +1295,7 @@ namespace Dc {
                 !SettingsManager.rpc_server_path_is_fixed ();
 
             string icon_name = "dialog-error-symbolic";
-            string title = "RPC server not found";
+            string title = _("RPC server not found");
             string description;
             if (settings.effective_rpc_server_source () == RpcServerSource.CUSTOM &&
                 settings.effective_rpc_server_path ().length > 0) {
@@ -1305,12 +1305,12 @@ namespace Dc {
                     (can_download ? "\n\nDownload the engine to use it instead." : "");
             } else if (can_download) {
                 icon_name = "parla-welcome";
-                title = "Welcome to Parla";
+                title = _("Welcome to Parla");
                 description =
-                    "Parla needs the Delta Chat engine to connect.\n" +
-                    "Download it once to get started.";
+                    _("Parla needs the Delta Chat engine to connect.\n" +
+                    "Download it once to get started.");
             } else {
-                title = "Delta Chat engine required";
+                title = _("Delta Chat engine required");
                 description =
                     "No prebuilt deltachat-rpc-server is available for this\n" +
                     "architecture. Install it manually (see docs/rpc-server.md)\n" +
@@ -1322,14 +1322,14 @@ namespace Dc {
                 var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 12);
                 box.halign = Gtk.Align.CENTER;
 
-                var dl = new Gtk.Button.with_label ("Download & start");
+                var dl = new Gtk.Button.with_label (_("Download & start"));
                 dl.add_css_class ("suggested-action");
                 dl.add_css_class ("pill");
                 dl.halign = Gtk.Align.CENTER;
                 dl.clicked.connect (() => { install_and_connect.begin (); });
                 box.append (dl);
 
-                var settings_link = new Gtk.Button.with_label ("Open Settings…");
+                var settings_link = new Gtk.Button.with_label (_("Open Settings…"));
                 settings_link.add_css_class ("flat");
                 settings_link.halign = Gtk.Align.CENTER;
                 settings_link.clicked.connect (show_settings_dialog);
@@ -1337,13 +1337,13 @@ namespace Dc {
 
                 child = box;
             } else {
-                var btn = new Gtk.Button.with_label ("Open Settings…");
+                var btn = new Gtk.Button.with_label (_("Open Settings…"));
                 btn.add_css_class ("suggested-action");
                 btn.add_css_class ("pill");
                 btn.halign = Gtk.Align.CENTER;
                 btn.clicked.connect (show_settings_dialog);
                 child = btn;
-                show_toast ("deltachat-rpc-server not found");
+                show_toast (_("deltachat-rpc-server not found"));
             }
 
             show_empty_status (icon_name, title, description, child);
@@ -1357,11 +1357,11 @@ namespace Dc {
             spinner.spinning = true;
             spinner.set_size_request (32, 32);
             box.append (spinner);
-            var label = new Gtk.Label ("Downloading Delta Chat engine…");
+            var label = new Gtk.Label (_("Downloading Delta Chat engine…"));
             label.add_css_class ("dim-label");
             box.append (label);
 
-            show_empty_status ("folder-download-symbolic", "Setting up Parla",
+            show_empty_status ("folder-download-symbolic", _("Setting up Parla"),
                 "", box);
 
             var installer = new RpcInstaller ();
@@ -1369,10 +1369,10 @@ namespace Dc {
                 if (total > 0) {
                     double pct = (double) received / (double) total * 100.0;
                     label.label =
-                        "Downloading Delta Chat engine… %.0f%% (%.1f MB)".printf (
+                        _("Downloading Delta Chat engine… %.0f%% (%.1f MB)").printf (
                             pct, total / 1048576.0);
                 } else {
-                    label.label = "Downloading Delta Chat engine… %.1f MB".printf (
+                    label.label = _("Downloading Delta Chat engine… %.1f MB").printf (
                         received / 1048576.0);
                 }
             });
@@ -1380,7 +1380,7 @@ namespace Dc {
             try {
                 yield installer.download_latest ();
             } catch (Error e) {
-                show_toast ("Download failed: " + e.message);
+                show_toast (_("Download failed: ") + e.message);
                 show_rpc_not_found ();
                 return;
             }
@@ -1391,7 +1391,7 @@ namespace Dc {
                 settings.save_rpc_server_source (RpcServerSource.AUTO);
             }
 
-            show_toast ("Delta Chat engine installed");
+            show_toast (_("Delta Chat engine installed"));
             yield reconnect_rpc_server ();
         }
 
@@ -1402,12 +1402,12 @@ namespace Dc {
          * Returns null on success, otherwise a message for the user.
          */
         public async string? refresh_tracking_filter (bool force) {
-            if (!settings.tracking_filter_enabled) return "Filter list disabled";
+            if (!settings.tracking_filter_enabled) return _("Filter list disabled");
             string url = settings.tracking_filter_url;
-            if (url.length == 0) return "No filter list URL configured";
+            if (url.length == 0) return _("No filter list URL configured");
             if (rpc == null || rpc.account_id <= 0)
-                return "Not connected: the list is downloaded through the "
-                       + "active account";
+                return _("Not connected: the list is downloaded through the "
+                       + "active account");
             if (!force) {
                 var cached = RemoveParamFilter.active;
                 if (cached != null && !cached.cache_is_stale ()) return null;
@@ -1418,15 +1418,15 @@ namespace Dc {
                 body = yield rpc.get_http_response (url, out mimetype);
             } catch (Error e) {
                 warning ("tracking filter: download failed: %s", e.message);
-                return "Download failed: " + e.message;
+                return _("Download failed: ") + e.message;
             }
             var sb = new StringBuilder.sized (body.length + 1);
             sb.append_len ((string) body, body.length);
             var filter = RemoveParamFilter.from_text (sb.str);
             if (filter == null)
-                return "The downloaded file contains no $removeparam rules";
+                return _("The downloaded file contains no $removeparam rules");
             if (!RemoveParamFilter.save_cached (sb.str))
-                return "Could not save the filter list";
+                return _("Could not save the filter list");
             RemoveParamFilter.active = filter;
             debug ("tracking filter: %d rules from %s", filter.rule_count, url);
             return null;
@@ -1445,7 +1445,7 @@ namespace Dc {
                 var toast = new Adw.Toast (
                     "Delta Chat engine update available: %s".printf (latest));
                 toast.timeout = 8;
-                toast.button_label = "Update";
+                toast.button_label = _("Update");
                 toast.button_clicked.connect (() => {
                     update_managed_server.begin ();
                 });
@@ -1456,14 +1456,14 @@ namespace Dc {
         }
 
         private async void update_managed_server () {
-            show_toast ("Updating Delta Chat engine…");
+            show_toast (_("Updating Delta Chat engine…"));
             var installer = new RpcInstaller ();
             try {
                 yield installer.download_latest ();
-                show_toast ("Update installed");
+                show_toast (_("Update installed"));
                 yield reconnect_rpc_server ();
             } catch (Error e) {
-                show_toast ("Update failed: " + e.message);
+                show_toast (_("Update failed: ") + e.message);
             }
         }
 
@@ -1484,9 +1484,9 @@ namespace Dc {
             reset_chat_ui ();
             profile_unread_badge.visible = false;
 
-            show_empty_status ("parla-welcome", "Connecting",
-                "Starting Delta Chat engine…");
-            set_connection_status (false, "Reconnecting…");
+            show_empty_status ("parla-welcome", _("Connecting"),
+                _("Starting Delta Chat engine…"));
+            set_connection_status (false, _("Reconnecting…"));
 
             yield try_connect ();
             reconnecting_rpc = false;
@@ -1495,10 +1495,10 @@ namespace Dc {
         public void clear_chat_view () {
             current_chat_id = 0;
             mark_current_chat_row (null);
-            content_title_label.label = "Select a chat";
+            content_title_label.label = _("Select a chat");
             content_mute_icon.visible = false;
-            show_empty_status ("parla-welcome", "Parla",
-                "Select a chat to start messaging.");
+            show_empty_status ("parla-welcome", Parla.AppData.NAME,
+                _("Select a chat to start messaging."));
         }
 
         public async void mark_chat_unread (int chat_id) throws Error {
@@ -1597,13 +1597,13 @@ namespace Dc {
                 && (showing_archived || archived_count > 0);
             if (showing_archived) {
                 archived_btn_content.icon_name = "go-previous-symbolic";
-                archived_btn_content.label = compact ? "" : "Back to Chats";
-                archived_toggle_btn.tooltip_text = "Back to Chats";
+                archived_btn_content.label = compact ? "" : _("Back to Chats");
+                archived_toggle_btn.tooltip_text = _("Back to Chats");
             } else {
                 archived_btn_content.icon_name = "archive-symbolic";
                 archived_btn_content.label = compact ? ""
-                    : "Archived Chats (%d)".printf (archived_count);
-                archived_toggle_btn.tooltip_text = "Show Archived Chats";
+                    : _("Archived Chats (%d)").printf (archived_count);
+                archived_toggle_btn.tooltip_text = _("Show Archived Chats");
             }
         }
 
@@ -1729,7 +1729,7 @@ namespace Dc {
                         chat_row.set_compact (settings.sidebar_mode == SidebarMode.COMPACT);
                         chat_row.accept_file_drop.connect (() => can_attach_file_to_chat (chat_row.chat_id));
                         chat_row.file_dropped.connect ((path, name) => attach_file_to_chat (chat_row.chat_id, path, name));
-                        chat_row.file_drop_failed.connect ((message) => show_toast ("Attach failed: " + message));
+                        chat_row.file_drop_failed.connect ((message) => show_toast (_("Attach failed: ") + message));
                     }
                     if (new_row) chat_listbox.append (row);
                     if (entry.id == desired_chat_id) {
@@ -1754,7 +1754,7 @@ namespace Dc {
                 }
             } catch (Error e) {
                 if (chats_load_is_current (generation, acct_id, archived_view))
-                    show_toast ("Failed to load chats: " + e.message);
+                    show_toast (_("Failed to load chats: ") + e.message);
             } finally {
                 chats_loading--;
             }
@@ -1846,17 +1846,17 @@ namespace Dc {
         private void attach_file_to_chat (int chat_id, string path,
                                           string name) {
             if (!can_attach_file_to_chat (chat_id)) {
-                show_toast ("Attach failed: cannot attach here");
+                show_toast (_("Attach failed: cannot attach here"));
                 return;
             }
             if (!select_chat_by_id (chat_id)) {
-                show_toast ("Attach failed: chat is unavailable");
+                show_toast (_("Attach failed: chat is unavailable"));
                 return;
             }
 
             var view = current_view ();
             if (view == null) {
-                show_toast ("Attach failed: chat is unavailable");
+                show_toast (_("Attach failed: chat is unavailable"));
                 return;
             }
             view.attach_dropped_file (path, name);
@@ -1997,17 +1997,17 @@ namespace Dc {
                 var msg = yield rpc.fetch_message_for (acct_id, msg_id);
                 if (acct_id != rpc.account_id || token != search_open_generation) return;
                 if (msg == null || msg.chat_id != chat_id) {
-                    show_toast ("Message is no longer available");
+                    show_toast (_("Message is no longer available"));
                     return;
                 }
                 var chat = yield rpc.get_full_chat_by_id_for (acct_id, chat_id);
                 if (acct_id != rpc.account_id || token != search_open_generation) return;
-                if (chat == null) { show_toast ("Chat is no longer available"); return; }
+                if (chat == null) { show_toast (_("Chat is no longer available")); return; }
                 mark_current_chat_row (null);
                 open_chat (chat_id, RpcParsers.parse_chat_item (chat_id, chat), msg_id);
             } catch (Error e) {
                 if (acct_id == rpc.account_id && token == search_open_generation)
-                    show_toast ("Cannot open search result: " + e.message);
+                    show_toast (_("Cannot open search result: ") + e.message);
             }
         }
 
@@ -2083,10 +2083,10 @@ namespace Dc {
                 var src_file = File.new_for_path (src_path);
                 yield src_file.copy_async (dest, FileCopyFlags.OVERWRITE,
                                            Priority.DEFAULT, null, null);
-                show_toast ("File saved");
+                show_toast (_("File saved"));
             } catch (Error e) {
                 if (is_dialog_dismissal (e)) return;
-                show_toast ("Save failed: " + e.message);
+                show_toast (_("Save failed: ") + e.message);
             }
         }
 
@@ -2105,26 +2105,26 @@ namespace Dc {
             string title;
             string body;
             if (!Webxdc.AVAILABLE) {
-                title = "Cannot Start Webxdc App";
-                body = ("This version of Parla was built without Webxdc "
+                title = _("Cannot Start Webxdc App");
+                body = (_("This version of Parla was built without Webxdc "
                     + "support, so it cannot start “%s”. You can still "
-                    + "download the .xdc file.").printf (app_name);
+                    + "download the .xdc file.")).printf (app_name);
             } else if (!Webxdc.enabled ()) {
-                title = "In-Chat Apps Are Disabled";
-                body = ("In-chat apps are turned off in Settings, so Parla "
+                title = _("In-Chat Apps Are Disabled");
+                body = (_("In-chat apps are turned off in Settings, so Parla "
                     + "cannot start “%s”. You can still download the .xdc "
-                    + "file.").printf (app_name);
+                    + "file.")).printf (app_name);
             } else {
-                title = "Open Webxdc App?";
-                body = ("Start “%s” in Parla, or download its .xdc file "
-                    + "without opening it.").printf (app_name);
+                title = _("Open Webxdc App?");
+                body = (_("Start “%s” in Parla, or download its .xdc file "
+                    + "without opening it.")).printf (app_name);
             }
 
             var dialog = new Adw.AlertDialog (title, body);
-            dialog.add_response ("cancel", "Cancel");
-            dialog.add_response ("download", "Download File");
+            dialog.add_response ("cancel", _("Cancel"));
+            dialog.add_response ("download", _("Download File"));
             if (can_start) {
-                dialog.add_response ("start", "Start App");
+                dialog.add_response ("start", _("Start App"));
                 dialog.set_response_appearance (
                     "start", Adw.ResponseAppearance.SUGGESTED);
                 dialog.default_response = "start";
@@ -2153,11 +2153,11 @@ namespace Dc {
             app window talks to the account its chat belongs to. */
         public async bool run_webxdc_instance (int acct_id, Message msg) {
             if (!Webxdc.AVAILABLE) {
-                show_toast ("This build of Parla has no Webxdc support");
+                show_toast (_("This build of Parla has no Webxdc support"));
                 return false;
             }
             if (!Webxdc.enabled ()) {
-                show_toast ("In-chat apps are disabled in Settings");
+                show_toast (_("In-chat apps are disabled in Settings"));
                 return false;
             }
             if (acct_id != rpc.account_id
@@ -2174,24 +2174,24 @@ namespace Dc {
                                                     Message msg) {
             if (msg.has_local_file) return msg;
             if (msg.is_downloading_full_message) {
-                show_toast ("The app file is still downloading");
+                show_toast (_("The app file is still downloading"));
                 return null;
             }
             if (!msg.can_download_full_message) {
-                show_toast ("The app file is not available for download");
+                show_toast (_("The app file is not available for download"));
                 return null;
             }
 
             try {
-                show_toast ("Downloading app…");
+                show_toast (_("Downloading app…"));
                 yield app_rpc.download_full_message (msg.id);
                 var downloaded = yield app_rpc.fetch_message (msg.id);
                 if (downloaded != null && downloaded.has_local_file) {
                     return downloaded;
                 }
-                show_toast ("The app file has not finished downloading");
+                show_toast (_("The app file has not finished downloading"));
             } catch (Error e) {
-                show_toast ("App download failed: " + e.message);
+                show_toast (_("App download failed: ") + e.message);
             }
             return null;
         }
@@ -2273,9 +2273,9 @@ namespace Dc {
                offline) collapses into one account-wide group banner. */
             if (chat_ids.length > 3) {
                 string title = yield prefix_background_account (acct_id,
-                    "%d new messages".printf (messages));
+                    _("%d new messages").printf (messages));
                 events.send_chat_notification (acct_id, 0, title,
-                    "In %d chats".printf (chat_ids.length));
+                    _("In %d chats").printf (chat_ids.length));
                 return;
             }
 
@@ -2313,10 +2313,10 @@ namespace Dc {
             }
 
             bool show = settings.show_notification_contents;
-            string title = chat_name ?? "New message";
-            string body = messages == 0 ? "New reaction" : "New message";
+            string title = chat_name ?? _("New message");
+            string body = messages == 0 ? _("New reaction") : _("New message");
             if (messages > 1) {
-                body = "%d new messages".printf (messages);
+                body = _("%d new messages").printf (messages);
             } else if (messages == 1 && show) {
                 try {
                     var msg = yield rpc.fetch_message_for (acct_id,
@@ -2330,7 +2330,7 @@ namespace Dc {
                         body = (msg.text != null && msg.text.length > 0)
                             ? msg.text
                             : (msg.file_name != null && msg.file_name.length > 0)
-                            ? msg.file_name : "New message";
+                            ? msg.file_name : _("New message");
                     }
                 } catch (Error e) { /* keep the generic body */ }
             } else if (messages == 0 && show) {
@@ -2342,8 +2342,8 @@ namespace Dc {
                     if (c != null) reactor = json_str (c, "displayName") ?? "";
                 } catch (Error e) { /* name is optional */ }
                 body = reactor.length > 0
-                    ? "%s reacted %s".printf (reactor, r.reaction)
-                    : "Reacted %s".printf (r.reaction);
+                    ? _("%s reacted %s").printf (reactor, r.reaction)
+                    : _("Reacted %s").printf (r.reaction);
             }
 
             title = yield prefix_background_account (acct_id, title);
@@ -2417,8 +2417,8 @@ namespace Dc {
                 account_menu_state = null;
                 clear_listbox (account_menu_list);
                 var row = new Adw.ActionRow ();
-                row.title = "Not connected";
-                row.subtitle = "Open Settings to configure the RPC server";
+                row.title = _("Not connected");
+                row.subtitle = _("Open Settings to configure the RPC server");
                 account_menu_list.append (row);
                 focus_current_account_menu_row_if_requested ();
                 return;
@@ -2452,8 +2452,8 @@ namespace Dc {
                 foreach (var row in rows) account_menu_list.append (row);
                 if (rows.length == 0) {
                     var empty = new Adw.ActionRow ();
-                    empty.title = "No profiles";
-                    empty.subtitle = "Add a profile to get started";
+                    empty.title = _("No profiles");
+                    empty.subtitle = _("Add a profile to get started");
                     account_menu_list.append (empty);
                 }
                 account_menu_list.append (build_add_account_row ());
@@ -2464,7 +2464,7 @@ namespace Dc {
                 clear_listbox (account_menu_list);
                 var err_row = new Adw.ActionRow ();
                 err_row.use_markup = false;
-                err_row.title = "Error loading accounts";
+                err_row.title = _("Error loading accounts");
                 err_row.subtitle = e.message;
                 account_menu_list.append (err_row);
                 focus_current_account_menu_row_if_requested ();
@@ -2504,7 +2504,7 @@ namespace Dc {
 
         private Adw.ActionRow build_add_account_row () {
             var row = new Adw.ActionRow ();
-            row.title = "Add Profile";
+            row.title = _("Add Profile");
             row.activatable = true;
             row.set_data<int> ("acct-id", -1);
 
@@ -2550,9 +2550,9 @@ namespace Dc {
             if (display_name != null && display_name.length > 0) {
                 title = display_name;
             } else if (configured) {
-                title = email ?? "Account #%d".printf (id);
+                title = email ?? _("Account #%d").printf (id);
             } else {
-                title = "Unconfigured account";
+                title = _("Unconfigured account");
             }
 
             var row = new Adw.ActionRow ();
@@ -2586,7 +2586,7 @@ namespace Dc {
             var edit_btn = new Gtk.Button.from_icon_name ("preferences-system-symbolic");
             edit_btn.valign = Gtk.Align.CENTER;
             edit_btn.add_css_class ("flat");
-            edit_btn.tooltip_text = "Edit profile";
+            edit_btn.tooltip_text = _("Edit profile");
             edit_btn.sensitive = configured;
             edit_btn.clicked.connect (() => {
                 account_popover.popdown ();
@@ -2595,7 +2595,7 @@ namespace Dc {
             row.add_suffix (edit_btn);
 
             if (!configured) {
-                var status = new Gtk.Label ("Not configured");
+                var status = new Gtk.Label (_("Not configured"));
                 status.add_css_class ("caption");
                 status.add_css_class ("dim-label");
                 status.valign = Gtk.Align.CENTER;
@@ -2642,9 +2642,9 @@ namespace Dc {
             if (active_modal != null) return;
 
             Gtk.Box box;
-            var dialog = make_modal ("Add Profile", 460, out box);
+            var dialog = make_modal (_("Add Profile"), 460, out box);
 
-            var intro = new Gtk.Label ("Choose how you want to add a profile.");
+            var intro = new Gtk.Label (_("Choose how you want to add a profile."));
             intro.halign = Gtk.Align.START;
             intro.margin_start = intro.margin_end = 12;
             intro.margin_top = 12;
@@ -2721,7 +2721,7 @@ namespace Dc {
         }
 
         private async void after_profile_created (int new_id) {
-            if (yield switch_account (new_id)) show_toast ("Profile created");
+            if (yield switch_account (new_id)) show_toast (_("Profile created"));
         }
 
         private void show_invitation_code_profile_dialog () {
@@ -2742,8 +2742,8 @@ namespace Dc {
                     select_chat_by_id (chat_id);
                 }
                 show_toast (chat_id > 0
-                    ? "Profile created and invitation accepted"
-                    : "Profile created");
+                    ? _("Profile created and invitation accepted")
+                    : _("Profile created"));
             }
         }
 
@@ -2758,7 +2758,7 @@ namespace Dc {
         }
 
         private async void after_secondary_device_imported (int new_id) {
-            if (yield switch_account (new_id)) show_toast ("Profile imported");
+            if (yield switch_account (new_id)) show_toast (_("Profile imported"));
         }
 
         private void show_classic_email_dialog () {
@@ -2777,7 +2777,7 @@ namespace Dc {
             try {
                 yield apply_auto_download_limit ();
             } catch (Error e) {
-                show_toast ("Unable to update attachment downloads: " + e.message);
+                show_toast (_("Unable to update attachment downloads: ") + e.message);
             }
         }
 
@@ -2846,8 +2846,8 @@ namespace Dc {
 
             yield update_unread_indicators ();
             show_toast (switched_account
-                ? "Profile deleted; switched profile"
-                : "Profile deleted");
+                ? _("Profile deleted; switched profile")
+                : _("Profile deleted"));
         }
 
         private async bool switch_to_first_configured_account (int skip_id) {
@@ -2872,7 +2872,7 @@ namespace Dc {
                     }
                 }
             } catch (Error e) {
-                show_toast ("Failed to select another profile: " + e.message);
+                show_toast (_("Failed to select another profile: ") + e.message);
             }
             return false;
         }
@@ -2968,9 +2968,9 @@ namespace Dc {
                 yield load_chats ();
                 select_chat_by_id (chat_id);
 
-                show_toast ("Chat created with " + email);
+                show_toast (_("Chat created with ") + email);
             } catch (Error e) {
-                show_toast ("Failed to create chat: " + e.message);
+                show_toast (_("Failed to create chat: ") + e.message);
             }
         }
 
@@ -2995,7 +2995,7 @@ namespace Dc {
         private async void after_group_created (int chat_id, bool is_channel) {
             yield load_chats ();
             select_chat_by_id (chat_id);
-            show_toast (is_channel ? "Channel created" : "Group created");
+            show_toast (is_channel ? _("Channel created") : _("Group created"));
         }
 
         public void scroll_to_message (int msg_id) {
@@ -3094,7 +3094,7 @@ namespace Dc {
             var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 4);
             box.add_css_class ("menu");
             popover.child = box;
-            foreach (unowned AppMenuEntry e in APP_MENU) {
+            foreach (unowned AppMenuEntry e in build_app_menu_entries ()) {
                 if (e.label == null) {
                     box.append (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
                     continue;
@@ -3114,21 +3114,23 @@ namespace Dc {
         }
 
         /* Main-menu rows in order; a null label is a separator. */
-        private const AppMenuEntry[] APP_MENU = {
-            { "New Chat", "new-chat" },
-            { "New Group", "new-group" },
-            { "New Channel", "new-channel" },
-            { "Use Invite Link", "use-invite-link" },
-            { null, null },
-            { "Stickers", "stickers" },
-            { "Apps", "webxdc-apps" },
-            { null, null },
-            { "Settings", "settings" },
-            { "Shortcuts", "shortcuts" },
-            { "About", "about" },
-            { null, null },
-            { "Quit", "quit" },
-        };
+        private AppMenuEntry[] build_app_menu_entries () {
+            return new AppMenuEntry[] {
+                { _("New Chat"), "new-chat" },
+                { _("New Group"), "new-group" },
+                { _("New Channel"), "new-channel" },
+                { _("Use Invite Link"), "use-invite-link" },
+                { null, null },
+                { _("Stickers"), "stickers" },
+                { _("Apps"), "webxdc-apps" },
+                { null, null },
+                { _("Settings"), "settings" },
+                { _("Shortcuts"), "shortcuts" },
+                { _("About"), "about" },
+                { null, null },
+                { _("Quit"), "quit" },
+            };
+        }
 
         /* Display form of an action's first accelerator, or null. The
            window's application property is still unset while construct
@@ -3178,7 +3180,7 @@ namespace Dc {
 
             if (rpc == null || rpc.account_id <= 0) {
                 pending_invite_uri = uri;
-                show_toast ("Invite link will open once a profile is ready");
+                    show_toast (_("Invite link will open once a profile is ready"));
                 return;
             }
             show_use_invite_link_dialog (uri);
@@ -3187,12 +3189,12 @@ namespace Dc {
         private void show_use_invite_link_dialog (string? prefill = null) {
             if (active_modal != null) return;
             if (rpc.account_id <= 0) {
-                show_toast ("No active profile");
+                show_toast (_("No active profile"));
                 return;
             }
 
             Gtk.Box box;
-            var dialog = make_modal ("Use Invite Link", 460, out box);
+            var dialog = make_modal (_("Use Invite Link"), 460, out box);
 
             var content = new Gtk.Box (Gtk.Orientation.VERTICAL, 10);
             content.margin_start = 18;
@@ -3200,7 +3202,7 @@ namespace Dc {
             content.margin_top = 12;
             content.margin_bottom = 18;
 
-            var label = new Gtk.Label ("Paste a Delta Chat invite link.");
+            var label = new Gtk.Label (_("Paste a Delta Chat invite link."));
             label.halign = Gtk.Align.START;
             label.xalign = 0;
             label.wrap = true;
@@ -3208,7 +3210,7 @@ namespace Dc {
             content.append (label);
 
             var entry = new Gtk.Entry ();
-            entry.placeholder_text = "https://i.delta.chat/#...";
+            entry.placeholder_text = _("https://i.delta.chat/#...");
             entry.input_purpose = Gtk.InputPurpose.URL;
             entry.hexpand = true;
             content.append (entry);
@@ -3224,11 +3226,11 @@ namespace Dc {
             actions.halign = Gtk.Align.END;
             actions.margin_top = 6;
 
-            var cancel_btn = new Gtk.Button.with_label ("Cancel");
+            var cancel_btn = new Gtk.Button.with_label (_("Cancel"));
             cancel_btn.clicked.connect (() => { dialog.close (); });
             actions.append (cancel_btn);
 
-            var add_btn = new Gtk.Button.with_label ("Add");
+            var add_btn = new Gtk.Button.with_label (_("Add"));
             add_btn.add_css_class ("suggested-action");
             add_btn.sensitive = false;
             add_btn.clicked.connect (() => {
@@ -3271,12 +3273,12 @@ namespace Dc {
 
             add_btn.sensitive = false;
             entry.sensitive = false;
-            status.label = "Checking invite link…";
+            status.label = _("Checking invite link…");
 
             try {
                 var qr = yield rpc.check_qr (rpc.account_id, invite_link);
                 if (qr == null || !qr.has_member ("kind")) {
-                    status.label = "This is not a valid invite link.";
+                    status.label = _("This is not a valid invite link.");
                     return;
                 }
 
@@ -3293,12 +3295,12 @@ namespace Dc {
                 case "askVerifyGroup":
                 case "askJoinBroadcast":
                     {
-                        status.label = "Accepting invite link…";
+                        status.label = _("Accepting invite link…");
                         int chat_id = yield rpc.secure_join (rpc.account_id, invite_link);
                         yield load_chats ();
                         select_chat_by_id (chat_id);
                         dialog.close ();
-                        show_toast ("Invite link accepted");
+                        show_toast (_("Invite link accepted"));
                     }
                     break;
 
@@ -3307,10 +3309,10 @@ namespace Dc {
                 case "reviveJoinBroadcast":
                     /* Our own link, currently inactive — activate it so others
                        can join. */
-                    status.label = "Activating your invite link…";
+                    status.label = _("Activating your invite link…");
                     yield rpc.set_config_from_qr (rpc.account_id, invite_link);
-                    status.label = "This is your own invite link. It is now active — "
-                        + "share it with others so they can join.";
+                    status.label = _("This is your own invite link. It is now active — "
+                        + "share it with others so they can join.");
                     break;
 
                 case "withdrawVerifyContact":
@@ -3318,16 +3320,16 @@ namespace Dc {
                 case "withdrawJoinBroadcast":
                     /* Our own link, already active. Nothing to join — just tell
                        the user it is ready to share. */
-                    status.label = "This is your own invite link and it is active. "
-                        + "Share it with others so they can join.";
+                    status.label = _("This is your own invite link and it is active. "
+                        + "Share it with others so they can join.");
                     break;
 
                 default:
-                    status.label = "This is not a contact, group, or channel invite link.";
+                    status.label = _("This is not a contact, group, or channel invite link.");
                     break;
                 }
             } catch (Error e) {
-                status.label = "Invite link failed: " + e.message;
+                status.label = _("Invite link failed: ") + e.message;
             } finally {
                 if (active_modal == dialog) {
                     entry.sensitive = true;
@@ -3373,8 +3375,8 @@ namespace Dc {
                 return;
             }
 
-            show_empty_status ("parla-welcome", "Parla",
-                "Select a chat to start messaging.");
+            show_empty_status ("parla-welcome", Parla.AppData.NAME,
+                _("Select a chat to start messaging."));
             yield load_self_identity ();
             current_chat_id = 0;
             yield load_chats ();
@@ -3497,7 +3499,7 @@ namespace Dc {
                 search_entry.visible = true;
                 sidebar_menu_button.visible = true;
                 sidebar_title.visible = true;
-                sidebar_title.title = "Parla";
+                sidebar_title.title = Parla.AppData.NAME;
                 set_compact_header_chrome (false);
             }
             set_sidebar_toggle_tooltip (!split_view.show_sidebar);
@@ -3507,7 +3509,7 @@ namespace Dc {
 
         private void set_sidebar_toggle_tooltip (bool hidden) {
             sidebar_toggle_btn.tooltip_text =
-                (hidden ? "Show Sidebar (%s)" : "Hide Sidebar (%s)").printf (
+                (hidden ? _("Show Sidebar (%s)") : _("Hide Sidebar (%s)")).printf (
                     Platform.primary_shortcut_text ("S"));
         }
 
@@ -3879,35 +3881,37 @@ namespace Dc {
             return false;
         }
 
-        private const string[] SHORTCUTS = {
-            "New chat",              "<Primary>n",
-            "New group",             "<Primary>g",
-            "New channel",           "<Primary><Shift>g",
-            "Open settings",         "<Primary>comma",
-            "Increase font size",     "<Primary>plus",
-            "Decrease font size",     "<Primary>minus",
-            "Reset font size",        "<Primary>0",
-            "Open chat info",        "<Primary>i",
-            "Apps and media gallery","<Primary>m",
-            "Search in conversation","<Primary>f",
-            "Search chats and messages", "<Primary><Shift>f",
-            "Quick switch chat",     "<Primary>k",
-            "Focus message entry",   "<Primary>l",
-            "Message action (from Settings)", "Return",
-            "Menu for focused message", "<Shift>F10",
-            "Account menu",          "<Primary><Shift>a",
-            "Focus next chat",       "<Primary>Page_Down",
-            "Focus previous chat",   "<Primary>Page_Up",
-            "Refresh messages",      "<Primary>r",
-            "Toggle sidebar",        "<Primary>s",
-            "Compact sidebar",       "<Primary><Shift>s",
-            "Focus message entry",   "Escape",
-            "Select or deselect focused message", "space",
-            "Focus message selection actions", "<Control>Tab",
-            "Cancel reply/edit/image/selection", "Escape",
-            "Close window",          "<Primary>w",
-            "Quit application",      "<Primary>q",
-        };
+        private string[] build_shortcut_entries () {
+            return new string[] {
+                _("New chat"),              "<Primary>n",
+                _("New group"),             "<Primary>g",
+                _("New channel"),           "<Primary><Shift>g",
+                _("Open settings"),         "<Primary>comma",
+                _("Increase font size"),     "<Primary>plus",
+                _("Decrease font size"),     "<Primary>minus",
+                _("Reset font size"),        "<Primary>0",
+                _("Open chat info"),        "<Primary>i",
+                _("Apps and media gallery"),"<Primary>m",
+                _("Search in conversation"),"<Primary>f",
+                _("Search chats and messages"), "<Primary><Shift>f",
+                _("Quick switch chat"),     "<Primary>k",
+                _("Focus message entry"),   "<Primary>l",
+                _("Message action (from Settings)"), "Return",
+                _("Menu for focused message"), "<Shift>F10",
+                _("Account menu"),          "<Primary><Shift>a",
+                _("Focus next chat"),       "<Primary>Page_Down",
+                _("Focus previous chat"),   "<Primary>Page_Up",
+                _("Refresh messages"),      "<Primary>r",
+                _("Toggle sidebar"),        "<Primary>s",
+                _("Compact sidebar"),       "<Primary><Shift>s",
+                _("Focus message entry"),   "Escape",
+                _("Select or deselect focused message"), "space",
+                _("Focus message selection actions"), "<Control>Tab",
+                _("Cancel reply/edit/image/selection"), "Escape",
+                _("Close window"),          "<Primary>w",
+                _("Quit application"),      "<Primary>q",
+            };
+        }
 
         private static string shortcut_accelerator (string accelerator) {
             return accelerator.replace ("<Primary>",
@@ -3928,7 +3932,7 @@ namespace Dc {
             if (active_modal != null) return;
 
             Gtk.Box box;
-            var dialog = make_modal ("Shortcuts", 400, out box);
+            var dialog = make_modal (_("Shortcuts"), 400, out box);
             dialog.content_height = 380;
 
             var scroller = new Gtk.ScrolledWindow ();
@@ -3942,10 +3946,11 @@ namespace Dc {
             list.add_css_class ("boxed-list");
             list.margin_start = list.margin_end = list.margin_top = list.margin_bottom = 12;
 
-            for (int i = 0; i + 1 < SHORTCUTS.length; i += 2) {
+            var shortcuts = build_shortcut_entries ();
+            for (int i = 0; i + 1 < shortcuts.length; i += 2) {
                 var row = new Adw.ActionRow ();
-                row.title = SHORTCUTS[i];
-                var lbl = new Gtk.Label (shortcut_label_text (SHORTCUTS[i + 1]));
+                row.title = shortcuts[i];
+                var lbl = new Gtk.Label (shortcut_label_text (shortcuts[i + 1]));
                 lbl.valign = Gtk.Align.CENTER;
                 lbl.add_css_class ("dim-label");
                 row.add_suffix (lbl);
@@ -3953,7 +3958,7 @@ namespace Dc {
             }
 
             var wheel_row = new Adw.ActionRow ();
-            wheel_row.title = "Change font size";
+            wheel_row.title = _("Change font size");
             var wheel_lbl = new Gtk.Label (
                 Platform.primary_shortcut_text ("Mouse Wheel"));
             wheel_lbl.valign = Gtk.Align.CENTER;
@@ -3964,7 +3969,7 @@ namespace Dc {
             /* The emoji picker opens on a typed "::" rather than a key
                accelerator, so it gets a plain-text suffix. */
             var emoji_row = new Adw.ActionRow ();
-            emoji_row.title = "Emoji picker";
+            emoji_row.title = _("Emoji picker");
             var emoji_lbl = new Gtk.Label ("::");
             emoji_lbl.valign = Gtk.Align.CENTER;
             emoji_lbl.add_css_class ("dim-label");
@@ -4010,7 +4015,7 @@ namespace Dc {
             icon.pixel_size = 14;
             box.append (icon);
 
-            connection_banner_label = new Gtk.Label ("Not connected");
+            connection_banner_label = new Gtk.Label (_("Not connected"));
             connection_banner_label.add_css_class ("connection-banner-label");
             box.append (connection_banner_label);
 
@@ -4031,7 +4036,7 @@ namespace Dc {
             if (connected) {
                 connection_banner.reveal_child = false;
             } else {
-                connection_banner_label.label = reason ?? "Not connected";
+                connection_banner_label.label = reason ?? _("Not connected");
                 connection_banner.reveal_child = true;
             }
         }

@@ -46,41 +46,41 @@ namespace Dc {
 
             vbox.append (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
 
-            var reply_btn = new PopoverButton (popover, "Reply");
+            var reply_btn = new PopoverButton (popover, _("Reply"));
             reply_btn.selected.connect (() => start_replying (msg_id));
             vbox.append (reply_btn);
 
-            var forward_btn = new PopoverButton (popover, "Forward\u2026");
+            var forward_btn = new PopoverButton (popover, _("Forward…"));
             forward_btn.selected.connect (() => start_forwarding (msg_id));
             vbox.append (forward_btn);
 
             bool msg_is_pinned = msg != null
                 ? msg.is_pinned : pinned.is_pinned (msg_id);
             var pin_btn = new PopoverButton (popover,
-                msg_is_pinned ? "Unpin" : "Pin");
+                msg_is_pinned ? _("Unpin") : _("Pin"));
             pin_btn.selected.connect (() => pinned.toggle_pin.begin (msg_id));
             vbox.append (pin_btn);
 
             if (msg != null && msg.can_edit_text) {
-                var edit_btn = new PopoverButton (popover, "Edit");
+                var edit_btn = new PopoverButton (popover, _("Edit"));
                 edit_btn.selected.connect (() => start_editing (msg_id));
                 vbox.append (edit_btn);
             }
 
             if (msg != null && msg.can_retry) {
-                var retry_btn = new PopoverButton (popover, "Retry");
+                var retry_btn = new PopoverButton (popover, _("Retry"));
                 retry_btn.sensitive = !retrying.contains (msg_id)
                     && !rpc.is_retrying_message_for (account_id, msg_id);
                 retry_btn.selected.connect (() => { retry_message.begin (msg_id); });
                 vbox.append (retry_btn);
             }
 
-            var select_btn = new PopoverButton (popover, "Select Messages",
+            var select_btn = new PopoverButton (popover, _("Select Messages"),
                 false, false, "Space");
             select_btn.selected.connect (() => select_requested (msg_id));
             vbox.append (select_btn);
 
-            var details_btn = new PopoverButton (popover, "Details...");
+            var details_btn = new PopoverButton (popover, _("Details..."));
             details_btn.selected.connect (() => show_details (msg_id));
             vbox.append (details_btn);
 
@@ -89,7 +89,7 @@ namespace Dc {
                 msg.file_path.length > 0) {
                 string fpath = msg.file_path;
                 string? fname = msg.file_name;
-                var save_btn = new PopoverButton (popover, "Save file");
+                var save_btn = new PopoverButton (popover, _("Save file"));
                 save_btn.selected.connect (() =>
                     window.save_attachment.begin (fpath, fname));
                 vbox.append (save_btn);
@@ -99,7 +99,7 @@ namespace Dc {
             if (msg != null && msg.is_audio_file () && msg.has_local_file
                 && Transcriber.available ()) {
                 string apath = msg.file_path;
-                var transcribe_btn = new PopoverButton (popover, "Transcribe");
+                var transcribe_btn = new PopoverButton (popover, _("Transcribe"));
                 transcribe_btn.selected.connect (() =>
                     Transcriber.shared ().transcribe (apath));
                 vbox.append (transcribe_btn);
@@ -108,7 +108,7 @@ namespace Dc {
             /* Collect sticker attachments into a local pack */
             if (msg != null && msg.is_sticker_file () && msg.has_local_file) {
                 string spath = msg.file_path;
-                var sticker_btn = new PopoverButton (popover, "Add Sticker…");
+                var sticker_btn = new PopoverButton (popover, _("Add Sticker…"));
                 sticker_btn.selected.connect (() =>
                     StickerManagerDialog.prompt_add_sticker (window, spath));
                 vbox.append (sticker_btn);
@@ -116,7 +116,7 @@ namespace Dc {
 
             vbox.append (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
 
-            var delete_btn = new PopoverButton (popover, "Delete…", true);
+            var delete_btn = new PopoverButton (popover, _("Delete…"), true);
             delete_btn.selected.connect (() =>
                 confirm_delete_message.begin (msg_id));
             vbox.append (delete_btn);
@@ -151,7 +151,7 @@ namespace Dc {
                 var btn = new PopoverButton (popover, emoji);
                 bool is_more = (emoji == "…");
                 if (is_more) {
-                    btn.tooltip_text = "More emojis…";
+                    btn.tooltip_text = _("More emojis…");
                     btn.selected.connect (() => {
                         show_emoji_picker (msg_id, parent, x, y);
                     });
@@ -209,7 +209,7 @@ namespace Dc {
                 }
                 yield update_row (msg_id);
             } catch (Error e) {
-                window.show_toast ("Reaction failed: " + e.message);
+                window.show_toast (_("Reaction failed: ") + e.message);
             }
         }
 
@@ -217,7 +217,7 @@ namespace Dc {
                                          double x, double y) {
             var chooser = create_emoji_chooser ();
             if (chooser == null) {
-                window.show_toast ("Emoji picker unavailable");
+                window.show_toast (_("Emoji picker unavailable"));
                 return;
             }
             chooser.emoji_picked.connect ((emoji) => {
@@ -241,7 +241,7 @@ namespace Dc {
                 int idx = find_message_index (message_store, msg_id);
                 if (idx >= 0) message_store.remove (idx);
             } catch (Error e) {
-                window.show_toast ("Delete failed: " + e.message);
+                window.show_toast (_("Delete failed: ") + e.message);
             }
         }
 
@@ -262,8 +262,8 @@ namespace Dc {
         public void start_replying (int msg_id) {
             var m = find_message (message_store, msg_id);
             if (m == null) return;
-            string sender = m.is_outgoing ? "You" : (m.sender_name ?? "");
-            string preview = m.text ?? "(attachment)";
+            string sender = m.is_outgoing ? _("You") : (m.sender_name ?? "");
+            string preview = m.text ?? _("(attachment)");
             compose_bar.begin_reply (msg_id, sender, preview);
         }
 
@@ -286,7 +286,7 @@ namespace Dc {
                is a different account. */
             int src_acct = rpc.account_id;
             var picker = new ContactPickerDialog (rpc, window.chat_store,
-                                                  "Forward To", true);
+                                                  _("Forward To"), true);
             picker.chat_picked.connect ((chat_id) => {
                 forward_to_chat.begin (window, rpc, forward_ids.copy (),
                                        src_acct, picker.selected_account_id,
@@ -323,9 +323,9 @@ namespace Dc {
                     window.request_chat_messages_reload (chat_id);
                 }
                 window.show_toast (msg_ids.length == 1
-                    ? "Message forwarded" : "Messages forwarded");
+                    ? _("Message forwarded") : _("Messages forwarded"));
             } catch (Error e) {
-                window.show_toast ("Forward failed: " + e.message);
+                window.show_toast (_("Forward failed: ") + e.message);
             }
         }
 
@@ -367,7 +367,7 @@ namespace Dc {
                 chat_id = yield rpc.get_or_create_chat_by_contact_for (dest_acct,
                                                                        cid);
             } catch (Error e) {
-                window.show_toast ("Forward failed: " + e.message);
+                window.show_toast (_("Forward failed: ") + e.message);
                 return;
             }
             yield forward_to_chat (window, rpc, (owned) msg_ids, src_acct,
@@ -379,7 +379,7 @@ namespace Dc {
                 yield rpc.send_edit_request (msg_id, new_text);
                 yield update_row (msg_id);
             } catch (Error e) {
-                window.show_toast ("Edit failed: " + e.message);
+                window.show_toast (_("Edit failed: ") + e.message);
             }
         }
 
@@ -405,7 +405,7 @@ namespace Dc {
                 try {
                     updated = yield client.fetch_message_for (account_id, msg_id);
                 } catch (Error e) {
-                    if (failure == null) failure = "Could not refresh message: " + e.message;
+                    if (failure == null) failure = _("Could not refresh message: ") + e.message;
                 }
                 if (!retry_context_active (client, owner)) return null;
                 if (updated != null) {
@@ -419,7 +419,7 @@ namespace Dc {
                 }
                 owner.request_reload_chats ();
                 if (failure != null)
-                    owner.show_toast (Markup.escape_text ("Could not retry message: " + failure));
+                    owner.show_toast (Markup.escape_text (_("Could not retry message: ") + failure));
                 return updated;
             } finally {
                 retrying.remove (msg_id);
@@ -506,7 +506,7 @@ namespace Dc {
                     window.show_chat_info (chat_id);
                 }
             } catch (Error e) {
-                window.show_toast ("Could not open contact details: " + e.message);
+                window.show_toast (_("Could not open contact details: ") + e.message);
             }
         }
     }
