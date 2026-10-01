@@ -51,6 +51,8 @@ namespace Dc {
         private Gtk.Label recording_time_label;
         private Gtk.Stack recording_action_stack;
         private Gtk.Button recording_stop_button;
+        private Gtk.Button recording_preview_button;
+        private ulong recording_preview_handler = 0;
         private Gtk.Button transcribe_button;
         private AudioRecorder? audio_recorder = null;
         /* Path being transcribed for the composer, null when idle. */
@@ -386,6 +388,12 @@ namespace Dc {
             cancel_recording_button.clicked.connect (cancel_audio_recording);
             recording_row.append (cancel_recording_button);
 
+            recording_preview_button = icon_button (
+                "media-playback-start-symbolic", _("Preview voice message"), true);
+            recording_preview_button.visible = false;
+            recording_preview_button.clicked.connect (preview_audio_recording);
+            recording_row.append (recording_preview_button);
+
             recording_time_label = new Gtk.Label ("00:00");
             recording_time_label.hexpand = true;
             recording_time_label.halign = Gtk.Align.CENTER;
@@ -434,6 +442,7 @@ namespace Dc {
             if (closed) return;
             closed = true;
             stop_recording_timer ();
+            stop_recording_preview ();
             if (transcriber_handler != 0) {
                 Transcriber.shared ().disconnect (transcriber_handler);
                 transcriber_handler = 0;
@@ -765,6 +774,10 @@ namespace Dc {
             recorder.completed.connect (() => {
                 if (audio_recorder != recorder) return;
                 recording_action_stack.visible_child_name = "send";
+                recording_preview_button.visible = true;
+                recording_preview_handler = AudioPlayback.shared ()
+                    .notify["playing"].connect (update_recording_preview);
+                update_recording_preview ();
                 /* Only a finished file can be handed to whisper. */
                 transcribe_button.visible = Transcriber.available ();
             });
@@ -809,6 +822,38 @@ namespace Dc {
             audio_recorder.stop ();
         }
 
+        private void preview_audio_recording () {
+            if (audio_recorder == null || !recording_preview_button.visible) return;
+            var playback = AudioPlayback.shared ();
+            string path = audio_recorder.output_path;
+            if (playback.is_preview (path)) playback.toggle ();
+            else playback.play_preview (path);
+        }
+
+        private void update_recording_preview () {
+            var playback = AudioPlayback.shared ();
+            bool playing = audio_recorder != null
+                && playback.is_preview (audio_recorder.output_path)
+                && playback.playing;
+            recording_preview_button.icon_name = playing
+                ? "media-playback-pause-symbolic"
+                : "media-playback-start-symbolic";
+            recording_preview_button.tooltip_text = playing
+                ? _("Pause") : _("Preview voice message");
+        }
+
+        private void stop_recording_preview () {
+            var playback = AudioPlayback.shared ();
+            if (recording_preview_handler != 0) {
+                playback.disconnect (recording_preview_handler);
+                recording_preview_handler = 0;
+            }
+            if (audio_recorder != null
+                    && playback.is_preview (audio_recorder.output_path))
+                playback.stop ();
+            recording_preview_button.visible = false;
+        }
+
         /* Run whisper over the finished recording; on_transcription_updated
            moves the result into the composer. */
         private void transcribe_audio_recording () {
@@ -846,6 +891,7 @@ namespace Dc {
            attachment, with its transcription ready to edit in the entry. */
         private void attach_recording_with_text (string text) {
             if (audio_recorder == null) return;
+            stop_recording_preview ();
             /* Take the file first: leaving recording mode discards whatever
                the recorder still owns. */
             string path = audio_recorder.take_output ();
@@ -873,6 +919,7 @@ namespace Dc {
 
         private void send_audio_recording () {
             if (audio_recorder == null) return;
+            stop_recording_preview ();
             send_voice_message (audio_recorder.take_output (), "",
                 replying_msg_id, true);
             leave_audio_recording_mode ();
@@ -890,6 +937,7 @@ namespace Dc {
 
         private void leave_audio_recording_mode () {
             stop_recording_timer ();
+            stop_recording_preview ();
             transcribing_path = null;
             reset_transcribe_button ();
             transcribe_button.visible = false;

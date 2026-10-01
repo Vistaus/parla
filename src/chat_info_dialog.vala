@@ -535,25 +535,25 @@ namespace Dc {
                                                 Contact contact) {
             string label = contact_label (contact);
             if (contact.is_blocked) {
-                row.title = "Unblock Contact";
-                row.subtitle = "Allow messages from %s".printf (label);
+                row.title = _("Unblock Contact");
+                row.subtitle = _("Allow messages from %s").printf (label);
             } else {
-                row.title = "Block Contact…";
-                row.subtitle = "Block direct messages from %s and keep the history".printf (label);
+                row.title = _("Block Contact…");
+                row.subtitle = _("Block direct messages from %s and keep the history").printf (label);
             }
         }
 
         private static string contact_label (Contact contact) {
             if (contact.display_name.length > 0) return contact.display_name;
             if (contact.address.length > 0) return contact.address;
-            return "this contact";
+            return _("this contact");
         }
 
         private async void show_edit_contact_name_dialog (int contact_id,
                                                            Gtk.Label name_lbl) {
-            string? name = yield prompt_text (this, "Edit Contact Name",
-                "Leave empty to use the contact's own name.", "Save",
-                name_lbl.label, "Contact name");
+            string? name = yield prompt_text (this, _("Edit Contact Name"),
+                _("Leave empty to use the contact's own name."), _("Save"),
+                name_lbl.label, _("Contact name"));
             if (name != null)
                 yield save_contact_name (contact_id, name.strip (), name_lbl);
         }
@@ -589,8 +589,9 @@ namespace Dc {
 
         private async void show_edit_group_name_dialog (Gtk.Label name_lbl) {
             string? name = yield prompt_text (this,
-                is_channel ? "Edit Channel Name" : "Edit Group Name", null,
-                "Save", name_lbl.label, is_channel ? "Channel name" : "Group name");
+                is_channel ? _("Edit Channel Name") : _("Edit Group Name"), null,
+                _("Save"), name_lbl.label,
+                is_channel ? _("Channel name") : _("Group name"));
             if (name == null) return;
             string new_name = name.strip ();
             /* Groups must keep a name, so ignore an empty entry. */
@@ -611,22 +612,23 @@ namespace Dc {
 
         private async void confirm_remove_member (Contact contact, Adw.ActionRow row) {
             int account_id = rpc.account_id;
-            string body = "Remove \"%s\" from \"%s\"? They keep messages already received.".printf (
+            string body = _("Remove “%s” from “%s”? They keep messages already received.").printf (
                 contact_label (contact), chat_name);
             body += is_channel
-                ? " They will no longer receive new messages sent to this channel."
-                : " They will no longer receive new group messages.";
-            if (!is_channel && !is_unpromoted) body += " Group members will be notified.";
+                ? _(" They will no longer receive new messages sent to this channel.")
+                : _(" They will no longer receive new group messages.");
+            if (!is_channel && !is_unpromoted) body += _(" Group members will be notified.");
             if (!(yield confirm_action (this,
-                is_channel ? "Remove Subscriber?" : "Remove Member?",
-                body, "remove", is_channel ? "Remove Subscriber" : "Remove Member"))) return;
+                is_channel ? _("Remove Subscriber?") : _("Remove Member?"),
+                body, "remove",
+                is_channel ? _("Remove Subscriber") : _("Remove Member")))) return;
             if (rpc.account_id != account_id) return;
             try {
                 yield rpc.remove_contact_from_chat (chat_id, contact.id);
                 members_list.remove (row);
                 chat_changed ();
             } catch (Error e) {
-                row.subtitle = "Remove failed: " + e.message;
+                row.subtitle = _("Remove failed: ") + e.message;
             }
         }
 
@@ -705,8 +707,8 @@ namespace Dc {
                 if (rpc.account_id != account_id) return;
                 if (ids.length == 0) {
                     app_window.show_toast (for_all
-                        ? "No sent messages can be deleted for everyone"
-                        : "No messages to clear");
+                        ? _("No sent messages can be deleted for everyone")
+                        : _("No messages to clear"));
                     return;
                 }
                 if (!(yield confirm_chat_clear (this, chat_name, for_all, ids.length))) return;
@@ -760,7 +762,7 @@ namespace Dc {
             yield app_window.load_chats ();
             app_window.select_chat_by_id (new_chat_id);
             app_window.show_toast (is_channel
-                ? "Channel created" : "Group created");
+                ? _("Channel created") : _("Group created"));
             this.close ();
         }
 
@@ -781,14 +783,14 @@ namespace Dc {
                     chat_deleted (chat_id);
                 } else {
                     chat_changed ();
-                    app_window.show_toast ("Chat left; history kept");
+                    app_window.show_toast (_("Chat left; history kept"));
                 }
                 this.close ();
             } catch (Error e) {
                 chat_changed ();
                 show_error (this, (left
-                    ? "Chat left, but its history could not be deleted: "
-                    : "Could not finish leaving; chat history was kept: ") + e.message);
+                    ? _("Chat left, but its history could not be deleted: ")
+                    : _("Could not finish leaving; chat history was kept: ")) + e.message);
             }
         }
 
@@ -811,7 +813,7 @@ namespace Dc {
 
         private async void pick_avatar () {
             string? path = yield pick_image_file (
-                (Gtk.Window) this.get_root (), "Select Avatar Image");
+                (Gtk.Window) this.get_root (), _("Select Avatar Image"));
             if (path == null) return;
             try {
                 yield rpc.set_chat_profile_image (chat_id, path);

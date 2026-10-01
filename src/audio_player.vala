@@ -102,8 +102,22 @@ namespace Dc {
         public void play_message (Message msg, int account_id) {
             if (msg.id <= 0 || !msg.has_local_file || !msg.is_audio_file ()) return;
             var item = new AudioPlaybackItem (msg, account_id);
+            start_playback (item.path, item);
+        }
+
+        /* Unsent recordings share the backends without appearing in the
+           conversation media bar or advancing to another voice message. */
+        public void play_preview (string file_path) {
+            start_playback (file_path, null);
+        }
+
+        public bool is_preview (string file_path) {
+            return current_item == null && path == file_path;
+        }
+
+        private void start_playback (string file_path, AudioPlaybackItem? item) {
             stop_backend ();
-            path = item.path;
+            path = file_path;
             position_us = 0;
             duration_us = 0;
             can_seek = false;
@@ -113,7 +127,7 @@ namespace Dc {
             has_previous = false;
             has_next = false;
             current_item = item;
-            current_message_id = item.message_id;
+            current_message_id = item != null ? item.message_id : 0;
             start_backend ();
         }
 
@@ -123,7 +137,7 @@ namespace Dc {
         }
 
         public void toggle () {
-            if (current_message_id <= 0 || path == null) return;
+            if (path == null) return;
             if (playing) pause ();
             else resume ();
         }
