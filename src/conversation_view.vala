@@ -68,7 +68,7 @@ namespace Dc {
         private Gtk.ListView message_listview;
         /* Keyboard-focus bookkeeping for the message list, see
            on_focus_widget_changed. */
-        private WeakRef last_focus_item = WeakRef (null);
+        private int last_focus_message_id = 0;
         private bool focus_in_message_list = false;
         private int64 list_press_us = 0;
         private int64 focus_jump_until_us = 0;
@@ -1980,6 +1980,10 @@ namespace Dc {
                     if (pending_scroll_message_id != 0) {
                         goal = ViewportGoal.FREE;
                     } else if (snapshot_unread && !unread_scroll_cancelled && unread_pos >= 0) {
+                        /* Enter the list at the unread boundary without
+                           taking focus from the composer or sidebar. IDs
+                           survive GtkListView's recycling of item widgets. */
+                        last_focus_message_id = first_unread_message_id;
                         message_listview.scroll_to ((uint) unread_pos, Gtk.ListScrollFlags.NONE, null);
                         /* Leave room above the message for its separator. */
                         anchor_message (first_unread_message_id, (uint) unread_pos, 48, 3);
@@ -2745,9 +2749,10 @@ namespace Dc {
            backwards, into the last row's text). In a conversation the first
            item is the oldest loaded message, so the view jumped to the top:
            the bug that once made the rows non-focusable. When the focus
-           enters the list, land on the row the user last focused if it is
-           still on screen, else on the bottom-most visible row. A pointer
-           press (clicking a message's text to select it) and a programmatic
+           enters the list, land on the unread boundary or the row the user
+           subsequently focused if still on screen, else on the bottom-most
+           visible row. A pointer press (clicking a message's text to select
+           it) and a programmatic
            jump (scroll_to with FOCUS) keep their own target. Moves inside
            the list are never touched: Up/Down must be free to focus a row
            GTK has not mapped yet. */
@@ -2768,7 +2773,8 @@ namespace Dc {
                     return;
                 }
             }
-            last_focus_item.set (item);
+            var focused_row = find_message_row_in (item);
+            if (focused_row != null) last_focus_message_id = focused_row.message_id;
             if (selection_mode && focus == item) {
                 var row = find_message_row_in (item);
                 if (row != null) row.focus_selection ();
@@ -2804,16 +2810,14 @@ namespace Dc {
         /* Where the keyboard focus should land when it enters the list. */
         private Gtk.Widget? entry_item () {
             float y;
-            var last = last_focus_item.get () as Gtk.Widget;
-            if (last != null && last.get_parent () == message_listview &&
-                item_on_screen (last, out y)) {
-                return last;
-            }
             Gtk.Widget? best = null;
             float best_y = -1;
             for (var c = message_listview.get_first_child (); c != null;
                  c = c.get_next_sibling ()) {
-                if (item_on_screen (c, out y) && y > best_y) {
+                if (!item_on_screen (c, out y)) continue;
+                var row = find_message_row_in (c);
+                if (row != null && row.message_id == last_focus_message_id) return c;
+                if (y > best_y) {
                     best = c;
                     best_y = y;
                 }

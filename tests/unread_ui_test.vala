@@ -19,6 +19,30 @@ private async bool fixture_seen (RpcClient rpc, int id) throws Error {
     return result.get_boolean ();
 }
 
+private MessageRow? unread_focused_row (Dc.Window window, Gtk.ListView list) {
+    var item = window.get_focus ();
+    while (item != null && item.get_parent () != list) item = item.get_parent ();
+    return item != null ? search_widget (item, typeof (MessageRow)) as MessageRow : null;
+}
+
+private async void unread_tab_to_messages (Dc.Window window, ConversationView view,
+                                          int expected_id) {
+    view.focus_entry ();
+    yield unread_ui_pause (50);
+    assert (view.compose_entry_has_focus ());
+    var list = (Gtk.ListView) search_widget (view, typeof (Gtk.ListView), "conversation-messages");
+    // Follow GTK's Shift+Tab traversal through the composer controls.
+    for (int i = 0; i < 20 && unread_focused_row (window, list) == null; i++) {
+        assert (window.child_focus (Gtk.DirectionType.TAB_BACKWARD));
+    }
+    yield unread_ui_pause (100);
+    var row = unread_focused_row (window, list);
+    assert (row != null);
+    stdout.printf ("Keyboard entry: expected %d, focused %d\n", expected_id, row.message_id);
+    assert (row.message_id == expected_id);
+    assert (window.get_focus ().get_parent () == list);
+}
+
 private async void check_unread_ui (Dc.Application app, Dc.Window window) {
     try {
         for (int i = 0; i < 100 && app.rpc.account_id == 0; i++)
@@ -37,13 +61,33 @@ private async void check_unread_ui (Dc.Application app, Dc.Window window) {
         // Both messages are loaded but only the first is on screen.
         assert (!(yield fixture_seen (app.rpc, 80)));
         assert (!(yield fixture_seen (app.rpc, 109)));
+        assert (view.compose_entry_has_focus ());
+
+        double unread_scroll = view.get_scroll_value ();
+        yield unread_tab_to_messages (window, view, 20);
+        assert (Math.fabs (view.get_scroll_value () - unread_scroll) <= 8);
+
+        // After entry, arrows choose the reading position. Returning from the
+        // composer must retain it even after the rows have been rebuilt.
+        var list = (Gtk.ListView) search_widget (view, typeof (Gtk.ListView), "conversation-messages");
+        assert (list.child_focus (Gtk.DirectionType.DOWN));
+        assert (unread_focused_row (window, list).message_id == 21);
+        view.focus_entry ();
+        yield unread_ui_pause (50);
+        yield view.reload_messages ();
+        yield unread_ui_pause (500);
+        yield unread_tab_to_messages (window, view, 21);
 
         // Scrolling to the bottom reads the messages that enter the viewport.
         view.on_reselected (false);
         yield unread_ui_pause ();
         assert (yield fixture_seen (app.rpc, 109));
         assert (view.first_unread_message_id == 20);
+        yield unread_tab_to_messages (window, view, 109);
 
+        // Reopening an unread chat must replace its previous keyboard target.
+        assert (list.child_focus (Gtk.DirectionType.UP));
+        assert (unread_focused_row (window, list).message_id == 108);
         // Marking the open chat unread closes it and defeats pending timers.
         yield window.mark_chat_unread (10);
         yield unread_ui_pause ();
@@ -55,6 +99,7 @@ private async void check_unread_ui (Dc.Application app, Dc.Window window) {
         assert (view.first_unread_message_id == 109);
         assert (unread_separator_count (view) == 1);
         assert (yield fixture_seen (app.rpc, 109));
+        yield unread_tab_to_messages (window, view, 109);
 
         // Receiving at the bottom while hidden must defer receipts to focus.
         window.visible = false;
@@ -66,9 +111,17 @@ private async void check_unread_ui (Dc.Application app, Dc.Window window) {
         yield unread_ui_pause (1500);
         assert (yield fixture_seen (app.rpc, 110));
 
+        // A fully read chat retains the last keyboard position if visible.
+        window.clear_chat_view ();
+        yield window.open_chat_from_notification (1, 10);
+        yield unread_ui_pause (1000);
+        assert (view.first_unread_message_id == 0);
+        yield unread_tab_to_messages (window, view, 109);
+
         // New messages below the viewport remain unread while reading history.
         view.scroll_to_message (20);
         yield unread_ui_pause (1500);
+        yield unread_tab_to_messages (window, view, 20);
         yield app.rpc.call ("test_incoming", Params.begin ().add_int (111).build ());
         yield view.handle_incoming_msg (111);
         yield unread_ui_pause ();
@@ -76,7 +129,7 @@ private async void check_unread_ui (Dc.Application app, Dc.Window window) {
         view.close ();
         app.rpc.stop ();
         window.destroy ();
-        stdout.printf ("Unread navigation, separator, visible receipts, reopen and focus: PASS\n");
+        stdout.printf ("Unread navigation, keyboard entry, reload, separator, visible receipts and reopen: PASS\n");
     } catch (Error e) {
         error ("Unread UI: %s", e.message);
     }
