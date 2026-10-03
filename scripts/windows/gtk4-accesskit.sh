@@ -143,8 +143,10 @@ grep -q -- '-accesskit-c")' "$GTK_PKGDIR/PKGBUILD" || {
 }
 
 echo "gtk4-accesskit: building gtk4 $gtk_fullver with -Daccesskit=enabled"
-(cd "$GTK_PKGDIR" && MINGW_ARCH="$MSYSTEM" makepkg-mingw \
-    --syncdeps --noconfirm --skippgpcheck --nocheck --force)
+# Parallel GIR scanners can race on their shared cache on Windows and
+# fail with PermissionError. Disable only the scanner cache for this build.
+(cd "$GTK_PKGDIR" && GI_SCANNER_DISABLE_CACHE=1 MINGW_ARCH="$MSYSTEM" \
+    makepkg-mingw --syncdeps --noconfirm --skippgpcheck --nocheck --force)
 pacman -U --noconfirm "$GTK_PKGDIR"/*.pkg.tar.*
 
 gtk_has_accesskit || {
