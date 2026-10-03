@@ -37,6 +37,17 @@
     <name translate="no">pancake</name>
   </developer>
   <releases>
+    <release version="0.9.9" date="2026-10-03">
+      <description>
+        <ul>
+          <li>Initial location to Catalan!</li>
+          <li>Preview unsent voice messages</li>
+          <li>Enhanced startup loading experience</li>
+          <li>Open chat on the first unread message</li>
+          <li>Fix memory and tray icon regressions</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.9.8" date="2026-09-28">
       <description>
         <ul>
