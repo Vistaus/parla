@@ -339,6 +339,10 @@ private void test_unread_calls () {
 }
 
 public int main (string[] args) {
+    if (args.length > 1 && args[1] == "--chat-lifetime-ui")
+        return run_chat_lifetime_test (args.length > 2 ? int.parse (args[2]) : 10);
+    if (args.length > 1 && args[1] == "--chat-switch-lifetime-ui")
+        return run_chat_lifetime_test (args.length > 2 ? int.parse (args[2]) : 24, true);
     if (args.length > 1 && args[1] == "--realtime-settings")
         return run_realtime_settings_test ();
 #if WEBXDC && !MACOS && !WINDOWS

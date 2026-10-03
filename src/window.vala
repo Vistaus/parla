@@ -1727,9 +1727,13 @@ namespace Dc {
                         var chat_row = new ChatRow (entry);
                         row.child = chat_row;
                         chat_row.set_compact (settings.sidebar_mode == SidebarMode.COMPACT);
-                        chat_row.accept_file_drop.connect (() => can_attach_file_to_chat (chat_row.chat_id));
-                        chat_row.file_dropped.connect ((path, name) => attach_file_to_chat (chat_row.chat_id, path, name));
-                        chat_row.file_drop_failed.connect ((message) => show_toast (_("Attach failed: ") + message));
+                        // Use the signal sender without retaining it in its
+                        // own closure: replaced rows must release their avatars.
+                        Signal.connect_object (chat_row, "accept-file-drop",
+                            (Callback) on_chat_row_accept_file_drop, this, (ConnectFlags) 0);
+                        Signal.connect_object (chat_row, "file-dropped",
+                            (Callback) on_chat_row_file_dropped, this, (ConnectFlags) 0);
+                        chat_row.file_drop_failed.connect (on_chat_row_file_drop_failed);
                     }
                     if (new_row) chat_listbox.append (row);
                     if (entry.id == desired_chat_id) {
@@ -1833,6 +1837,19 @@ namespace Dc {
         private bool chat_list_has_focus () {
             var f = get_focus ();
             return f != null && (f == chat_listbox || f.is_ancestor (chat_listbox));
+        }
+
+        private static bool on_chat_row_accept_file_drop (ChatRow row, Window window) {
+            return window.can_attach_file_to_chat (row.chat_id);
+        }
+
+        private static void on_chat_row_file_dropped (ChatRow row, string path,
+                                                      string name, Window window) {
+            window.attach_file_to_chat (row.chat_id, path, name);
+        }
+
+        private void on_chat_row_file_drop_failed (string message) {
+            show_toast (_("Attach failed: ") + message);
         }
 
         private bool can_attach_file_to_chat (int chat_id) {

@@ -114,16 +114,10 @@ namespace Dc {
             var speed_popup = first_descendant (speed_dropdown,
                 typeof (Gtk.Popover)) as Gtk.Popover;
             if (speed_popup != null) {
-                speed_popup.notify["visible"].connect (() => {
-                    if (!speed_popup.visible) return;
-                    var list = first_descendant (speed_popup,
-                        typeof (Gtk.ListView)) as Gtk.ListView;
-                    if (list != null) {
-                        list.scroll_to (speed_dropdown.selected,
-                            Gtk.ListScrollFlags.FOCUS | Gtk.ListScrollFlags.SELECT,
-                            null);
-                    }
-                });
+                // Capturing this popup in its own signal keeps the entire
+                // media bar alive after its conversation leaves the cache.
+                Signal.connect_object (speed_popup, "notify::visible",
+                    (Callback) on_speed_popup_visible, this, (ConnectFlags) 0);
             }
             metadata.append (speed_dropdown);
             details.append (metadata);
@@ -194,6 +188,17 @@ namespace Dc {
                 sync_navigation);
             next_handler = playback.notify["has-next"].connect (sync_navigation);
             sync_item ();
+        }
+
+        private static void on_speed_popup_visible (Gtk.Popover popup,
+                ParamSpec pspec, ConversationMediaBar bar) {
+            if (!popup.visible) return;
+            var list = first_descendant (popup,
+                typeof (Gtk.ListView)) as Gtk.ListView;
+            if (list != null) {
+                list.scroll_to (bar.speed_dropdown.selected,
+                    Gtk.ListScrollFlags.FOCUS | Gtk.ListScrollFlags.SELECT, null);
+            }
         }
 
         private Gtk.Button media_button (string icon_name, string tooltip) {
