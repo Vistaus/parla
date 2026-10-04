@@ -43,6 +43,7 @@ namespace Dc {
             { "reddit.com redd.it", "share_id ref ref_source rdt correlation_id", "" },
             { "spotify.com", "si nd _branch_match_id _branch_referrer", "" },
             { "twitch.tv", "tt_content tt_medium", "" },
+            { "substack.com", "r", "" },
             /* YouTube thumbnail CDN: rendering hints and signatures that
                the plain .jpg does not need. */
             { "ytimg.com", "sqp rs usqp", "" },

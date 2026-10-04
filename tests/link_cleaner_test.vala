@@ -67,6 +67,23 @@ int main () {
         "spotify si dropped");
 
     check_eq (
+        LinkCleaner.clean_url ("https://thecodinggopher.substack.com/p/virtual-memory-for-dummies?r=1x5uat&utm_medium=ios"),
+        "https://thecodinggopher.substack.com/p/virtual-memory-for-dummies",
+        "substack referral and utm params dropped");
+
+    check_eq (
+        LinkCleaner.clean_url ("https://substack.com/p/example?r=1x5uat&id=7#comments"),
+        "https://substack.com/p/example?id=7#comments",
+        "substack keeps content params and fragment");
+
+    foreach (string host in new string[] { "example.com", "notsubstack.com", "substack.com.example.org" }) {
+        check_eq (
+            LinkCleaner.clean_url ("https://" + host + "/p/example?r=1x5uat&utm_medium=ios"),
+            "https://" + host + "/p/example?r=1x5uat",
+            "substack referral rule does not affect " + host);
+    }
+
+    check_eq (
         LinkCleaner.clean_url ("https://www.amazon.com/dp/B08N5WRWNW/ref=sr_1_3?tag=aff-20&qid=1700000000&sr=8-3&th=1"),
         "https://www.amazon.com/dp/B08N5WRWNW?th=1",
         "amazon ref path and affiliate params dropped, keeps variant");
