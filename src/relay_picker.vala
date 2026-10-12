@@ -12,32 +12,32 @@ namespace Dc {
     }
 
     public const ChatmailRelay[] CHATMAIL_RELAYS = {
-        { "nine.testrun.org",                "Default" },
-        { "mehl.cloud",                      "German" },
-        { "mailchat.pl",                     "Poland" },
-        { "chatmail.woodpeckersnest.space",  "Italy" },
-        { "chatmail.culturanerd.it",         "Italy" },
-        { "chat.adminforge.de",              "Falkenstein, Germany" },
-        { "chika.aangat.lahat.computer",     "Santa Clara, USA" },
-        { "tarpit.fun",                      "Nuremberg, Germany" },
-        { "d.gaufr.es",                      "Roubaix, France" },
-        { "chtml.ca",                        "Quebec, Canada" },
-        { "chatmail.au",                     "Melbourne, Australia" },
-        { "e2ee.wang",                       "Johannesburg, South Africa" },
-        { "chat.privittytech.com",           "Bangalore, India" },
-        { "e2ee.im",                         "Orastie, Romania" },
-        { "chatmail.email",                  "Warsaw, Poland" },
-        { "danneskjold.de",                  "Helsinki, Finland" },
-        { "chat.in-the.eu",                  "Falkenstein, Germany" },
-        { "chat.nuvon.app",                  "Prague, Czechia" },
-        { "nibblehole.com",                  "Zug, Switzerland" },
-        { "chat.zashm.org",                  "Lviv, Ukraine" },
-        { "chat.sus.fr",                     "Iceland/Japan/Kenya/South Africa" },
-        { "delta.thelab.uno",                "Gravelines, France" },
-        { "chat.vim.wtf",                    "Frankfurt, Germany" },
-        { "uninterest.ing",                  "Elk Grove Village, USA" },
-        { "sweetfern.net",                   "Ashburn, USA" },
-        { "delta.disobey.net",               "Roon, Netherlands" }
+        { "nine.testrun.org",                N_("Default") },
+        { "mehl.cloud",                      N_("German") },
+        { "mailchat.pl",                     N_("Poland") },
+        { "chatmail.woodpeckersnest.space",  N_("Italy") },
+        { "chatmail.culturanerd.it",         N_("Italy") },
+        { "chat.adminforge.de",              N_("Falkenstein, Germany") },
+        { "chika.aangat.lahat.computer",     N_("Santa Clara, USA") },
+        { "tarpit.fun",                      N_("Nuremberg, Germany") },
+        { "d.gaufr.es",                      N_("Roubaix, France") },
+        { "chtml.ca",                        N_("Quebec, Canada") },
+        { "chatmail.au",                     N_("Melbourne, Australia") },
+        { "e2ee.wang",                       N_("Johannesburg, South Africa") },
+        { "chat.privittytech.com",           N_("Bangalore, India") },
+        { "e2ee.im",                         N_("Orastie, Romania") },
+        { "chatmail.email",                  N_("Warsaw, Poland") },
+        { "danneskjold.de",                  N_("Helsinki, Finland") },
+        { "chat.in-the.eu",                  N_("Falkenstein, Germany") },
+        { "chat.nuvon.app",                  N_("Prague, Czechia") },
+        { "nibblehole.com",                  N_("Zug, Switzerland") },
+        { "chat.zashm.org",                  N_("Lviv, Ukraine") },
+        { "chat.sus.fr",                     N_("Iceland/Japan/Kenya/South Africa") },
+        { "delta.thelab.uno",                N_("Gravelines, France") },
+        { "chat.vim.wtf",                    N_("Frankfurt, Germany") },
+        { "uninterest.ing",                  N_("Elk Grove Village, USA") },
+        { "sweetfern.net",                   N_("Ashburn, USA") },
+        { "delta.disobey.net",               N_("Roon, Netherlands") }
     };
 
     /**
@@ -73,13 +73,13 @@ namespace Dc {
             domains = new GenericArray<string> ();
             model = new Gtk.StringList (null);
             if (allow_automatic) {
-                model.append ("Automatic (recommended)");
+                model.append (_("Automatic (recommended)"));
                 domains.add ("");
             }
             for (int i = 0; i < CHATMAIL_RELAYS.length; i++) {
                 model.append ("%s (%s)".printf (
                     CHATMAIL_RELAYS[i].domain,
-                    CHATMAIL_RELAYS[i].location));
+                    _(CHATMAIL_RELAYS[i].location)));
                 domains.add (CHATMAIL_RELAYS[i].domain);
             }
             dropdown = new Gtk.DropDown (model, null);
@@ -87,7 +87,7 @@ namespace Dc {
             dropdown.hexpand = true;
 
             custom_entry = new Gtk.Entry ();
-            custom_entry.placeholder_text = "Custom server name";
+            custom_entry.placeholder_text = _("Custom server name");
             custom_entry.activates_default = true;
             custom_entry.hexpand = true;
             custom_entry.changed.connect (() => {
@@ -100,11 +100,11 @@ namespace Dc {
             this.append (row);
 
             if (rpc != null) {
-                discover_btn = new Gtk.Button.with_label ("Discover from Contacts");
+                discover_btn = new Gtk.Button.with_label (_("Discover from Contacts"));
                 discover_btn.halign = Gtk.Align.START;
                 discover_btn.add_css_class ("flat");
                 discover_btn.tooltip_text =
-                    "Scan contacts on your other profiles and add the relays they use.";
+                    _("Scan contacts on your other profiles and add the relays they use.");
                 discover_btn.clicked.connect (() => { run_discover.begin (); });
                 this.append (discover_btn);
             }
@@ -116,7 +116,7 @@ namespace Dc {
             if (rpc == null || discovered) return;
             discover_btn.sensitive = false;
             string original = discover_btn.label;
-            discover_btn.label = "Scanning…";
+            discover_btn.label = _("Scanning…");
 
             int added = 0;
             try {
@@ -124,14 +124,15 @@ namespace Dc {
             } catch (Error e) {
                 discover_btn.label = original;
                 discover_btn.sensitive = true;
-                show_error (this, "Failed to scan contacts: " + e.message);
+                show_error (this, _("Failed to scan contacts: ") + e.message);
                 return;
             }
 
             discovered = true;
             discover_btn.label = added > 0
-                ? "Found %d new".printf (added)
-                : "No new relays";
+                ? ngettext ("Found %d new relay", "Found %d new relays", added)
+                    .printf (added)
+                : _("No new relays");
         }
 
         public string get_selected_domain () {
@@ -187,9 +188,8 @@ namespace Dc {
 
             int added = 0;
             counts.foreach ((domain, count) => {
-                string note = count == 1
-                    ? "1 contact"
-                    : "%d contacts".printf (count);
+                string note = ngettext ("%d contact", "%d contacts", count)
+                    .printf (count);
                 if (add_domain (domain, note)) added++;
             });
             return added;
@@ -238,7 +238,7 @@ namespace Dc {
             this.rpc = rpc;
             this.events = events;
             this.account_id = acct_id;
-            this.title = "Relays";
+            this.title = _("Relays");
             this.content_width = 480;
             this.content_height = 520;
             this.can_close = true;
@@ -254,8 +254,8 @@ namespace Dc {
             content.vexpand = true;
 
             var intro = new Gtk.Label (
-                "Transports configured for this profile. " +
-                "Add more relays to receive messages on additional addresses.");
+                _("Transports configured for this profile. " +
+                "Add more relays to receive messages on additional addresses."));
             intro.wrap = true;
             intro.xalign = 0;
             intro.add_css_class ("dim-label");
@@ -265,7 +265,7 @@ namespace Dc {
             list_box.selection_mode = Gtk.SelectionMode.NONE;
             list_box.add_css_class ("boxed-list");
 
-            empty_label = new Gtk.Label ("No transports configured.");
+            empty_label = new Gtk.Label (_("No transports configured."));
             empty_label.add_css_class ("dim-label");
             empty_label.margin_top = 24;
             empty_label.margin_bottom = 24;
@@ -280,7 +280,7 @@ namespace Dc {
             scroll.child = list_stack;
             content.append (scroll);
 
-            var add_label = new Gtk.Label ("Add Relay");
+            var add_label = new Gtk.Label (_("Add Relay"));
             add_label.add_css_class ("heading");
             add_label.xalign = 0;
             content.append (add_label);
@@ -290,7 +290,7 @@ namespace Dc {
 
             var add_row = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 8);
             add_row.halign = Gtk.Align.END;
-            add_btn = new Gtk.Button.with_label ("Add Relay");
+            add_btn = new Gtk.Button.with_label (_("Add Relay"));
             add_btn.add_css_class ("suggested-action");
             add_btn.clicked.connect (() => { do_add_relay.begin (); });
             add_row.append (add_btn);
@@ -321,7 +321,7 @@ namespace Dc {
                 result = yield rpc.list_transports (account_id);
             } catch (Error e) {
                 if (generation != refresh_generation) return;
-                show_error (this, "Failed to load transports: " + e.message);
+                show_error (this, _("Failed to load transports: ") + e.message);
                 list_stack.visible_child_name = "empty";
                 return;
             }
@@ -361,7 +361,7 @@ namespace Dc {
                 "document-edit-symbolic");
             edit_btn.add_css_class ("flat");
             edit_btn.valign = Gtk.Align.CENTER;
-            edit_btn.tooltip_text = "Edit password and server settings";
+            edit_btn.tooltip_text = _("Edit password and server settings");
             edit_btn.clicked.connect (() => {
                 show_edit_transport_dialog (params);
             });
@@ -370,7 +370,7 @@ namespace Dc {
             var trash_btn = new Gtk.Button.from_icon_name ("user-trash-symbolic");
             trash_btn.add_css_class ("flat");
             trash_btn.valign = Gtk.Align.CENTER;
-            trash_btn.tooltip_text = "Remove this relay";
+            trash_btn.tooltip_text = _("Remove this relay");
             trash_btn.clicked.connect (() => {
                 confirm_delete_relay.begin (addr);
             });
@@ -389,9 +389,9 @@ namespace Dc {
         }
 
         private async void confirm_delete_relay (string addr) {
-            if (yield confirm_action (this, "Remove Relay",
-                "Remove transport \"%s\"? The profile will no longer receive messages on this address.".printf (addr),
-                "remove", "Remove"))
+            if (yield confirm_action (this, _("Remove Relay"),
+                _("Remove transport \"%s\"? The profile will no longer receive messages on this address.").printf (addr),
+                "remove", _("Remove")))
                 do_delete_relay.begin (addr);
         }
 
@@ -401,7 +401,7 @@ namespace Dc {
             try {
                 yield rpc.delete_transport (account_id, addr);
             } catch (Error e) {
-                show_error (this, "Failed to remove relay: " + e.message);
+                show_error (this, _("Failed to remove relay: ") + e.message);
                 busy = false;
                 return;
             }
@@ -418,7 +418,7 @@ namespace Dc {
             try {
                 yield rpc.add_transport_from_qr (account_id, qr);
             } catch (Error e) {
-                show_error (this, "Failed to add relay: " + e.message);
+                show_error (this, _("Failed to add relay: ") + e.message);
                 add_btn.sensitive = true;
                 busy = false;
                 return;

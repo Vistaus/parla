@@ -10,7 +10,7 @@ namespace Dc {
 
         public QuickSwitchDialog (GLib.ListStore chat_store) {
             this.chat_store = chat_store;
-            this.title = "Switch Chat";
+            this.title = _("Switch Chat");
             this.content_width = 360;
             this.content_height = 400;
 
@@ -25,7 +25,7 @@ namespace Dc {
             inner.margin_bottom = 12;
 
             entry = new Gtk.SearchEntry ();
-            entry.placeholder_text = "Type to filter chats\u2026";
+            entry.placeholder_text = _("Type to filter chats\u2026");
             entry.hexpand = true;
             inner.append (entry);
 

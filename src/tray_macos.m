@@ -7,6 +7,7 @@
 #import <objc/runtime.h>
 
 #include <gtk/gtk.h>
+#include <glib/gi18n-lib.h>
 #include <gdk/macos/gdkmacos.h>
 
 #include "tray_macos_icon.h"
@@ -251,7 +252,8 @@ parla_macos_tray_init (ParlaMacosTrayAction window_toggle,
 static NSString *
 parla_tray_toggle_title (void)
 {
-	return tray.window_visible ? @"Hide Parla" : @"Show Parla";
+	return [NSString stringWithUTF8String:
+		tray.window_visible ? _("Hide Parla") : _("Show Parla")];
 }
 
 gboolean
@@ -274,7 +276,7 @@ parla_macos_tray_show (void)
 	[tray.toggle_menu_item setTarget:tray.controller];
 
 	tray.notifications_menu_item =
-		[menu addItemWithTitle:@"Notifications"
+		[menu addItemWithTitle:[NSString stringWithUTF8String:_("Notifications")]
 		                action:@selector (toggleNotifications:)
 		         keyEquivalent:@""];
 	[tray.notifications_menu_item setTarget:tray.controller];
@@ -284,7 +286,7 @@ parla_macos_tray_show (void)
 
 	[menu addItem:[NSMenuItem separatorItem]];
 
-	NSMenuItem *quit_item = [menu addItemWithTitle:@"Quit Parla"
+	NSMenuItem *quit_item = [menu addItemWithTitle:[NSString stringWithUTF8String:_("Quit Parla")]
 	                                        action:@selector (quit:)
 	                                 keyEquivalent:@""];
 	[quit_item setTarget:tray.controller];

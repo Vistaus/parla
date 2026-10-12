@@ -172,7 +172,7 @@ namespace Dc {
             if (FileUtils.rename (sticker_path (from),
                                   sticker_path (to)) != 0) {
                 throw new IOError.FAILED (
-                    "Could not rename %s".printf (from));
+                    _("Could not rename %s").printf (from));
             }
         }
 

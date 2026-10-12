@@ -1519,7 +1519,7 @@ namespace Dc {
 
             if (draft.quote_msg_id > 0) {
                 replying_msg_id = draft.quote_msg_id;
-                string sender = draft.quote_sender_name ?? "Message";
+                string sender = draft.quote_sender_name ?? _("Message");
                 string preview = draft.quote_text ?? draft.quote_msg_id.to_string ();
                 reply_label.label = "%s: %s".printf (sender, shorten_preview (preview));
                 reply_bar.visible = true;
@@ -1569,7 +1569,7 @@ namespace Dc {
 
         private void on_attach_clicked () {
             var dialog = new Gtk.FileDialog ();
-            dialog.title = "Select files to attach";
+            dialog.title = _("Select files to attach");
             var window = (Gtk.Window) get_root ();
             dialog.open_multiple.begin (window, null, (obj, res) => {
                 try {

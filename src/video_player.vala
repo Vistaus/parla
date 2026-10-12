@@ -122,7 +122,7 @@ namespace Dc {
             vbox.margin_end = 4;
             vbox.margin_top = 4;
             vbox.margin_bottom = 4;
-            var save_btn = new PopoverButton (popover, "Save video");
+            var save_btn = new PopoverButton (popover, _("Save video"));
             save_btn.selected.connect (() => {
                 if (window != null)
                     window.save_attachment.begin (path,

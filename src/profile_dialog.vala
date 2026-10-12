@@ -55,7 +55,7 @@ namespace Dc {
     }
 
     private Gtk.Button close_button (Adw.Dialog dialog) {
-        var button = new Gtk.Button.with_label ("Close");
+        var button = new Gtk.Button.with_label (_("Close"));
         button.clicked.connect (() => { dialog.close (); });
         return button;
     }
@@ -94,7 +94,7 @@ namespace Dc {
             this.settings = settings;
             this.events = events;
             this.account_id = acct_id > 0 ? acct_id : rpc.account_id;
-            this.title = "Profile";
+            this.title = _("Profile");
             this.content_width = 420;
             this.content_height = 560;
 
@@ -106,8 +106,8 @@ namespace Dc {
             content.append (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
             content.append (build_fields_grid ());
 
-            var invite_button = append_profile_action_row (content, "Invite Code",
-                "Show a contact invite QR code", "Share your contact");
+            var invite_button = append_profile_action_row (content, _("Invite Code"),
+                _("Show a contact invite QR code"), _("Share your contact"));
             invite_button.clicked.connect (show_invite_code_dialog);
 
             content.append (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
@@ -116,25 +116,25 @@ namespace Dc {
             content.append (build_connectivity_storage_section ());
             content.append (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
 
-            var relays_button = append_profile_action_row (content, "Relays",
-                "Manage chatmail relays for this profile", "Manage the servers used by this profile");
+            var relays_button = append_profile_action_row (content, _("Relays"),
+                _("Manage chatmail relays for this profile"), _("Manage the servers used by this profile"));
             relays_button.clicked.connect (show_relays_dialog);
             var second_device_button = append_profile_action_row (
-                content, "Add Second Device…",
-                "Show a setup QR code for another device",
-                "Use this profile on another device");
+                content, _("Add Second Device…"),
+                _("Show a setup QR code for another device"),
+                _("Use this profile on another device"));
             second_device_button.clicked.connect (show_second_device_dialog);
 
             var blocked_button = append_profile_action_row (content,
-                "Blocked Contacts", "Unblock contacts, channels and mailing lists",
-                "Manage blocked contacts for this profile");
+                _("Blocked Contacts"), _("Unblock contacts, channels and mailing lists"),
+                _("Manage blocked contacts for this profile"));
             blocked_button.clicked.connect (() => show_blocked_contacts.begin ());
 
             content.append (build_default_account_row ());
 
             var delete_button = append_profile_action_row (content,
-                "Remove Profile…",
-                "Remove this profile from this device", "Remove the profile and its messages from this device",
+                _("Remove Profile…"),
+                _("Remove this profile from this device"), _("Remove the profile and its messages from this device"),
                 "destructive-action");
             delete_button.clicked.connect (() => confirm_delete_account.begin ());
 
@@ -163,7 +163,7 @@ namespace Dc {
 
         private Gtk.Widget build_header () {
             var header = new Adw.HeaderBar ();
-            var save_btn = new Gtk.Button.with_label ("Save");
+            var save_btn = new Gtk.Button.with_label (_("Save"));
             save_btn.add_css_class ("suggested-action");
             save_btn.clicked.connect (() => {
                 do_save.begin ();
@@ -180,7 +180,7 @@ namespace Dc {
             avatar_widget.halign = Gtk.Align.CENTER;
             box.append (avatar_widget);
 
-            var avatar_btn = new Gtk.Button.with_label ("Change Profile Picture…");
+            var avatar_btn = new Gtk.Button.with_label (_("Change Profile Picture…"));
             avatar_btn.halign = Gtk.Align.CENTER;
             avatar_btn.add_css_class ("flat");
             avatar_btn.clicked.connect (() => {
@@ -198,23 +198,23 @@ namespace Dc {
 
             name_entry = new Gtk.Entry ();
             name_entry.hexpand = true;
-            name_entry.placeholder_text = "Your name";
+            name_entry.placeholder_text = _("Your name");
             name_entry.changed.connect (() => {
                 avatar_widget.text = name_entry.text.length > 0
                     ? name_entry.text : "";
             });
-            attach_field (fields_grid, 0, "Name", name_entry);
+            attach_field (fields_grid, 0, _("Name"), name_entry);
 
             status_entry = new Gtk.Entry ();
             status_entry.hexpand = true;
-            status_entry.placeholder_text = "About this profile";
-            attach_field (fields_grid, 1, "Bio", status_entry);
+            status_entry.placeholder_text = _("About this profile");
+            attach_field (fields_grid, 1, _("Bio"), status_entry);
 
             email_label = dim_label ("");
             email_label.selectable = true;
             email_label.hexpand = true;
             email_label.valign = Gtk.Align.CENTER;
-            attach_field (fields_grid, 2, "Email", email_label);
+            attach_field (fields_grid, 2, _("Email"), email_label);
 
             return fields_grid;
         }
@@ -249,10 +249,10 @@ namespace Dc {
             default_caption_label.valign = Gtk.Align.CENTER;
             box.append (default_caption_label);
 
-            default_make_button = new Gtk.Button.with_label ("Make Default");
+            default_make_button = new Gtk.Button.with_label (_("Make Default"));
             default_make_button.halign = Gtk.Align.END;
             default_make_button.valign = Gtk.Align.CENTER;
-            default_make_button.tooltip_text = "Open This Profile When Parla Starts";
+            default_make_button.tooltip_text = _("Open This Profile When Parla Starts");
             default_make_button.clicked.connect (make_account_default);
             box.append (default_make_button);
 
@@ -267,11 +267,11 @@ namespace Dc {
             var labels = new Gtk.Box (Gtk.Orientation.VERTICAL, 2);
             labels.hexpand = true;
 
-            var title = heading_label ("Read Receipts");
+            var title = heading_label (_("Read Receipts"));
             labels.append (title);
 
             read_receipts_caption_label = dim_label (
-                "Let contacts know when their messages have been read. This setting syncs to other devices using this profile.",
+                _("Let contacts know when their messages have been read. This setting syncs to other devices using this profile."),
                 true);
             labels.append (read_receipts_caption_label);
             box.append (labels);
@@ -291,7 +291,7 @@ namespace Dc {
         private async void load_read_receipt_settings () {
             if (!rpc.is_connected || account_id <= 0) {
                 set_read_receipt_controls_sensitive (false);
-                read_receipts_caption_label.label = "No active profile";
+                read_receipts_caption_label.label = _("No active profile");
                 return;
             }
 
@@ -305,7 +305,7 @@ namespace Dc {
                 update_read_receipts_caption (read_receipts_switch.active);
             } catch (Error e) {
                 read_receipts_caption_label.label =
-                    "Unable to read read receipt setting";
+                    _("Unable to read read receipt setting");
                 read_receipts_caption_label.tooltip_text = e.message;
             } finally {
                 loading_read_receipts = false;
@@ -320,8 +320,8 @@ namespace Dc {
 
         private void update_read_receipts_caption (bool enabled) {
             read_receipts_caption_label.label = enabled
-                ? "Contacts can see when their messages have been read. This setting syncs to other devices using this profile."
-                : "Read receipts are not sent. This setting syncs to other devices using this profile.";
+                ? _("Contacts can see when their messages have been read. This setting syncs to other devices using this profile.")
+                : _("Read receipts are not sent. This setting syncs to other devices using this profile.");
             read_receipts_caption_label.tooltip_text = null;
         }
 
@@ -329,7 +329,7 @@ namespace Dc {
             if (loading_read_receipts || saving_read_receipts) return;
 
             if (!rpc.is_connected || account_id <= 0) {
-                show_error (this, "No active profile");
+                show_error (this, _("No active profile"));
                 return;
             }
 
@@ -346,7 +346,7 @@ namespace Dc {
                 saved_read_receipts_enabled = enabled;
                 update_read_receipts_caption (enabled);
             } catch (Error e) {
-                show_error (this, "Failed to save read receipt setting: "
+                show_error (this, _("Failed to save read receipt setting: ")
                     + e.message);
                 loading_read_receipts = true;
                 read_receipts_switch.active = saved_read_receipts_enabled;
@@ -374,22 +374,22 @@ namespace Dc {
                     is_default = true;
             }
             default_caption_label.label = is_default
-                ? "This profile opens when Parla starts"
-                : "Open this profile automatically when Parla starts";
+                ? _("This profile opens when Parla starts")
+                : _("Open this profile automatically when Parla starts");
             default_make_button.visible = loaded && !is_default;
         }
 
         private Gtk.Widget build_connectivity_storage_section () {
             var section = new Gtk.Box (Gtk.Orientation.VERTICAL, 8);
 
-            section.append (heading_label ("Storage and Connection"));
+            section.append (heading_label (_("Storage and Connection")));
 
             var conn_row = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 8);
             var conn_icon = new Gtk.Image.from_icon_name ("network-transmit-receive-symbolic");
             conn_icon.valign = Gtk.Align.CENTER;
             conn_row.append (conn_icon);
 
-            connectivity_status_label = dim_label ("Checking connection…", true);
+            connectivity_status_label = dim_label (_("Checking connection…"), true);
             conn_row.append (connectivity_status_label);
             section.append (conn_row);
 
@@ -398,22 +398,22 @@ namespace Dc {
             storage_progress.fraction = 0.0;
             section.append (storage_progress);
 
-            storage_summary_label = dim_label ("Loading server quota…");
+            storage_summary_label = dim_label (_("Loading server quota…"));
             section.append (storage_summary_label);
 
             var actions = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 8);
             actions.halign = Gtk.Align.END;
 
             var refresh_btn = new Gtk.Button.from_icon_name ("view-refresh-symbolic");
-            refresh_btn.tooltip_text = "Refresh storage and connectivity";
+            refresh_btn.tooltip_text = _("Refresh storage and connectivity");
             refresh_btn.add_css_class ("flat");
             refresh_btn.clicked.connect (() => {
                 load_connectivity_summary.begin ();
             });
             actions.append (refresh_btn);
 
-            var details_btn = new Gtk.Button.with_label ("Storage Details");
-            details_btn.tooltip_text = "Show Storage by Chat";
+            var details_btn = new Gtk.Button.with_label (_("Storage Details"));
+            details_btn.tooltip_text = _("Show Storage by Chat");
             details_btn.clicked.connect (() => {
                 var dialog = new StorageDetailsDialog (rpc, account_id);
                 dialog.present (this);
@@ -471,18 +471,18 @@ namespace Dc {
                 apply_quota_progress (storage_progress, quota);
                 storage_summary_label.label = quota.summary_text ();
             } catch (Error e) {
-                connectivity_status_label.label = "Connection details unavailable";
+                connectivity_status_label.label = _("Connection details unavailable");
                 storage_summary_label.label = e.message;
                 storage_progress.fraction = 0.0;
             }
         }
 
         private static string connection_label_for_state (int state) {
-            if (state >= 4000) return "Connected; all background work is done";
-            if (state >= 3000) return "Connected; sending or syncing messages";
-            if (state >= 2000) return "Connecting to the server";
-            if (state >= 1000) return "Not connected";
-            return "Connection state unknown";
+            if (state >= 4000) return _("Connected; all background work is done");
+            if (state >= 3000) return _("Connected; sending or syncing messages");
+            if (state >= 2000) return _("Connecting to the server");
+            if (state >= 1000) return _("Not connected");
+            return _("Connection state unknown");
         }
 
         private async void do_save () {
@@ -518,7 +518,7 @@ namespace Dc {
             try {
                 var contacts = yield rpc.get_blocked_contacts (account_id);
                 var dialog = new Adw.Dialog ();
-                dialog.title = "Blocked Contacts";
+                dialog.title = _("Blocked Contacts");
                 dialog.content_width = 360;
                 dialog.content_height = 420;
                 var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
@@ -528,7 +528,7 @@ namespace Dc {
                 list.add_css_class ("boxed-list");
                 list.margin_start = list.margin_end = 12;
                 list.margin_top = list.margin_bottom = 12;
-                list.set_placeholder (new Gtk.Label ("No blocked contacts"));
+                list.set_placeholder (new Gtk.Label (_("No blocked contacts")));
                 var dialog_ref = WeakRef (dialog);
                 var list_ref = WeakRef (list);
                 var client = rpc;
@@ -539,7 +539,7 @@ namespace Dc {
                         int id = (int) json_int (obj, "id");
                         var row = contact_row (RpcParsers.parse_contact (id, obj), false, false);
                         var row_ref = WeakRef (row);
-                        var button = flat_button ("Unblock");
+                        var button = flat_button (_("Unblock"));
                         button.clicked.connect (() => {
                             var parent = dialog_ref.get () as Adw.Dialog;
                             var rows = list_ref.get () as Gtk.ListBox;
@@ -568,7 +568,7 @@ namespace Dc {
                 dialog.child = box;
                 dialog.present (this);
             } catch (Error e) {
-                show_error (this, "Could not load blocked contacts: " + e.message);
+                show_error (this, _("Could not load blocked contacts: ") + e.message);
             }
         }
 
@@ -578,12 +578,12 @@ namespace Dc {
                 label = name_entry.text.strip ();
             }
             if (label.length == 0) {
-                label = "this profile";
+                label = _("this profile");
             }
 
-            if (yield confirm_action (this, "Remove Profile from This Device?",
-                "Remove \"%s\" from this device, including its chats, contacts, downloaded attachments and keys? This does not delete the server account, backups or files saved elsewhere. Other devices and other participants keep their data.\n\nWithout a backup or another device using this profile, access to it will be lost. This cannot be undone.".printf (label),
-                "delete", "Remove Profile"))
+            if (yield confirm_action (this, _("Remove Profile from This Device?"),
+                _("Remove \"%s\" from this device, including its chats, contacts, downloaded attachments and keys? This does not delete the server account, backups or files saved elsewhere. Other devices and other participants keep their data.\n\nWithout a backup or another device using this profile, access to it will be lost. This cannot be undone.").printf (label),
+                "delete", _("Remove Profile")))
                 do_delete_account.begin ();
         }
 
@@ -602,7 +602,7 @@ namespace Dc {
 
         private async void pick_avatar () {
             string? path = yield pick_image_file (
-                (Gtk.Window) this.get_root (), "Select Avatar");
+                (Gtk.Window) this.get_root (), _("Select Avatar"));
             if (path != null) {
                 avatar_path = path;
                 avatar_changed = true;
@@ -658,7 +658,7 @@ namespace Dc {
         public StorageDetailsDialog (RpcClient rpc, int acct_id) {
             this.rpc = rpc;
             this.account_id = acct_id;
-            this.title = "Storage Details";
+            this.title = _("Storage Details");
             this.content_width = 560;
             this.content_height = 680;
 
@@ -666,38 +666,38 @@ namespace Dc {
 
             var header = new Adw.HeaderBar ();
             refresh_btn = new Gtk.Button.from_icon_name ("view-refresh-symbolic");
-            refresh_btn.tooltip_text = "Rescan storage usage";
+            refresh_btn.tooltip_text = _("Rescan storage usage");
             refresh_btn.clicked.connect (() => { load_details.begin (); });
             header.pack_end (refresh_btn);
             box.append (header);
 
             var content = content_box ();
 
-            content.append (heading_label ("Server Quota"));
+            content.append (heading_label (_("Server Quota")));
 
             quota_progress = new Gtk.ProgressBar ();
             quota_progress.add_css_class ("storage-quota-bar");
             content.append (quota_progress);
 
-            quota_label = dim_label ("Loading quota…");
+            quota_label = dim_label (_("Loading quota…"));
             content.append (quota_label);
 
-            content.append (heading_label ("Local Copies"));
+            content.append (heading_label (_("Local Copies")));
 
-            local_total_label = dim_label ("Scanning local files…");
+            local_total_label = dim_label (_("Scanning local files…"));
             content.append (local_total_label);
 
-            clear_cache_btn = new Gtk.Button.with_label ("How to Free Up Space");
+            clear_cache_btn = new Gtk.Button.with_label (_("How to Free Up Space"));
             clear_cache_btn.halign = Gtk.Align.START;
-            clear_cache_btn.tooltip_text = "Explain what can be safely cleared";
+            clear_cache_btn.tooltip_text = _("Explain what can be safely cleared");
             clear_cache_btn.clicked.connect (show_clear_cache_info);
             content.append (clear_cache_btn);
 
             content.append (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
 
-            content.append (heading_label ("Chats by Storage Size"));
+            content.append (heading_label (_("Chats by Storage Size")));
 
-            scan_status_label = dim_label ("Preparing scan…");
+            scan_status_label = dim_label (_("Preparing scan…"));
             content.append (scan_status_label);
 
             chat_usage_list = new Gtk.ListBox ();
@@ -722,8 +722,8 @@ namespace Dc {
             known_attachment_bytes = 0;
             unique_local_file_bytes = 0;
             global_local_paths.remove_all ();
-            scan_status_label.label = "Scanning chats…";
-            local_total_label.label = "Scanning local files…";
+            scan_status_label.label = _("Scanning chats…");
+            local_total_label.label = _("Scanning local files…");
 
             try {
                 int64 account_bytes = 0;
@@ -744,7 +744,7 @@ namespace Dc {
                     quota_label.label = quota.summary_text ();
                 } catch (Error e) {
                     quota_progress.fraction = 0.0;
-                    quota_label.label = "Server quota unavailable: " + e.message;
+                    quota_label.label = _("Server quota unavailable: ") + e.message;
                 }
 
                 var usages = yield scan_all_chats ();
@@ -752,19 +752,21 @@ namespace Dc {
                 populate_chat_usage_list (usages);
 
                 string file_summary =
-                    "%s downloaded message files · %s known attachment payload".printf (
+                    _("%s downloaded message files · %s known attachment payload").printf (
                         StorageQuota.format_mb (unique_local_file_bytes),
                         StorageQuota.format_mb (known_attachment_bytes));
                 local_total_label.label = account_bytes > 0
-                    ? "%s local profile data · %s".printf (
+                    ? _("%s local profile data · %s").printf (
                         StorageQuota.format_mb (account_bytes), file_summary)
                     : file_summary;
 
                 scan_status_label.label = usages.length == 0
-                    ? "No downloaded files found in chats"
-                    : "%d chats with local or attached files".printf (usages.length);
+                    ? _("No downloaded files found in chats")
+                    : ngettext ("%d chat with local or attached files",
+                        "%d chats with local or attached files",
+                        usages.length).printf (usages.length);
             } catch (Error e) {
-                scan_status_label.label = "Storage scan failed: " + e.message;
+                scan_status_label.label = _("Storage scan failed: ") + e.message;
             }
 
             refresh_btn.sensitive = true;
@@ -783,7 +785,7 @@ namespace Dc {
             for (uint i = 0; i < entries.get_length (); i++) {
                 int chat_id = (int) entries.get_int_element (i);
                 string name = get_chat_name (items, chat_id);
-                scan_status_label.label = "Scanning %s…".printf (name);
+                scan_status_label.label = _("Scanning %s…").printf (name);
 
                 var usage = yield scan_chat (chat_id, name);
                 if (usage.remote_bytes > 0 || usage.local_bytes > 0) {
@@ -802,7 +804,7 @@ namespace Dc {
                     if (entry.name.length > 0) return entry.name;
                 }
             }
-            return "Chat #%d".printf (chat_id);
+            return _("Chat #%d").printf (chat_id);
         }
 
         private async ChatStorageUsage scan_chat (int chat_id,
@@ -929,11 +931,13 @@ namespace Dc {
             box.append (top);
 
             var subtitle = dim_label (
-                "%s local · %s attached · %d files · %d messages".printf (
+                _("%s local · %s attached · %s · %s").printf (
                     StorageQuota.format_mb (usage.local_bytes),
                     StorageQuota.format_mb (usage.remote_bytes),
-                    usage.local_file_count,
-                    usage.message_count));
+                    ngettext ("%d file", "%d files", usage.local_file_count)
+                        .printf (usage.local_file_count),
+                    ngettext ("%d message", "%d messages", usage.message_count)
+                        .printf (usage.message_count)));
             subtitle.add_css_class ("caption");
             box.append (subtitle);
 
@@ -985,25 +989,25 @@ namespace Dc {
             this.rpc = rpc;
             this.account_id = acct_id;
             this.chat_id = chat_id;
-            this.title = chat_id > 0 ? "Invite Link" : "Invite Code";
+            this.title = chat_id > 0 ? _("Invite Link") : _("Invite Code");
             this.content_width = 480;
             this.content_height = 560;
             this.can_close = true;
 
-            qr_view = new QrCodeView ("Preparing invite code…");
+            qr_view = new QrCodeView (_("Preparing invite code…"));
             var actions = setup_qr_dialog (this, qr_view);
 
             /* Group/channel invite links can be deactivated (withdrawn) and
                reactivated (revived) by their owner — see set_config_from_qr.
                Personal contact codes have no such toggle. */
             if (chat_id > 0) {
-                toggle_btn = new Gtk.Button.with_label ("Deactivate Link");
+                toggle_btn = new Gtk.Button.with_label (_("Deactivate Link"));
                 toggle_btn.sensitive = false;
                 toggle_btn.clicked.connect (() => { toggle_link.begin (); });
                 actions.append (toggle_btn);
             }
 
-            actions.append (qr_view.make_copy_button ("Copy Link"));
+            actions.append (qr_view.make_copy_button (_("Copy Link")));
             actions.append (close_button (this));
 
             install_escape_close (this);
@@ -1023,10 +1027,10 @@ namespace Dc {
 
         private void show_qr (string text, string svg) {
             string ready_status = chat_id > 0
-                ? "Share this QR code or invite link to let others join."
-                : "Share this QR code with another user, or copy the invite link below.";
+                ? _("Share this QR code or invite link to let others join.")
+                : _("Share this QR code with another user, or copy the invite link below.");
             qr_view.show_code (text, svg, ready_status,
-                "Invite link is ready, but the QR image could not be rendered: ");
+                _("Invite link is ready, but the QR image could not be rendered: "));
 
             if (chat_id > 0) refresh_link_state.begin ();
         }
@@ -1058,17 +1062,17 @@ namespace Dc {
             if (toggle_btn == null) return;
             toggle_btn.sensitive = true;
             if (link_active) {
-                toggle_btn.label = "Deactivate Link";
+                toggle_btn.label = _("Deactivate Link");
                 toggle_btn.remove_css_class ("suggested-action");
                 qr_view.set_qr_opacity (1.0);
                 qr_view.set_status (
-                    "Share this QR code or invite link to let others join.");
+                    _("Share this QR code or invite link to let others join."));
             } else {
-                toggle_btn.label = "Activate Link";
+                toggle_btn.label = _("Activate Link");
                 toggle_btn.add_css_class ("suggested-action");
                 qr_view.set_qr_opacity (0.35);
                 qr_view.set_status (
-                    "This invite link is deactivated — activate it to let others join.");
+                    _("This invite link is deactivated — activate it to let others join."));
             }
         }
 
@@ -1077,14 +1081,14 @@ namespace Dc {
             if (text.length == 0 || toggle_btn == null || toggle_busy) return;
             toggle_busy = true;
             toggle_btn.sensitive = false;
-            toggle_btn.label = link_active ? "Deactivating…" : "Activating…";
+            toggle_btn.label = link_active ? _("Deactivating…") : _("Activating…");
             try {
                 yield rpc.set_config_from_qr (account_id, text);
                 yield refresh_link_state ();
             } catch (Error e) {
                 if (!closing) {
                     qr_view.set_status (
-                        "Could not update the invite link: " + e.message);
+                        _("Could not update the invite link: ") + e.message);
                     apply_link_state ();
                 }
             } finally {
@@ -1093,7 +1097,7 @@ namespace Dc {
         }
 
         private void show_invite_error (string message) {
-            qr_view.set_status ("Invite code creation failed: " + message);
+            qr_view.set_status (_("Invite code creation failed: ") + message);
             qr_view.set_copy_sensitive (false);
             if (toggle_btn != null) toggle_btn.visible = false;
         }
@@ -1110,14 +1114,14 @@ namespace Dc {
         public SecondDeviceDialog (RpcClient rpc, int acct_id) {
             this.rpc = rpc;
             this.account_id = acct_id;
-            this.title = "Add Second Device";
+            this.title = _("Add Second Device");
             this.content_width = 480;
             this.content_height = 560;
             this.can_close = true;
 
-            qr_view = new QrCodeView ("Preparing account…");
+            qr_view = new QrCodeView (_("Preparing account…"));
             var actions = setup_qr_dialog (this, qr_view);
-            actions.append (qr_view.make_copy_button ("Copy Text"));
+            actions.append (qr_view.make_copy_button (_("Copy Text")));
             actions.append (close_button (this));
 
             install_escape_close (this);
@@ -1151,12 +1155,12 @@ namespace Dc {
 
         private void show_qr (string text, string svg) {
             qr_view.show_code (text, svg,
-                "Scan this QR code with the second device, or copy the text below.",
-                "QR text is ready, but the image could not be rendered: ");
+                _("Scan this QR code with the second device, or copy the text below."),
+                _("QR text is ready, but the image could not be rendered: "));
         }
 
         private void show_transfer_error (string message) {
-            qr_view.set_status ("Second-device setup failed: " + message);
+            qr_view.set_status (_("Second-device setup failed: ") + message);
             qr_view.set_copy_sensitive (false);
         }
 

@@ -183,6 +183,31 @@ namespace Dc.Platform {
         return platform_get_executable_path ();
     }
 
+    public string get_locale_dir () {
+        string? executable = get_executable_path ();
+        if (executable != null) {
+            string bin_dir = Path.get_dirname (executable);
+#if MACOS
+            string bundle_dir = Path.build_filename (bin_dir, "..", "Resources",
+                "share", "locale");
+            if (has_locale_catalog (bundle_dir)) return bundle_dir;
+#endif
+            string installed_dir = Path.build_filename (bin_dir, "..", "share",
+                "locale");
+            if (has_locale_catalog (installed_dir)) return installed_dir;
+        }
+        return Parla.LOCALEDIR;
+    }
+
+    private bool has_locale_catalog (string locale_dir) {
+        foreach (string language in Intl.get_language_names ()) {
+            string catalog = Path.build_filename (locale_dir, language,
+                "LC_MESSAGES", Parla.GETTEXT_PACKAGE + ".mo");
+            if (FileUtils.test (catalog, FileTest.IS_REGULAR)) return true;
+        }
+        return false;
+    }
+
     public bool is_macos () {
         return platform_is_macos ();
     }

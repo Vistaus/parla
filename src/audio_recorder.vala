@@ -26,7 +26,7 @@ namespace Dc {
 
         public void start () throws Error {
             if (process != null || native != null || output_path.length > 0)
-                throw new IOError.BUSY ("An audio recording is already active");
+                throw new IOError.BUSY (_("An audio recording is already active"));
 
             FileIOStream stream;
             output_path = File.new_tmp (
@@ -42,14 +42,14 @@ namespace Dc {
                 if (native == null) {
                     discard_output ();
                     throw new IOError.FAILED (
-                        "The system audio recorder could not be created");
+                        _("The system audio recorder could not be created"));
                 }
                 return;
             }
             if (!spawn_next ()) {
                 discard_output ();
                 throw new IOError.NOT_SUPPORTED (
-                    "Install GStreamer or FFmpeg to record voice messages");
+                    _("Install GStreamer or FFmpeg to record voice messages"));
             }
         }
 
@@ -137,10 +137,10 @@ namespace Dc {
 
             if (!completed) {
                 self.discard_output ();
-                self.failed (message ?? "The voice recording failed");
+                self.failed (message ?? _("The voice recording failed"));
             } else if (!self.stop_requested) {
                 self.discard_output ();
-                self.failed ("The recording ended unexpectedly");
+                self.failed (_("The recording ended unexpectedly"));
             } else {
                 self.finish_stopped ();
             }
@@ -193,8 +193,8 @@ namespace Dc {
             if (spawn_next ()) return;
 
             discard_output ();
-            failed ("Could not access the microphone; check microphone "
-                + "permission and the configured media tools");
+            failed (_("Could not access the microphone; check microphone "
+                + "permission and the configured media tools"));
         }
 
         private void finish_stopped () {
@@ -204,8 +204,8 @@ namespace Dc {
             }
             discard_output ();
             failed (timed_out
-                ? "Audio recording did not stop cleanly"
-                : "The recording was too short or could not be encoded");
+                ? _("Audio recording did not stop cleanly")
+                : _("The recording was too short or could not be encoded"));
         }
 
         private void clear_stop_timeout () {

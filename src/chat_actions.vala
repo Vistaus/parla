@@ -24,9 +24,9 @@ namespace Dc {
         }
 
         public static string request_action (string type) {
-            if (type == "Group") return "Delete Request…";
-            if (type == "Single") return "Block Contact…";
-            return "Block Chat…";
+            if (type == "Group") return _("Delete Request…");
+            if (type == "Single") return _("Block Contact…");
+            return _("Block Chat…");
         }
     }
 }

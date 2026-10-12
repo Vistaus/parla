@@ -4,10 +4,9 @@ Parla uses the standard GNU gettext stack that is already shipped with GLib,
 GTK and libadwaita. The build system is Meson and the translation domain is
 `parla`.
 
-The infrastructure is in place and a substantial part of the UI is translated
-to **Catalan** (`ca`), the only language shipped today. Coverage grows by
-wrapping more strings with `_()` and adding the source file to `po/POTFILES`; no
-architecture change is needed for that.
+The UI is translated to **Catalan** (`ca`); Dutch (`nl`) is also shipped.
+Coverage grows by wrapping more strings with `_()` and adding the source file
+to `po/POTFILES`; no architecture change is needed for that.
 
 ## How it works
 
@@ -77,7 +76,8 @@ po/
 ├── POTFILES         # source files scanned by xgettext
 ├── meson.build      # i18n.gettext(...) with the glib preset
 ├── parla.pot        # generated template (do not edit by hand)
-└── ca.po            # Catalan catalog (add more .po files here)
+├── ca.po            # Catalan catalog
+└── nl.po            # Dutch catalog
 ```
 
 `po/ca.po` is an ordinary PO file: edit it in place with any PO editor. After
@@ -173,8 +173,7 @@ All files listed in `po/POTFILES` are translated; run
 cat po/POTFILES
 ```
 
-for the current list. It covers the whole chat surface and most of the settings
-surface:
+for the current list. It covers the chat, settings and account setup surfaces:
 
 * Command-line options (`src/application.vala`) and the main window, including
   its app menu and keyboard shortcut menu (`src/window.vala`).
@@ -192,14 +191,22 @@ surface:
   `src/webxdc_manager_dialog.vala`).
 * The settings dialog (`src/settings_dialog.vala`), including the Chatmail Core
   updater, proxy configuration and link-tracking filter list.
-* Voice message playback and transcription (`src/audio_player.vala`) and the
-  storage-quota explanation dialog in `src/profile_dialog.vala`.
+* Voice message playback, transcription and recording errors, including the
+  native macOS microphone permission flow.
+* Profile editing and storage details, invite codes, second-device setup,
+  account creation, classic email login and relay management.
+* The gallery, pinned-message and sticker managers, message details, quick
+  chat switcher, Webxdc bar and built-in error dialogs, and both tray menus.
 
-The remaining unwrapped strings live in files that are not yet in `POTFILES`,
-mainly the profile/account setup flow, the gallery, the pinned-message and
-sticker managers, the message details dialog, the webxdc bar and the tray icon.
-Expanding coverage is a matter of wrapping more strings with `_()` and adding
-their source files to `po/POTFILES`.
+Protocol identifiers, file formats, log messages and content supplied by the
+core or by Webxdc apps are not UI translations. Keep identifiers such as
+`"Audio"`, `"Group"` and `"Configured"` unchanged in RPC calls, comparisons
+and settings files. Translate display labels separately. Constant labels use
+`N_()` and are translated with `_()` when they are displayed; the profile
+creation menu keeps its untranslated identifiers for action dispatch.
+
+The Catalan catalog uses informal singular address, imperative action labels,
+`xat`, `adhesiu`, `adjunció`, `desar` and `suprimir` consistently.
 
 ### Plurals and composed strings
 
@@ -210,9 +217,10 @@ pluralisation. Use `ngettext()` for a plain count:
 label = ngettext ("%u chat", "%u chats", n).printf (n);
 ```
 
-When a plural noun is embedded in a longer sentence, pass the noun in as a
-parameter instead, as `webxdc_manager_dialog.vala` does with its `count_label()`
-helper. That keeps the plural in one translatable place.
+When a plural noun is embedded in a longer sentence, format it with
+`ngettext()` and pass it as a parameter to the enclosing translated string,
+as the storage rows in `src/profile_dialog.vala` do. Use complete translated
+sentences for gallery save actions so grammatical gender can vary by item type.
 
 Long sentences that are built by concatenating string literals should be joined
 *inside* the `_()` call, not outside it, otherwise translators get a fragment
@@ -237,55 +245,34 @@ self-contained: `_("Remove failed: %s").printf (reason)`.
 
 ### Desktop and AppData files
 
-The current POC only translates in-app strings. The next step is to make the
-desktop entry and AppStream metainfo translatable. The standard GNOME/Meson
-pattern is:
-
-1. Rename the source files to end with `.in`:
-   * `data/io.github.trufae.Parla.desktop` →
-     `data/io.github.trufae.Parla.desktop.in`
-   * `data/io.github.trufae.Parla.appdata.xml` →
-     `data/io.github.trufae.Parla.metainfo.xml.in`
-2. Replace `install_data()` in `meson.build` with `i18n.merge_file()`:
-
-   ```meson
-   i18n.merge_file(
-     input: 'data/io.github.trufae.Parla.desktop.in',
-     output: 'io.github.trufae.Parla.desktop',
-     po_dir: meson.project_source_root() / 'po',
-     type: 'desktop',
-     install: true,
-     install_dir: get_option('datadir') / 'applications',
-   )
-   ```
-
-3. Add the `.in` files to `po/POTFILES`.
-4. Packaging scripts that copy the raw `.desktop` or `.appdata.xml` files
-   (macOS bundle, AppImage, etc.) must be updated to use the generated
-   translated outputs from the build directory.
-
-This is documented here so future work can follow the same clean path.
+The desktop entry contains Catalan `GenericName`, `Comment` and `Keywords`
+fields. The AppStream file contains Catalan summaries, descriptions and
+screenshot captions using `xml:lang="ca"`. These metadata translations live
+in `data/io.github.trufae.Parla.desktop` and
+`data/io.github.trufae.Parla.appdata.xml`; edit them alongside the catalog.
+The desktop strings are also extracted into gettext, including the summary
+shared with the About dialog.
 
 ## Testing a translation without installing
 
-Because the locale directory is compiled into the binary (`LOCALEDIR`),
-uninstalled testing requires a build configured with a local prefix:
+Parla first looks for catalogs beside its executable, under
+`../share/locale`. macOS app bundles use `../Resources/share/locale` instead.
+If neither contains a matching catalog, it uses the compiled `LOCALEDIR`. This keeps
+translations working when Windows distributions or AppImages are relocated.
+The macOS bundler compiles all catalogs listed in `po/LINGUAS` into the bundle.
+
+To test the app's translations without installing it system-wide:
 
 ```sh
-rm -rf builddir-locale-test /tmp/parla-locale
-meson setup builddir-locale-test -Dprefix=/tmp/parla-locale
-meson compile -C builddir-locale-test
-meson install -C builddir-locale-test
-
-# Run with the Catalan catalog
+meson compile -C builddir
+mkdir -p /tmp/parla-locale/bin /tmp/parla-locale/share/locale/ca/LC_MESSAGES
+cp builddir/parla /tmp/parla-locale/bin/parla
+msgfmt -c po/ca.po -o /tmp/parla-locale/share/locale/ca/LC_MESSAGES/parla.mo
 LANG=en_US.UTF-8 LANGUAGE=ca /tmp/parla-locale/bin/parla --help
 ```
 
-If `ca_ES.UTF-8` is installed on the system, the simpler form also works:
-
-```sh
-LC_ALL=ca_ES.UTF-8 /tmp/parla-locale/bin/parla
-```
+If `ca_ES.UTF-8` is installed, you can also use
+`LC_ALL=ca_ES.UTF-8 /tmp/parla-locale/bin/parla`.
 
 ## References
 

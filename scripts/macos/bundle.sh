@@ -179,6 +179,13 @@ copy_dir "$BREW_PREFIX/share/mime" "$RESOURCES/share/mime"
 copy_dir "$BREW_PREFIX/share/themes" "$RESOURCES/share/themes"
 copy_dir "$BREW_PREFIX/etc/fonts" "$RESOURCES/etc/fonts"
 
+while IFS= read -r lang; do
+    [ -n "$lang" ] || continue
+    locale_dir="$RESOURCES/share/locale/$lang/LC_MESSAGES"
+    mkdir -p "$locale_dir"
+    msgfmt -c "$ROOT/po/$lang.po" -o "$locale_dir/parla.mo"
+done < "$ROOT/po/LINGUAS"
+
 copy_file "$ROOT/data/io.github.trufae.Parla.appdata.xml" \
     "$RESOURCES/share/metainfo/io.github.trufae.Parla.metainfo.xml"
 copy_file "$ROOT/data/io.github.trufae.Parla.desktop" \

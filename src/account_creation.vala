@@ -21,7 +21,7 @@ namespace Dc {
             }
             if (kind != "askVerifyContact" && kind != "askVerifyGroup"
                 && kind != "askJoinBroadcast")
-                throw new IOError.INVALID_ARGUMENT ("This code cannot create a profile");
+                throw new IOError.INVALID_ARGUMENT (_("This code cannot create a profile"));
         }
         yield rpc.add_transport_from_qr (account_id,
             build_chatmail_qr (CHATMAIL_RELAYS[0].domain));
@@ -187,7 +187,7 @@ namespace Dc {
             append (progress_label);
 
             var actions = account_setup_action_row ();
-            var cancel_btn = new Gtk.Button.with_label ("Cancel");
+            var cancel_btn = new Gtk.Button.with_label (_("Cancel"));
             cancel_btn.add_css_class ("destructive-action");
             cancel_btn.clicked.connect (() => { cancel_requested (); });
             actions.append (cancel_btn);
@@ -201,7 +201,7 @@ namespace Dc {
         public void set_permille (int progress, string? comment = null,
                                   string? active_status = null) {
             if (progress == 0) {
-                set_status (comment ?? "Failed");
+                set_status (comment ?? _("Failed"));
                 return;
             }
 
@@ -213,7 +213,7 @@ namespace Dc {
             if (comment != null && comment.length > 0) {
                 set_status (comment);
             } else if (progress >= 1000) {
-                set_status ("Finishing…");
+                set_status (_("Finishing…"));
             } else if (active_status != null) {
                 set_status (active_status);
             }
@@ -243,7 +243,7 @@ namespace Dc {
             this.rpc = rpc;
             this.events = events;
 
-            stack = account_setup_dialog (this, "Create New Profile",
+            stack = account_setup_dialog (this, _("Create New Profile"),
                 build_input_page (), build_progress_page ());
             this.closed.connect (on_dialog_closed);
         }
@@ -251,16 +251,16 @@ namespace Dc {
         private Gtk.Widget build_input_page () {
             var content = account_setup_content ();
             content.append (account_setup_intro (
-                "Let Parla choose fast chatmail relays, or select a server. " +
+                _("Let Parla choose fast chatmail relays, or select a server. " +
                 "Your profile is created automatically, with encryption keys " +
-                "generated on this device."));
+                "generated on this device.")));
 
-            content.append (account_setup_heading ("Display Name"));
+            content.append (account_setup_heading (_("Display Name")));
 
-            name_entry = account_setup_entry ("Your name");
+            name_entry = account_setup_entry (_("Your name"));
             content.append (name_entry);
 
-            content.append (account_setup_heading ("Server"));
+            content.append (account_setup_heading (_("Server")));
 
             relay_picker = new RelayPicker (rpc, true);
             content.append (relay_picker);
@@ -271,11 +271,12 @@ namespace Dc {
             hint.wrap = true;
             hint.add_css_class ("dim-label");
             hint.add_css_class ("caption");
-            hint.label = "See <a href=\"https://chatmail.at/relays\">" +
-                "chatmail.at/relays</a> for the full list.";
+            /// TRANSLATORS: Keep the link markup; the placeholders are its URL and label.
+            hint.label = _("See <a href=\"%s\">%s</a> for the full list.")
+                .printf ("https://chatmail.at/relays", "chatmail.at/relays");
             content.append (hint);
 
-            create_btn = account_setup_action (content, "Create Profile");
+            create_btn = account_setup_action (content, _("Create Profile"));
             create_btn.clicked.connect (() => { do_create.begin (); });
             this.default_widget = create_btn;
 
@@ -283,7 +284,7 @@ namespace Dc {
         }
 
         private Gtk.Widget build_progress_page () {
-            progress_page = new AccountProgressPage ("Contacting server…");
+            progress_page = new AccountProgressPage (_("Contacting server…"));
             progress_page.cancel_requested.connect (cancel_create);
             return progress_page;
         }
@@ -297,8 +298,8 @@ namespace Dc {
 
             create_running = true;
             stack.visible_child_name = "progress";
-            progress_page.set_status (qr_link == null ? "Finding a fast relay…"
-                : "Creating profile on %s…".printf (domain));
+            progress_page.set_status (qr_link == null ? _("Finding a fast relay…")
+                : _("Creating profile on %s…").printf (domain));
 
             progress_handler_id = events.configure_progress.connect (
                 on_configure_progress);
@@ -309,7 +310,7 @@ namespace Dc {
                 cleanup_signal ();
                 create_running = false;
                 if (!cancelled) {
-                    show_error (this, "Failed to create account: " + e.message);
+                    show_error (this, _("Failed to create account: ") + e.message);
                     this.close ();
                 }
                 return;
@@ -343,7 +344,7 @@ namespace Dc {
                 int aid = new_account_id;
                 new_account_id = 0;
                 yield cleanup_pending_account (rpc, aid, false);
-                show_error (this, "Profile creation failed: " + e.message);
+                show_error (this, _("Profile creation failed: ") + e.message);
                 this.close ();
                 return;
             }
@@ -404,7 +405,7 @@ namespace Dc {
             this.rpc = rpc;
             this.events = events;
 
-            stack = account_setup_dialog (this, "Use Invitation Code",
+            stack = account_setup_dialog (this, _("Use Invitation Code"),
                 build_input_page (), build_progress_page ());
             this.closed.connect (on_dialog_closed);
         }
@@ -412,17 +413,17 @@ namespace Dc {
         private Gtk.Widget build_input_page () {
             var content = account_setup_content ();
             content.append (account_setup_intro (
-                "Paste a Delta Chat account or invitation link. Account links " +
+                _("Paste a Delta Chat account or invitation link. Account links " +
                 "use the linked server; contact and group invites create a new " +
-                "chatmail profile first."));
+                "chatmail profile first.")));
 
             invite_entry = account_setup_entry (
-                "dcaccount:example.org or https://i.delta.chat/#...",
+                _("dcaccount:example.org or %s").printf ("https://i.delta.chat/#..."),
                 true, Gtk.InputPurpose.URL);
             invite_entry.changed.connect (update_start_sensitivity);
             content.append (invite_entry);
 
-            start_btn = account_setup_action (content, "Create Profile", false);
+            start_btn = account_setup_action (content, _("Create Profile"), false);
             start_btn.clicked.connect (() => { start_create.begin (); });
             start_btn.sensitive = false;
 
@@ -432,7 +433,7 @@ namespace Dc {
         }
 
         private Gtk.Widget build_progress_page () {
-            progress_page = new AccountProgressPage ("Checking invitation…", true);
+            progress_page = new AccountProgressPage (_("Checking invitation…"), true);
             progress_page.cancel_requested.connect (cancel_create);
             return progress_page;
         }
@@ -449,7 +450,7 @@ namespace Dc {
 
             create_running = true;
             stack.visible_child_name = "progress";
-            progress_page.set_status ("Checking invitation…");
+            progress_page.set_status (_("Checking invitation…"));
 
             progress_handler_id = events.configure_progress.connect (
                 on_configure_progress);
@@ -459,7 +460,7 @@ namespace Dc {
             } catch (Error e) {
                 cleanup_signal ();
                 create_running = false;
-                show_error (this, "Failed to create account: " + e.message);
+                show_error (this, _("Failed to create account: ") + e.message);
                 this.close ();
                 return;
             }
@@ -468,12 +469,12 @@ namespace Dc {
             try {
                 qr = yield rpc.check_qr (new_account_id, invite_link);
             } catch (Error e) {
-                yield fail_new_account ("Invitation code failed: " + e.message);
+                yield fail_new_account (_("Invitation code failed: ") + e.message);
                 return;
             }
 
             if (qr == null || !qr.has_member ("kind")) {
-                yield fail_new_account ("This is not a valid Delta Chat invitation code.");
+                yield fail_new_account (_("This is not a valid Delta Chat invitation code."));
                 return;
             }
 
@@ -481,28 +482,28 @@ namespace Dc {
             int chat_id = 0;
 
             if (kind == "account" || kind == "login") {
-                progress_page.set_status ("Creating profile…");
+                progress_page.set_status (_("Creating profile…"));
                 try {
                     yield initialize_profile_transports (rpc, new_account_id, invite_link);
                 } catch (Error e) {
-                    yield fail_new_account ("Profile creation failed: " + e.message);
+                    yield fail_new_account (_("Profile creation failed: ") + e.message);
                     return;
                 }
             } else if (kind == "askVerifyContact" ||
                        kind == "askVerifyGroup" ||
                        kind == "askJoinBroadcast") {
-                progress_page.set_status ("Creating profile…");
+                progress_page.set_status (_("Creating profile…"));
                 try {
                     yield initialize_profile_transports (rpc, new_account_id, invite_link);
-                    progress_page.set_status ("Accepting invitation…");
+                    progress_page.set_status (_("Accepting invitation…"));
                     chat_id = yield rpc.secure_join (new_account_id, invite_link);
                 } catch (Error e) {
-                    yield fail_new_account ("Invitation failed: " + e.message);
+                    yield fail_new_account (_("Invitation failed: ") + e.message);
                     return;
                 }
             } else {
                 yield fail_new_account (
-                    "This code cannot be used to create a profile.");
+                    _("This code cannot be used to create a profile."));
                 return;
             }
 
@@ -569,7 +570,7 @@ namespace Dc {
             this.rpc = rpc;
             this.events = events;
 
-            stack = account_setup_dialog (this, "Add as Secondary Device",
+            stack = account_setup_dialog (this, _("Add as Secondary Device"),
                 build_input_page (), build_progress_page ());
             this.closed.connect (on_dialog_closed);
         }
@@ -577,15 +578,15 @@ namespace Dc {
         private Gtk.Widget build_input_page () {
             var content = account_setup_content ();
             content.append (account_setup_intro (
-                "On your existing device, open Settings → " +
+                _("On your existing device, open Settings → " +
                 "“Add Second Device” and copy the setup code shown there. " +
-                "Paste it below."));
+                "Paste it below.")));
 
             url_entry = account_setup_entry ("DCBACKUP2:…", true);
             url_entry.changed.connect (update_start_sensitivity);
             content.append (url_entry);
 
-            start_btn = account_setup_action (content, "Start Import", false);
+            start_btn = account_setup_action (content, _("Start Import"), false);
             start_btn.clicked.connect (() => { start_import.begin (); });
             start_btn.sensitive = false;
 
@@ -595,7 +596,7 @@ namespace Dc {
         }
 
         private Gtk.Widget build_progress_page () {
-            progress_page = new AccountProgressPage ("Connecting…");
+            progress_page = new AccountProgressPage (_("Connecting…"));
             progress_page.cancel_requested.connect (cancel_import);
             return progress_page;
         }
@@ -620,7 +621,7 @@ namespace Dc {
             } catch (Error e) {
                 cleanup_signal ();
                 import_running = false;
-                show_error (this, "Failed to create account: " + e.message);
+                show_error (this, _("Failed to create account: ") + e.message);
                 this.close ();
                 return;
             }
@@ -634,7 +635,7 @@ namespace Dc {
                     yield cleanup_pending_account (rpc, new_account_id, false);
                     new_account_id = 0;
                 }
-                show_error (this, "Import failed: " + e.message);
+                show_error (this, _("Import failed: ") + e.message);
                 this.close ();
                 return;
             }
@@ -650,7 +651,7 @@ namespace Dc {
 
         private void on_imex_progress (int ctx, int progress) {
             if (ctx != new_account_id) return;
-            progress_page.set_permille (progress, null, "Transferring…");
+            progress_page.set_permille (progress, null, _("Transferring…"));
         }
 
         private void cleanup_signal () {

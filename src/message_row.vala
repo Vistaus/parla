@@ -1420,7 +1420,7 @@ namespace Dc {
 
                 if (!msg.can_download_full_message) {
                     var view_btn = new Gtk.Button.with_label (
-                        "View full message");
+                        _("View full message"));
                     view_btn.add_css_class ("flat");
                     view_btn.add_css_class ("message-full-text-button");
                     view_btn.hexpand = true;
@@ -1602,8 +1602,8 @@ namespace Dc {
                 toggle.add_css_class ("markdown-task-toggle");
                 toggle.valign = Gtk.Align.START;
                 toggle.tooltip_text = checked
-                    ? "Mark unchecked"
-                    : "Mark checked";
+                    ? _("Mark unchecked")
+                    : _("Mark checked");
                 string raw = msg.text ?? "";
                 int idx = line_index;
                 toggle.set_data<string> (TASK_RAW_DATA, raw.dup ());
@@ -2085,9 +2085,8 @@ namespace Dc {
             pill.add_css_class ("reaction-users-pill");
 
             if (reaction.count > reaction.users.length) {
-                var label = new Gtk.Label (reaction.count == 1
-                    ? "1 reaction"
-                    : "%d reactions".printf (reaction.count));
+                var label = new Gtk.Label (ngettext ("%d reaction",
+                    "%d reactions", reaction.count).printf (reaction.count));
                 label.add_css_class ("reaction-user-name");
                 pill.append (label);
             }
@@ -2126,7 +2125,7 @@ namespace Dc {
 
             if (contact_id == 1) {
                 name = self_display_name != null && self_display_name.length > 0
-                    ? self_display_name : "You";
+                    ? self_display_name : _("You");
                 avatar_path = self_avatar_path;
                 return;
             }
@@ -2138,7 +2137,7 @@ namespace Dc {
                     ? member.display_name
                     : (member.address.length > 0
                         ? member.address
-                        : "Contact %d".printf (contact_id));
+                        : _("Contact %d").printf (contact_id));
                 avatar_path = member.avatar_path;
                 return;
             }
@@ -2146,13 +2145,13 @@ namespace Dc {
             if (!msg.is_outgoing && contact_id > 0 &&
                 contact_id == msg.sender_contact_id) {
                 string? author = effective_author_name (msg);
-                name = author ?? msg.sender_address ?? "Contact";
+                name = author ?? msg.sender_address ?? _("Contact");
                 avatar_path = msg.sender_avatar_path;
                 return;
             }
 
-            name = contact_id > 0 ? "Contact %d".printf (contact_id)
-                                  : "Unknown user";
+            name = contact_id > 0 ? _("Contact %d").printf (contact_id)
+                                  : _("Unknown user");
         }
 
         private static string format_timestamp (int64 ts) {
@@ -2169,24 +2168,24 @@ namespace Dc {
          */
         internal static string accessible_summary (Message msg) {
             var sb = new StringBuilder ();
-            sb.append (msg.is_info ? "Info" : effective_sender_name (msg));
+            sb.append (msg.is_info ? _("Info") : effective_sender_name (msg));
             if (msg.timestamp > 0) {
                 sb.append (", ").append (format_date_label (msg.timestamp))
                   .append (" ").append (format_timestamp (msg.timestamp));
             }
             if (msg.is_outgoing && !msg.is_info) {
-                if (msg.is_failed) sb.append (", sending failed");
-                else if (msg.is_read) sb.append (", read");
-                else if (msg.is_delivered) sb.append (", delivered");
-                else if (msg.is_pending) sb.append (", sending");
-                else sb.append (", sent");
+                if (msg.is_failed) sb.append (_(", sending failed"));
+                else if (msg.is_read) sb.append (_(", read"));
+                else if (msg.is_delivered) sb.append (_(", delivered"));
+                else if (msg.is_pending) sb.append (_(", sending"));
+                else sb.append (_(", sent"));
             }
-            if (msg.is_forwarded) sb.append (", forwarded");
-            if (msg.is_edited) sb.append (", edited");
-            if (msg.is_pinned) sb.append (", pinned");
+            if (msg.is_forwarded) sb.append (_(", forwarded"));
+            if (msg.is_edited) sb.append (_(", edited"));
+            if (msg.is_pinned) sb.append (_(", pinned"));
             if (msg.quote_msg_id > 0 || msg.quote_text != null) {
-                sb.append (", replying to ")
-                  .append (msg.quote_sender_name ?? "a message");
+                sb.append (_(", replying to "))
+                  .append (msg.quote_sender_name ?? _("a message"));
             }
             sb.append (": ");
             string? attachment = attachment_summary (msg);
@@ -2195,25 +2194,25 @@ namespace Dc {
                 if (attachment != null) sb.append (", ");
                 sb.append (msg.text.strip ().replace ("\n", " "));
             } else if (attachment == null) {
-                sb.append ("empty message");
+                sb.append (_("empty message"));
             }
             if (msg.reactions != null && msg.reactions.length > 0) {
-                sb.append (", reactions: ").append (msg.reactions);
+                sb.append (_(", reactions: ")).append (msg.reactions);
             }
             return sb.str;
         }
 
         private static string? attachment_summary (Message msg) {
-            if (msg.is_webxdc ()) return "app " + (msg.file_name ?? "");
+            if (msg.is_webxdc ()) return _("app %s").printf (msg.file_name ?? "");
             if (!msg.has_file) return null;
             if (msg.is_sticker_file () || msg.is_video_sticker_file ()) {
-                return "sticker";
+                return _("sticker");
             }
-            if (msg.is_image_file ()) return "photo";
-            if (msg.is_video_file ()) return "video";
-            if ((msg.view_type ?? "").down () == "voice") return "voice message";
-            if (msg.is_audio_file ()) return "audio";
-            return "file " + (msg.file_name ?? "");
+            if (msg.is_image_file ()) return _("photo");
+            if (msg.is_video_file ()) return _("video");
+            if ((msg.view_type ?? "").down () == "voice") return _("voice message");
+            if (msg.is_audio_file ()) return _("audio");
+            return _("file %s").printf (msg.file_name ?? "");
         }
 #endif
 

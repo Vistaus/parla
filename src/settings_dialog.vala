@@ -744,9 +744,9 @@ namespace Dc {
                 apply_theme_override ();
             });
 
-            /* Syntax colour scheme names are proper nouns and stay as is. */
+            /* Named syntax colour schemes are proper nouns. */
             string[] code_labels = {
-                "Adaptive", "Solarized", "Monokai", "Nord", "None"
+                _("Adaptive"), "Solarized", "Monokai", "Nord", _("None")
             };
             row_combo (appearance_group,
                 _("Code highlighting"), _("Color scheme for code blocks in messages"),

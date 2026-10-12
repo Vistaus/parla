@@ -21,7 +21,7 @@ namespace Dc {
 
         public StickerManagerDialog (Window window) {
             this.app_window = window;
-            this.title = "Stickers";
+            this.title = _("Stickers");
             this.content_width = 420;
             this.content_height = 520;
 
@@ -41,7 +41,7 @@ namespace Dc {
             var pack_row = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 8);
             var add_pack_btn = new Gtk.Button.from_icon_name (
                 "list-add-symbolic");
-            add_pack_btn.tooltip_text = "Create a new sticker pack";
+            add_pack_btn.tooltip_text = _("Create a new sticker pack");
             add_pack_btn.clicked.connect (() => {
                 prompt_new_pack.begin (this, (obj, res) => {
                     var pack = prompt_new_pack.end (res);
@@ -59,14 +59,14 @@ namespace Dc {
 
             rename_pack_btn = new Gtk.Button.from_icon_name (
                 "document-edit-symbolic");
-            rename_pack_btn.tooltip_text = "Rename the selected pack";
+            rename_pack_btn.tooltip_text = _("Rename the selected pack");
             rename_pack_btn.clicked.connect (() => on_rename_pack.begin ());
             pack_row.append (rename_pack_btn);
 
             delete_pack_btn = new Gtk.Button.from_icon_name (
                 "list-remove-symbolic");
             delete_pack_btn.tooltip_text =
-                "Delete the selected pack and all of its stickers";
+                _("Delete the selected pack and all of its stickers");
             delete_pack_btn.clicked.connect (() => { on_delete_pack.begin (); });
             pack_row.append (delete_pack_btn);
             content.append (pack_row);
@@ -111,8 +111,8 @@ namespace Dc {
         /* ---- pack picker prompts (also used from the message menu) ---- */
 
         public static async string? prompt_new_pack (Gtk.Widget parent) {
-            string? name = yield prompt_text (parent, "New Sticker Pack",
-                "Name for the new sticker pack.", "Create", "", "Pack name");
+            string? name = yield prompt_text (parent, _("New Sticker Pack"),
+                _("Name for the new sticker pack."), _("Create"), "", _("Pack name"));
             return name != null ? StickerStore.sanitize_pack_name (name) : null;
         }
 
@@ -122,22 +122,22 @@ namespace Dc {
                                                string file_path) {
             string[] packs = StickerStore.list_packs ();
 
-            var d = new Adw.AlertDialog ("Add Sticker",
-                "Choose the sticker pack to add this sticker to.");
-            d.add_response ("cancel", "Cancel");
-            d.add_response ("add", "Add");
+            var d = new Adw.AlertDialog (_("Add Sticker"),
+                _("Choose the sticker pack to add this sticker to."));
+            d.add_response ("cancel", _("Cancel"));
+            d.add_response ("add", _("Add"));
             d.set_response_appearance ("add",
                 Adw.ResponseAppearance.SUGGESTED);
             d.default_response = "add";
             d.close_response = "cancel";
 
             string[] choices = packs;
-            choices += "New pack…";
+            choices += _("New pack…");
             var dropdown = new Gtk.DropDown.from_strings (choices);
             dropdown.selected = 0;
 
             var entry = new Gtk.Entry ();
-            entry.placeholder_text = "New pack name";
+            entry.placeholder_text = _("New pack name");
             entry.activates_default = true;
             entry.visible = packs.length == 0;
             dropdown.notify["selected"].connect (() => {
@@ -158,17 +158,17 @@ namespace Dc {
                     pack = StickerStore.sanitize_pack_name (entry.text);
                     if (pack == null) {
                         window.show_toast (
-                            "Enter a name for the new sticker pack");
+                            _("Enter a name for the new sticker pack"));
                         return;
                     }
                 }
                 try {
                     window.show_toast (
                         StickerStore.add_sticker (pack, file_path)
-                            ? "Sticker added to \"%s\"".printf (pack)
-                            : "Sticker is already in \"%s\"".printf (pack));
+                            ? _("Sticker added to \"%s\"").printf (pack)
+                            : _("Sticker is already in \"%s\"").printf (pack));
                 } catch (Error e) {
-                    show_error (window, "Could not add sticker: " + e.message);
+                    show_error (window, _("Could not add sticker: ") + e.message);
                 }
             });
             d.present (window);
@@ -226,14 +226,14 @@ namespace Dc {
             string? pack = selected_pack ();
             if (pack == null) {
                 placeholder.label =
-                    "No sticker packs yet.\nPress + to create one.";
+                    _("No sticker packs yet.\nPress + to create one.");
                 placeholder.visible = true;
                 return;
             }
             var stickers = StickerStore.list_stickers (pack);
-            placeholder.label = "This pack has no stickers yet.\n" +
+            placeholder.label = _("This pack has no stickers yet.\n" +
                 "Right-click a sticker in a conversation and choose " +
-                "\"Add Sticker…\".";
+                "\"Add Sticker…\".");
             placeholder.visible = stickers.length == 0;
             foreach (Sticker sticker in stickers) {
                 sticker_grid.append (build_sticker_card (sticker));
@@ -258,7 +258,7 @@ namespace Dc {
             emoji_btn.halign = Gtk.Align.CENTER;
             emoji_btn.margin_bottom = 6;
             emoji_btn.add_css_class ("flat");
-            emoji_btn.tooltip_text = "Emoji associated with this sticker";
+            emoji_btn.tooltip_text = _("Emoji associated with this sticker");
             if (sticker.emoji.length > 0) emoji_btn.label = sticker.emoji;
             else emoji_btn.icon_name = "face-smile-symbolic";
             emoji_btn.clicked.connect (() => {
@@ -284,7 +284,7 @@ namespace Dc {
         private void pick_emoji (Sticker sticker, Gtk.Button btn) {
             var chooser = create_emoji_chooser ();
             if (chooser == null) {
-                app_window.show_toast ("Emoji picker unavailable");
+                app_window.show_toast (_("Emoji picker unavailable"));
                 return;
             }
             chooser.emoji_picked.connect ((emoji) => {
@@ -294,7 +294,7 @@ namespace Dc {
                     StickerStore.set_emoji (sticker, emoji);
                     btn.label = emoji;
                 } catch (Error e) {
-                    show_error (this, "Could not set emoji: " + e.message);
+                    show_error (this, _("Could not set emoji: ") + e.message);
                 }
             });
             chooser.set_parent (btn);
@@ -308,11 +308,11 @@ namespace Dc {
             Gtk.Box vbox;
             var popover = popover_menu (parent, x, y, out vbox);
 
-            var copy_btn = new PopoverButton (popover, "Copy File Path");
+            var copy_btn = new PopoverButton (popover, _("Copy File Path"));
             copy_btn.selected.connect (() => {
                 this.get_clipboard ().set_text (
                     StickerStore.sticker_path (sticker.file_name));
-                app_window.show_toast ("File path copied");
+                app_window.show_toast (_("File path copied"));
             });
             vbox.append (copy_btn);
             vbox.append (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
@@ -323,16 +323,16 @@ namespace Dc {
                 has_move_targets = true;
                 string dest = other;
                 var move_btn = new PopoverButton (popover,
-                    "Move to \"%s\"".printf (dest));
+                    _("Move to \"%s\"").printf (dest));
                 move_btn.selected.connect (() => {
                     try {
                         app_window.show_toast (
                             StickerStore.move_sticker (sticker, dest)
-                                ? "Sticker moved to \"%s\"".printf (dest)
-                                : "Sticker is already in \"%s\"".printf (dest));
+                                ? _("Sticker moved to \"%s\"").printf (dest)
+                                : _("Sticker is already in \"%s\"").printf (dest));
                     } catch (Error e) {
                         show_error (this,
-                            "Could not move sticker: " + e.message);
+                            _("Could not move sticker: ") + e.message);
                     }
                     reload_stickers ();
                 });
@@ -342,7 +342,7 @@ namespace Dc {
                 vbox.append (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
             }
 
-            var delete_btn = new PopoverButton (popover, "Delete…", true);
+            var delete_btn = new PopoverButton (popover, _("Delete…"), true);
             delete_btn.selected.connect (() =>
                 confirm_delete_sticker.begin (sticker));
             vbox.append (delete_btn);
@@ -351,10 +351,10 @@ namespace Dc {
         }
 
         private async void confirm_delete_sticker (Sticker sticker) {
-            if (yield confirm_action (this, "Delete Sticker?",
-                    "Delete this sticker from \"%s\"? This cannot be undone."
+            if (yield confirm_action (this, _("Delete Sticker?"),
+                    _("Delete this sticker from \"%s\"? This cannot be undone.")
                         .printf (sticker.pack),
-                    "delete", "Delete")) {
+                    "delete", _("Delete"))) {
                 StickerStore.delete_sticker (sticker);
                 reload_stickers ();
             }
@@ -363,15 +363,15 @@ namespace Dc {
         private async void on_rename_pack () {
             string? pack = selected_pack ();
             if (pack == null) return;
-            string? entered = yield prompt_text (this, "Rename Sticker Pack",
-                "New name for the pack \"%s\".".printf (pack), "Rename", pack);
+            string? entered = yield prompt_text (this, _("Rename Sticker Pack"),
+                _("New name for the pack \"%s\".").printf (pack), _("Rename"), pack);
             if (entered == null) return;
             string? new_pack = StickerStore.sanitize_pack_name (entered);
             if (new_pack == null || new_pack == pack) return;
             try {
                 StickerStore.rename_pack (pack, new_pack);
             } catch (Error e) {
-                show_error (this, "Could not rename pack: " + e.message);
+                show_error (this, _("Could not rename pack: ") + e.message);
                 return;
             }
             /* Rewrite the in-memory list instead of rescanning the disk
@@ -392,10 +392,10 @@ namespace Dc {
         private async void on_delete_pack () {
             string? pack = selected_pack ();
             if (pack == null) return;
-            if (yield confirm_action (this, "Delete Sticker Pack?",
-                "Delete the pack \"%s\" and all of its stickers? This cannot be undone."
+            if (yield confirm_action (this, _("Delete Sticker Pack?"),
+                _("Delete the pack \"%s\" and all of its stickers? This cannot be undone.")
                     .printf (pack),
-                "delete", "Delete Pack")) {
+                "delete", _("Delete Pack"))) {
                 StickerStore.delete_pack (pack);
                 reload_packs (null);
             }

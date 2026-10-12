@@ -85,7 +85,7 @@ namespace Dc {
             try {
                 var file = yield read_file (drop);
                 if (file == null) {
-                    failed ("unsupported drop data");
+                    failed (_("unsupported drop data"));
                 } else {
                     ok = yield emit_local_file (file);
                 }
@@ -109,7 +109,7 @@ namespace Dc {
             }
 
             if (path == null) {
-                failed ("file has no local path");
+                failed (_("file has no local path"));
                 return false;
             }
             dropped (path, name);

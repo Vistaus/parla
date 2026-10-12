@@ -11,6 +11,7 @@
 
 #include <stdint.h>
 #include <gtk/gtk.h>
+#include <glib/gi18n-lib.h>
 #include <gdk/macos/gdkmacos.h>
 
 
@@ -389,8 +390,9 @@ static char parla_drop_subclass_key;
 		}];
 		return;
 	case AVAuthorizationStatusRestricted:
-		[self report:@"Microphone access is restricted on this Mac "
-		             @"(Screen Time or a management profile)"];
+		[self report:[NSString stringWithUTF8String:
+			_("Microphone access is restricted on this Mac "
+			  "(Screen Time or a management profile)")]];
 		return;
 	case AVAuthorizationStatusDenied:
 	default:
@@ -401,8 +403,9 @@ static char parla_drop_subclass_key;
 
 - (NSString *)deniedMessage
 {
-	return @"Microphone access is turned off for Parla. Allow it in "
-	       @"System Settings › Privacy & Security › Microphone";
+	return [NSString stringWithUTF8String:
+		_("Microphone access is turned off for Parla. Allow it in "
+		  "System Settings › Privacy & Security › Microphone")];
 }
 
 - (NSString *)describeError:(NSError *)error fallback:(NSString *)fallback
@@ -415,7 +418,7 @@ static char parla_drop_subclass_key;
 {
 	if (!active || reported || recorder != nil) return;
 	if ([AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio] == nil) {
-		[self report:@"No microphone is connected to this Mac"];
+		[self report:[NSString stringWithUTF8String:_("No microphone is connected to this Mac")]];
 		return;
 	}
 
@@ -433,12 +436,12 @@ static char parla_drop_subclass_key;
 	                                          error:&error];
 	if (recorder == nil) {
 		[self report:[self describeError:error
-		                        fallback:@"Could not set up the AAC encoder"]];
+		                        fallback:[NSString stringWithUTF8String:_("Could not set up the AAC encoder")]]];
 		return;
 	}
 	recorder.delegate = self;
 	if (![recorder prepareToRecord] || ![recorder record]) {
-		[self report:@"Could not start capturing from the default microphone"];
+		[self report:[NSString stringWithUTF8String:_("Could not start capturing from the default microphone")]];
 		return;
 	}
 	if (stop_requested) [recorder stop];
@@ -450,7 +453,7 @@ static char parla_drop_subclass_key;
 	stop_requested = YES;
 	if (recorder == nil) {
 		/* Stopped while the permission prompt was still open. */
-		[self report:@"Recording stopped before the microphone was ready"];
+		[self report:[NSString stringWithUTF8String:_("Recording stopped before the microphone was ready")]];
 		return;
 	}
 	[recorder stop];
@@ -462,8 +465,8 @@ static char parla_drop_subclass_key;
 	(void) sender;
 	dispatch_async (dispatch_get_main_queue (), ^{
 		if (flag && stop_requested) [self report:nil];
-		else if (flag) [self report:@"The microphone stopped delivering audio"];
-		else [self report:@"The voice message could not be written"];
+		else if (flag) [self report:[NSString stringWithUTF8String:_("The microphone stopped delivering audio")]];
+		else [self report:[NSString stringWithUTF8String:_("The voice message could not be written")]];
 	});
 }
 
@@ -472,7 +475,7 @@ static char parla_drop_subclass_key;
 {
 	(void) sender;
 	NSString *message = [self describeError:error
-	                               fallback:@"The AAC encoder failed"];
+	                               fallback:[NSString stringWithUTF8String:_("The AAC encoder failed")]];
 	dispatch_async (dispatch_get_main_queue (), ^{
 		[self report:message];
 	});

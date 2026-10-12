@@ -327,7 +327,7 @@ namespace Dc {
         }
 
         private static string sender_label (Message msg) {
-            if (msg.is_outgoing) return "Me";
+            if (msg.is_outgoing) return _("Me");
             return msg.sender_name ?? msg.sender_address ?? _("Unknown");
         }
 
@@ -444,7 +444,8 @@ namespace Dc {
             row.use_markup = false;
             row.title = entry.name;
             row.subtitle = "%s · %s".printf (entry.author,
-                count_label (entry.instances.length, _("chat"), _("chats")));
+                ngettext ("%u chat", "%u chats", entry.instances.length)
+                    .printf (entry.instances.length));
             row.activatable = true;
             row.add_prefix (app_icon (entry, 40));
 
@@ -492,12 +493,6 @@ namespace Dc {
                 box.append (more);
             }
             return box;
-        }
-
-        /* English-style "+s" pluralisation is not portable, so the caller
-           passes both forms and we pick by count. */
-        private static string count_label (uint n, string one, string many) {
-            return n == 1 ? _("1 %s").printf (one) : _("%u %s").printf (n, many);
         }
 
         /* ================================================================
@@ -589,7 +584,8 @@ namespace Dc {
                 about.append (url_row);
             }
             var used_row = info_row (_("Used by"),
-                count_label (entry.users.length, _("person"), _("people")));
+                ngettext ("%u person", "%u people", entry.users.length)
+                    .printf (entry.users.length));
             used_row.add_suffix (users_cluster (entry, 24, 6));
             about.append (used_row);
             box.append (section (_("About"), about));

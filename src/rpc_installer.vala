@@ -201,7 +201,7 @@ namespace Dc {
             var identity = new NetworkAddress ("github.com", 443);
             var tls = TlsClientConnection.new (tcp, identity);
             if (tls == null) {
-                throw new IOError.FAILED ("Unable to create TLS connection");
+                throw new IOError.FAILED (_("Unable to create TLS connection"));
             }
             yield tls.handshake_async (Priority.DEFAULT, null);
 
@@ -243,12 +243,12 @@ namespace Dc {
 
             if (status < 300 || status >= 400 || location == null) {
                 throw new IOError.FAILED (
-                    "GitHub returned HTTP status %d".printf (status));
+                    _("GitHub returned HTTP status %d").printf (status));
             }
 
             string? tag = extract_release_tag (location);
             if (tag == null) {
-                throw new IOError.FAILED ("GitHub response did not include a release tag");
+                throw new IOError.FAILED (_("GitHub response did not include a release tag"));
             }
             return tag;
         }
@@ -264,7 +264,7 @@ namespace Dc {
             }
 
             throw new IOError.NOT_SUPPORTED (
-                "No prebuilt deltachat-rpc-server is published for this platform");
+                _("No prebuilt deltachat-rpc-server is published for this platform"));
         }
 
         private async string download_release_asset (string asset) throws Error {
@@ -293,7 +293,7 @@ namespace Dc {
                 string final_path = managed_bin_path ();
                 FileUtils.unlink (final_path);
                 if (FileUtils.rename (tmp, final_path) != 0) {
-                    throw new IOError.FAILED ("Could not install the server binary");
+                    throw new IOError.FAILED (_("Could not install the server binary"));
                 }
                 ensure_executable (final_path);
                 return final_path;
@@ -314,13 +314,13 @@ namespace Dc {
 
         private static string curl_failure_message (string? stderr_buf) {
             string msg = (stderr_buf ?? "").strip ();
-            return msg.length > 0 ? msg : "curl exited unsuccessfully";
+            return msg.length > 0 ? msg : _("curl exited unsuccessfully");
         }
 
         private static async string fetch_latest_tag_with_curl () throws Error {
             string? curl = curl_path ();
             if (curl == null) {
-                throw new IOError.NOT_SUPPORTED ("curl is required to download");
+                throw new IOError.NOT_SUPPORTED (_("curl is required to download"));
             }
 
             string[] argv = {
@@ -364,12 +364,12 @@ namespace Dc {
             }
 
             if (location == null) {
-                throw new IOError.FAILED ("GitHub response did not include a release redirect");
+                throw new IOError.FAILED (_("GitHub response did not include a release redirect"));
             }
 
             string? tag = extract_release_tag (location);
             if (tag == null) {
-                throw new IOError.FAILED ("GitHub response did not include a release tag");
+                throw new IOError.FAILED (_("GitHub response did not include a release tag"));
             }
             return tag;
         }
@@ -377,7 +377,7 @@ namespace Dc {
         private async void curl_get_to_file (string url, string dest) throws Error {
             string? curl = curl_path ();
             if (curl == null) {
-                throw new IOError.NOT_SUPPORTED ("curl is required to download");
+                throw new IOError.NOT_SUPPORTED (_("curl is required to download"));
             }
 
             progress (0, -1);
@@ -430,11 +430,11 @@ namespace Dc {
         private static void ensure_executable (string path) throws Error {
             if (FileUtils.chmod (path, 0755) != 0) {
                 throw new IOError.FAILED (
-                    "Could not make the server executable: %s".printf (path));
+                    _("Could not make the server executable: %s").printf (path));
             }
             if (!FileUtils.test (path, FileTest.IS_EXECUTABLE)) {
                 throw new IOError.FAILED (
-                    "Installed server is not executable: %s".printf (path));
+                    _("Installed server is not executable: %s").printf (path));
             }
         }
 
@@ -444,7 +444,7 @@ namespace Dc {
         private async void https_get_to_file (string url, string dest, int depth)
                 throws Error {
             if (depth > MAX_REDIRECTS) {
-                throw new IOError.FAILED ("Too many HTTP redirects");
+                throw new IOError.FAILED (_("Too many HTTP redirects"));
             }
 
             /* ENCODED keeps the query percent-encoded; GitHub's signed asset
@@ -466,7 +466,7 @@ namespace Dc {
             var identity = new NetworkAddress (host, (uint16) port);
             var tls = TlsClientConnection.new (tcp, identity);
             if (tls == null) {
-                throw new IOError.FAILED ("Unable to create TLS connection");
+                throw new IOError.FAILED (_("Unable to create TLS connection"));
             }
             yield tls.handshake_async (Priority.DEFAULT, null);
 
@@ -511,7 +511,7 @@ namespace Dc {
                 catch (Error e) { /* ignore */ }
                 if (location == null) {
                     throw new IOError.FAILED (
-                        "Redirect (%d) without a Location header".printf (status));
+                        _("Redirect (%d) without a Location header").printf (status));
                 }
                 yield https_get_to_file (location, dest, depth + 1);
                 return;
@@ -521,7 +521,7 @@ namespace Dc {
                 try { yield tls.close_async (Priority.DEFAULT, null); }
                 catch (Error e) { /* ignore */ }
                 throw new IOError.FAILED (
-                    "Download failed with HTTP status %d".printf (status));
+                    _("Download failed with HTTP status %d").printf (status));
             }
 
             var fos = File.new_for_path (dest).replace (
@@ -544,7 +544,7 @@ namespace Dc {
 
             if (content_length > 0 && received < content_length) {
                 throw new IOError.PARTIAL_INPUT (
-                    "Download truncated (%s of %s bytes)".printf (
+                    _("Download truncated (%s of %s bytes)").printf (
                         received.to_string (), content_length.to_string ()));
             }
         }

@@ -252,10 +252,10 @@ namespace Dc.Webxdc {
         if (restricted.strip () != "1" || label.strip () != "unconfined") {
             return true;
         }
-        message = "Ubuntu AppArmor is blocking the user namespace required "
+        message = _("Ubuntu AppArmor is blocking the user namespace required "
             + "by WebKitGTK's sandbox. Install this Webxdc build with "
             + "‘sudo make install’, then restart Parla. "
-            + "Webxdc will not run without its web-engine sandbox.";
+            + "Webxdc will not run without its web-engine sandbox.");
         return false;
     }
 #endif
@@ -386,7 +386,7 @@ namespace Dc.Webxdc {
             try {
                 var dn = yield rpc.get_config ("displayname", account_id);
                 if (dn != null && dn.length > 0) self_name = dn;
-                else self_name = (yield rpc.get_account_address (account_id)) ?? "You";
+                else self_name = (yield rpc.get_account_address (account_id)) ?? _("You");
             } catch (Error e) {
                 warning ("webxdc config: %s", e.message);
             }
@@ -422,7 +422,7 @@ namespace Dc.Webxdc {
                 if (!developer_tools && p == "index.html") {
                     var message = Markup.escape_text (e.message);
                     var html = """<!doctype html><meta charset="utf-8">
-<title>Webxdc app error</title>
+<title>%s</title>
 <style>
 html,body{height:100%%;margin:0}body{box-sizing:border-box;display:flex;
 align-items:center;justify-content:center;padding:24px;background:#292929;
@@ -431,9 +431,11 @@ width:min(520px,100%%);max-height:80vh;overflow:auto;border-radius:12px;
 padding:20px;background:#fff;box-shadow:0 12px 40px #0008}h1{font-size:18px;
 margin:0 0 10px}pre{white-space:pre-wrap;overflow-wrap:anywhere;
 font:12px ui-monospace,monospace}.hint{color:#555}
-</style><main class="dialog" role="alert"><h1>This Webxdc app could not start</h1>
-<pre>%s</pre><div class="hint">Enable Web developer tools in Settings → Advanced
-for full diagnostics.</div></main>""".printf (message);
+</style><main class="dialog" role="alert"><h1>%s</h1>
+<pre>%s</pre><div class="hint">%s</div></main>""".printf (
+                        Markup.escape_text (_("Webxdc app error")),
+                        Markup.escape_text (_("This Webxdc app could not start")),
+                        message, Markup.escape_text (error_diagnostics_hint ()));
                     deliver (token, html.data, "text/html");
                     return;
                 }
@@ -447,6 +449,10 @@ for full diagnostics.</div></main>""".printf (message);
             return Json.to_string (node, false);
         }
 
+        private static string error_diagnostics_hint () {
+            return _("Enable Web developer tools in Settings → Advanced for full diagnostics.");
+        }
+
         /* Without an inspector, a broken app would otherwise leave only a
            blank window and a warning in Parla's terminal log. Install this
            before the app's own code (webxdc.js is conventionally its first
@@ -455,8 +461,15 @@ for full diagnostics.</div></main>""".printf (message);
            apps still cannot create arbitrary modal-dialog spam. */
         private string runtime_error_reporter_js () {
             if (developer_tools) return "";
-            return """(function () {
-    'use strict';
+            string labels = "{\"heading\":%s,\"unknown\":%s,\"hint\":%s," +
+                "\"dismiss\":%s,\"loadFailed\":%s,\"rejected\":%s}";
+            labels = labels.printf (
+                js_str (_("This Webxdc app encountered an error")),
+                js_str (_("Unknown JavaScript error")),
+                js_str (error_diagnostics_hint ()), js_str (_("Dismiss")),
+                js_str (_("Failed to load: ")),
+                js_str (_("Unhandled promise rejection: ")));
+            return "(function () {\n    'use strict';\n    var labels = " + labels + ";\n" + """
     var reported = false;
     function text(value) {
         if (value instanceof Error) return value.stack || value.message;
@@ -479,18 +492,17 @@ for full diagnostics.</div></main>""".printf (message);
                 + 'max-height:80vh;overflow:auto;border-radius:12px;'
                 + 'padding:20px;background:#fff;box-shadow:0 12px 40px #0008';
             var heading = document.createElement('div');
-            heading.textContent = 'This Webxdc app encountered an error';
+            heading.textContent = labels.heading;
             heading.style.cssText = 'font-size:18px;font-weight:700;margin-bottom:10px';
             var details = document.createElement('pre');
-            details.textContent = message || 'Unknown JavaScript error';
+            details.textContent = message || labels.unknown;
             details.style.cssText = 'white-space:pre-wrap;overflow-wrap:anywhere;'
                 + 'margin:0 0 12px;font:12px ui-monospace,monospace';
             var hint = document.createElement('div');
-            hint.textContent = 'Enable Web developer tools in Settings → Advanced '
-                + 'for full diagnostics.';
+            hint.textContent = labels.hint;
             hint.style.cssText = 'margin-bottom:16px;color:#555';
             var close = document.createElement('button');
-            close.textContent = 'Dismiss';
+            close.textContent = labels.dismiss;
             close.style.cssText = 'float:right;padding:7px 14px';
             close.addEventListener('click', function () { shade.remove(); });
             box.append(heading, details, hint, close);
@@ -508,7 +520,7 @@ for full diagnostics.</div></main>""".printf (message);
             var tag = event.target.tagName || 'resource';
             var url = event.target.src || event.target.href || '';
             if (tag === 'SCRIPT')
-                show('Failed to load ' + tag.toLowerCase() + (url ? ': ' + url : ''));
+                show(labels.loadFailed + tag.toLowerCase() + (url ? ': ' + url : ''));
             return;
         }
         var where = event.filename
@@ -516,7 +528,7 @@ for full diagnostics.</div></main>""".printf (message);
         show(text(event.error || event.message) + where);
     }, true);
     window.addEventListener('unhandledrejection', function (event) {
-        show('Unhandled promise rejection: ' + text(event.reason));
+        show(labels.rejected + text(event.reason));
     });
 })();
 """;

@@ -1047,8 +1047,8 @@ namespace Dc {
                 if ("already running" in msg.down () || "accounts.lock" in msg.down ()) {
                     show_toast (_("Cannot connect - account store is already in use"));
                     empty_status.description =
-                        "The Delta Chat account store is already in use.\n\n" +
-                        "Close the other Delta Chat or Parla process, then restart this app.";
+                        _("The Delta Chat account store is already in use.\n\n" +
+                        "Close the other Delta Chat or Parla process, then restart this app.");
                     set_connection_status (false, _("Account store is already in use"));
                 } else {
                     show_toast (_("RPC server error: ") + msg);
@@ -1207,9 +1207,9 @@ namespace Dc {
 
             if (events != null && settings.notifications_enabled) {
                 string title = msg.sender_name ?? msg.sender_address
-                    ?? "New mention";
+                    ?? _("New mention");
                 string body = (msg.text != null && msg.text.length > 0)
-                    ? msg.text : "Mentioned you";
+                    ? msg.text : _("Mentioned you");
                 events.send_mention_notification (acct_id, chat_id,
                     "@ " + title, body);
             }
@@ -1308,9 +1308,9 @@ namespace Dc {
             if (settings.effective_rpc_server_source () == RpcServerSource.CUSTOM &&
                 settings.effective_rpc_server_path ().length > 0) {
                 description =
-                    "Configured path is missing or not executable:\n" +
+                    _("Configured path is missing or not executable:\n") +
                     Markup.escape_text (settings.effective_rpc_server_path ()) +
-                    (can_download ? "\n\nDownload the engine to use it instead." : "");
+                    (can_download ? _("\n\nDownload the engine to use it instead.") : "");
             } else if (can_download) {
                 icon_name = "parla-welcome";
                 title = _("Welcome to Parla");
@@ -1320,9 +1320,9 @@ namespace Dc {
             } else {
                 title = _("Delta Chat engine required");
                 description =
-                    "No prebuilt deltachat-rpc-server is available for this\n" +
+                    _("No prebuilt deltachat-rpc-server is available for this\n" +
                     "architecture. Install it manually (see docs/rpc-server.md)\n" +
-                    "or choose a binary in Settings.";
+                    "or choose a binary in Settings.");
             }
 
             Gtk.Widget child;
@@ -1451,7 +1451,7 @@ namespace Dc {
                 if (latest == null || current == null || latest == current) return;
 
                 var toast = new Adw.Toast (
-                    "Delta Chat engine update available: %s".printf (latest));
+                    _("Delta Chat engine update available: %s").printf (latest));
                 toast.timeout = 8;
                 toast.button_label = _("Update");
                 toast.button_clicked.connect (() => {
@@ -2122,7 +2122,7 @@ namespace Dc {
                                              RpcClient app_rpc,
                                              Message msg) {
             bool can_start = Webxdc.AVAILABLE && Webxdc.enabled ();
-            string app_name = msg.display_file_name ("App");
+            string app_name = msg.display_file_name (_("App"));
             if (app_name.down ().has_suffix (".xdc")) {
                 app_name = app_name.substring (0, app_name.length - 4);
             }
@@ -2298,9 +2298,11 @@ namespace Dc {
                offline) collapses into one account-wide group banner. */
             if (chat_ids.length > 3) {
                 string title = yield prefix_background_account (acct_id,
-                    _("%d new messages").printf (messages));
+                    ngettext ("%d new message", "%d new messages", messages)
+                        .printf (messages));
                 events.send_chat_notification (acct_id, 0, title,
-                    _("In %d chats").printf (chat_ids.length));
+                    ngettext ("In %d chat", "In %d chats", chat_ids.length)
+                        .printf (chat_ids.length));
                 return;
             }
 
@@ -2341,7 +2343,8 @@ namespace Dc {
             string title = chat_name ?? _("New message");
             string body = messages == 0 ? _("New reaction") : _("New message");
             if (messages > 1) {
-                body = _("%d new messages").printf (messages);
+                body = ngettext ("%d new message", "%d new messages", messages)
+                    .printf (messages);
             } else if (messages == 1 && show) {
                 try {
                     var msg = yield rpc.fetch_message_for (acct_id,
@@ -2646,10 +2649,10 @@ namespace Dc {
         }
 
         private const string[] ADD_PROFILE_METHODS = {
-            "contact-new-symbolic", "Create new profile", "Pick a chatmail relay and create a new account",
-            "phone-symbolic", "Import from another device", "Link to an existing profile on the same network",
-            "mail-message-new-symbolic", "Use classic email address", "Sign in with an existing email account",
-            "mail-attachment-symbolic", "Use invitation code", "Join via a dcaccount: link or QR code",
+            "contact-new-symbolic", N_("Create new profile"), N_("Pick a chatmail relay and create a new account"),
+            "phone-symbolic", N_("Import from another device"), N_("Link to an existing profile on the same network"),
+            "mail-message-new-symbolic", N_("Use classic email address"), N_("Sign in with an existing email account"),
+            "mail-attachment-symbolic", N_("Use invitation code"), N_("Join via a dcaccount: link or QR code"),
         };
 
         // Modal Adw.Dialog with a vertical box whose first child is a header
@@ -2706,8 +2709,8 @@ namespace Dc {
                                                      string title,
                                                      string subtitle) {
             var row = new Adw.ActionRow ();
-            row.title = title;
-            row.subtitle = subtitle;
+            row.title = _(title);
+            row.subtitle = _(subtitle);
             row.activatable = true;
             row.set_data<string> ("add-method", title);
 
@@ -3188,7 +3191,7 @@ namespace Dc {
             about.license_type = Gtk.License.GPL_3_0;
             about.website = Parla.AppData.WEBSITE;
             about.issue_url = Parla.AppData.ISSUE_URL;
-            about.comments = Parla.AppData.COMMENTS;
+            about.comments = _(Parla.AppData.COMMENTS);
             about.release_notes_version = Parla.VERSION;
             about.release_notes = Parla.AppData.release_notes ();
             about.present (this);
@@ -3985,7 +3988,7 @@ namespace Dc {
             var wheel_row = new Adw.ActionRow ();
             wheel_row.title = _("Change font size");
             var wheel_lbl = new Gtk.Label (
-                Platform.primary_shortcut_text ("Mouse Wheel"));
+                Platform.primary_shortcut_text (_("Mouse Wheel")));
             wheel_lbl.valign = Gtk.Align.CENTER;
             wheel_lbl.add_css_class ("dim-label");
             wheel_row.add_suffix (wheel_lbl);

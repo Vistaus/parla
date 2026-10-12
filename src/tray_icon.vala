@@ -154,9 +154,9 @@ namespace Dc {
         private string label_for (int32 id) {
             switch (id) {
             case ID_SHOW:
-                return window_visible ? "Minimize to tray" : "Show Parla";
-            case ID_NOTIFY: return "Notifications";
-            default: return "Quit";
+                return window_visible ? _("Minimize to tray") : _("Show Parla");
+            case ID_NOTIFY: return _("Notifications");
+            default: return _("Quit");
             }
         }
 

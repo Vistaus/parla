@@ -26,7 +26,7 @@ namespace Dc {
             this.actions = actions;
             this.msg = msg;
             this.reaction_roster = reaction_roster;
-            this.title = "Message Details";
+            this.title = _("Message Details");
             this.content_width = 480;
             this.content_height = 620;
 
@@ -91,7 +91,7 @@ namespace Dc {
             button.add_css_class ("flat");
             button.add_css_class ("message-details-sender");
             button.halign = Gtk.Align.FILL;
-            button.tooltip_text = "Show contact details";
+            button.tooltip_text = _("Show contact details");
             button.sensitive = sender_details_available ();
             button.clicked.connect (() => {
                 this.close ();
@@ -116,7 +116,7 @@ namespace Dc {
             labels.append (name_lbl);
 
             var sub = new Gtk.Label (address != null && address.length > 0
-                ? address : (msg.is_outgoing ? "Outgoing message" : "Incoming message"));
+                ? address : (msg.is_outgoing ? _("Outgoing message") : _("Incoming message")));
             sub.add_css_class ("dim-label");
             sub.halign = Gtk.Align.START;
             sub.xalign = 0;
@@ -131,7 +131,7 @@ namespace Dc {
 
         private Gtk.Widget build_edit_section () {
             var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 8);
-            box.append (heading ("Edit Message"));
+            box.append (heading (_("Edit Message")));
 
             edit_original_text = msg.text ?? "";
             edit_view = new Gtk.TextView ();
@@ -158,7 +158,7 @@ namespace Dc {
             edit_status_lbl.valign = Gtk.Align.CENTER;
             actions_row.append (edit_status_lbl);
 
-            save_edit_btn = new Gtk.Button.with_label ("Save");
+            save_edit_btn = new Gtk.Button.with_label (_("Save"));
             save_edit_btn.add_css_class ("suggested-action");
             save_edit_btn.clicked.connect (() => {
                 save_edit.begin ();
@@ -172,12 +172,12 @@ namespace Dc {
 
         private Gtk.Widget build_reactions_section () {
             var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 8);
-            box.append (heading ("Reactions"));
+            box.append (heading (_("Reactions")));
 
             var list = boxed_list ();
             var reactions = sorted_reactions ();
             if (reactions.length == 0) {
-                list.append (info_row ("No reactions", "Nobody has reacted to this message yet."));
+                list.append (info_row (_("No reactions"), _("Nobody has reacted to this message yet.")));
             } else {
                 for (int i = 0; i < reactions.length; i++) {
                     var reaction = reactions[i];
@@ -198,38 +198,38 @@ namespace Dc {
 
         private Gtk.Widget build_message_info_section () {
             var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 8);
-            box.append (heading ("Message"));
+            box.append (heading (_("Message")));
 
             var list = boxed_list ();
-            list.append (info_row ("Message ID", msg.id.to_string ()));
-            list.append (info_row ("Chat ID", msg.chat_id.to_string ()));
-            list.append (info_row ("Sent", format_full_timestamp (msg.timestamp)));
-            list.append (info_row ("Direction", msg.is_outgoing ? "Outgoing" : "Incoming"));
-            delivery_row = info_row ("Delivery", delivery_state ());
+            list.append (info_row (_("Message ID"), msg.id.to_string ()));
+            list.append (info_row (_("Chat ID"), msg.chat_id.to_string ()));
+            list.append (info_row (_("Sent"), format_full_timestamp (msg.timestamp)));
+            list.append (info_row (_("Direction"), msg.is_outgoing ? _("Outgoing") : _("Incoming")));
+            delivery_row = info_row (_("Delivery"), delivery_state ());
             list.append (delivery_row);
-            error_row = info_row ("Error", msg.error ?? "", 0);
+            error_row = info_row (_("Error"), msg.error ?? "", 0);
             error_row.visible = has_value (msg.error);
             list.append (error_row);
-            list.append (info_row ("Type", message_type ()));
-            list.append (info_row ("Flags", flags_text ()));
-            list.append (info_row ("Sender contact ID",
-                msg.sender_contact_id > 0 ? msg.sender_contact_id.to_string () : "Unknown"));
+            list.append (info_row (_("Type"), message_type ()));
+            list.append (info_row (_("Flags"), flags_text ()));
+            list.append (info_row (_("Sender contact ID"),
+                msg.sender_contact_id > 0 ? msg.sender_contact_id.to_string () : _("Unknown")));
 
             string? sender_addr = msg.is_outgoing ? rpc.self_email : msg.sender_address;
             if (has_value (sender_addr)) {
-                list.append (info_row ("Sender address", sender_addr));
+                list.append (info_row (_("Sender address"), sender_addr));
             }
 
             if (has_value (msg.override_sender_name)) {
-                list.append (info_row ("Override sender", msg.override_sender_name));
+                list.append (info_row (_("Override sender"), msg.override_sender_name));
             }
 
             if (has_value (msg.download_state)) {
-                list.append (info_row ("Download state", msg.download_state));
+                list.append (info_row (_("Download state"), download_state ()));
             }
 
             box.append (list);
-            retry_btn = new Gtk.Button.with_label ("Retry");
+            retry_btn = new Gtk.Button.with_label (_("Retry"));
             retry_btn.halign = Gtk.Align.START;
             retry_btn.visible = msg.can_retry;
             retry_btn.clicked.connect (() => { retry_message.begin (); });
@@ -241,7 +241,7 @@ namespace Dc {
             if (retry_running || !msg.can_retry) return;
             retry_running = true;
             retry_btn.sensitive = false;
-            retry_btn.label = "Retrying…";
+            retry_btn.label = _("Retrying…");
             var updated = yield actions.retry_message (msg.id);
             retry_running = false;
             if (dialog_closed) return;
@@ -249,29 +249,29 @@ namespace Dc {
             delivery_row.subtitle = delivery_state ();
             error_row.subtitle = msg.error ?? "";
             error_row.visible = has_value (msg.error);
-            retry_btn.label = "Retry";
+            retry_btn.label = _("Retry");
             retry_btn.visible = msg.can_retry;
             retry_btn.sensitive = msg.can_retry;
         }
 
         private Gtk.Widget build_attachment_section () {
             var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 8);
-            box.append (heading ("Attachment"));
+            box.append (heading (_("Attachment")));
 
             var list = boxed_list ();
             if (has_value (msg.file_name)) {
-                list.append (info_row ("File name", msg.file_name));
+                list.append (info_row (_("File name"), msg.file_name));
             }
             if (has_value (msg.file_mime)) {
-                list.append (info_row ("MIME type", msg.file_mime));
+                list.append (info_row (_("MIME type"), msg.file_mime));
             }
             if (msg.file_bytes > 0) {
-                list.append (info_row ("Size", format_bytes (msg.file_bytes)));
+                list.append (info_row (_("Size"), format_bytes (msg.file_bytes)));
             }
             if (has_value (msg.file_path)) {
-                list.append (info_row ("Local path", msg.file_path, 3));
-                list.append (info_row ("Local copy",
-                    msg.has_local_file ? "Available" : "Not downloaded"));
+                list.append (info_row (_("Local path"), msg.file_path, 3));
+                list.append (info_row (_("Local copy"),
+                    msg.has_local_file ? _("Available") : _("Not downloaded")));
             }
             box.append (list);
             return box;
@@ -279,18 +279,18 @@ namespace Dc {
 
         private Gtk.Widget build_quote_section () {
             var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 8);
-            box.append (heading ("Reply Context"));
+            box.append (heading (_("Reply Context")));
 
             var list = boxed_list ();
             if (msg.quote_msg_id > 0) {
-                list.append (info_row ("Quoted message ID",
+                list.append (info_row (_("Quoted message ID"),
                     msg.quote_msg_id.to_string ()));
             }
             if (has_value (msg.quote_sender_name)) {
-                list.append (info_row ("Quoted sender", msg.quote_sender_name));
+                list.append (info_row (_("Quoted sender"), msg.quote_sender_name));
             }
             if (has_value (msg.quote_text)) {
-                list.append (info_row ("Quoted text", msg.quote_text, 4));
+                list.append (info_row (_("Quoted text"), msg.quote_text, 4));
             }
             box.append (list);
             return box;
@@ -300,21 +300,21 @@ namespace Dc {
             var row = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 8);
             row.halign = Gtk.Align.END;
 
-            var delete_btn = new Gtk.Button.with_label ("Delete…");
+            var delete_btn = new Gtk.Button.with_label (_("Delete…"));
             delete_btn.add_css_class ("destructive-action");
             delete_btn.clicked.connect (() => {
                 confirm_delete_message.begin ();
             });
             row.append (delete_btn);
 
-            var forward_btn = new Gtk.Button.with_label ("Forward…");
+            var forward_btn = new Gtk.Button.with_label (_("Forward…"));
             forward_btn.clicked.connect (() => {
                 this.close ();
                 actions.start_forwarding (msg.id);
             });
             row.append (forward_btn);
 
-            var reply_btn = new Gtk.Button.with_label ("Reply");
+            var reply_btn = new Gtk.Button.with_label (_("Reply"));
             reply_btn.add_css_class ("suggested-action");
             reply_btn.clicked.connect (() => {
                 this.close ();
@@ -354,7 +354,7 @@ namespace Dc {
             var row = new Adw.ActionRow ();
             row.use_markup = false;
             row.title = title;
-            row.subtitle = has_value (subtitle) ? subtitle : "None";
+            row.subtitle = has_value (subtitle) ? subtitle : _("None");
             row.subtitle_lines = subtitle_lines;
             return row;
         }
@@ -362,9 +362,8 @@ namespace Dc {
         private Adw.ActionRow reaction_count_row (MessageReaction reaction) {
             var row = new Adw.ActionRow ();
             row.use_markup = false;
-            row.title = reaction.count == 1
-                ? "1 reaction"
-                : "%d reactions".printf (reaction.count);
+            row.title = ngettext ("%d reaction", "%d reactions",
+                reaction.count).printf (reaction.count);
 
             var emoji = new Gtk.Label (reaction.emoji);
             emoji.add_css_class ("message-details-reaction-emoji");
@@ -440,7 +439,7 @@ namespace Dc {
             if (contact_id == 1) {
                 return MessageRow.self_display_name != null
                     && MessageRow.self_display_name.length > 0
-                    ? MessageRow.self_display_name : "You";
+                    ? MessageRow.self_display_name : _("You");
             }
 
             MentionMember? member = reaction_roster != null
@@ -459,8 +458,8 @@ namespace Dc {
                 return name;
             }
 
-            return contact_id > 0 ? "Contact %d".printf (contact_id)
-                                  : "Unknown user";
+            return contact_id > 0 ? _("Contact %d").printf (contact_id)
+                                  : _("Unknown user");
         }
 
         private void sender_identity (out string name, out string? address,
@@ -468,7 +467,7 @@ namespace Dc {
             if (msg.is_outgoing) {
                 name = MessageRow.self_display_name != null
                     && MessageRow.self_display_name.length > 0
-                    ? MessageRow.self_display_name : "You";
+                    ? MessageRow.self_display_name : _("You");
                 address = rpc.self_email;
                 avatar_path = MessageRow.self_avatar_path;
                 return;
@@ -481,7 +480,7 @@ namespace Dc {
             } else if (has_value (msg.sender_address)) {
                 name = msg.sender_address;
             } else {
-                name = "Unknown sender";
+                name = _("Unknown sender");
             }
             address = msg.sender_address;
             avatar_path = msg.sender_avatar_path;
@@ -508,7 +507,7 @@ namespace Dc {
             if (text.strip ().length == 0 || text == edit_original_text) return;
 
             save_edit_btn.sensitive = false;
-            if (edit_status_lbl != null) edit_status_lbl.label = "Saving…";
+            if (edit_status_lbl != null) edit_status_lbl.label = _("Saving…");
 
             try {
                 yield rpc.send_edit_request (msg.id, text);
@@ -516,13 +515,13 @@ namespace Dc {
                 msg.is_edited = true;
                 yield actions.update_row (msg.id);
                 edit_original_text = text;
-                if (edit_status_lbl != null) edit_status_lbl.label = "Saved";
+                if (edit_status_lbl != null) edit_status_lbl.label = _("Saved");
                 update_edit_button ();
             } catch (Error e) {
                 if (edit_status_lbl != null) {
-                    edit_status_lbl.label = "Edit failed: " + e.message;
+                    edit_status_lbl.label = _("Edit failed: ") + e.message;
                 }
-                window.show_toast ("Edit failed: " + e.message);
+                window.show_toast (_("Edit failed: ") + e.message);
                 update_edit_button ();
             }
         }
@@ -537,7 +536,7 @@ namespace Dc {
                     window.select_chat_by_id (chat_id);
                 }
             } catch (Error e) {
-                window.show_toast ("Could not open chat: " + e.message);
+                window.show_toast (_("Could not open chat: ") + e.message);
             }
         }
 
@@ -558,41 +557,51 @@ namespace Dc {
         }
 
         private string format_full_timestamp (int64 ts) {
-            if (ts <= 0) return "Unknown";
+            if (ts <= 0) return _("Unknown");
             var dt = new DateTime.from_unix_local (ts);
             return "%s (%s)".printf (dt.format ("%Y-%m-%d %H:%M:%S"),
                 ts.to_string ());
         }
 
         private string delivery_state () {
-            if (!msg.is_outgoing) return "Received";
-            if (msg.is_failed) return "Failed";
-            if (msg.is_read) return "Read";
-            if (msg.is_delivered) return "Delivered";
-            if (msg.is_pending) return "Pending";
-            if (msg.state == MessageState.OUT_DRAFT) return "Draft";
-            return msg.state > 0 ? "State %d".printf (msg.state) : "Unknown";
+            if (!msg.is_outgoing) return _("Received");
+            if (msg.is_failed) return _("Failed");
+            if (msg.is_read) return _("Read");
+            if (msg.is_delivered) return _("Delivered");
+            if (msg.is_pending) return _("Pending");
+            if (msg.state == MessageState.OUT_DRAFT) return _("Draft");
+            return msg.state > 0 ? _("State %d").printf (msg.state) : _("Unknown");
+        }
+
+        private string download_state () {
+            switch (msg.download_state) {
+            case "Done": return _("Downloaded");
+            case "Available": return _("Not downloaded");
+            case "InProgress": return _("Downloading…");
+            case "Failure": return _("Download failed");
+            default: return msg.download_state;
+            }
         }
 
         private string message_type () {
-            if (msg.is_info) return "Info";
+            if (msg.is_info) return _("Info");
             if (has_value (msg.view_type)) return msg.view_type;
-            if (msg.is_image_file ()) return "Image";
-            if (msg.is_video_file ()) return "Video";
-            if (msg.is_audio_file ()) return "Audio";
-            if (msg.has_file) return "File";
-            return "Text";
+            if (msg.is_image_file ()) return _("Image");
+            if (msg.is_video_file ()) return _("Video");
+            if (msg.is_audio_file ()) return _("Audio");
+            if (msg.has_file) return _("File");
+            return _("Text");
         }
 
         private string flags_text () {
             string[] flags = {};
-            if (msg.is_forwarded) flags += "Forwarded";
-            if (msg.is_edited) flags += "Edited";
-            if (msg.is_pinned) flags += "Pinned";
-            if (msg.is_info) flags += "Info";
+            if (msg.is_forwarded) flags += _("Forwarded");
+            if (msg.is_edited) flags += _("Edited");
+            if (msg.is_pinned) flags += _("Pinned");
+            if (msg.is_info) flags += _("Info");
             if (msg.has_html) flags += "HTML";
-            if (msg.has_full_message_action) flags += "Full message action";
-            return flags.length == 0 ? "None" : string.joinv (", ", flags);
+            if (msg.has_full_message_action) flags += _("Full message action");
+            return flags.length == 0 ? _("None") : string.joinv (", ", flags);
         }
 
         private static string format_bytes (int64 bytes) {

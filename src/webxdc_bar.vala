@@ -115,7 +115,7 @@ namespace Dc {
             if (info.icon != null) icon.paintable = info.icon;
             else icon.icon_name = "application-x-executable-symbolic";
 
-            var name_lbl = new Gtk.Label (info.name ?? "Webxdc app");
+            var name_lbl = new Gtk.Label (info.name ?? _("Webxdc app"));
             name_lbl.halign = Gtk.Align.START;
             name_lbl.ellipsize = Pango.EllipsizeMode.END;
             name_lbl.max_width_chars = 30;
@@ -129,19 +129,19 @@ namespace Dc {
             name_box.append (icon);
             name_box.append (name_lbl);
             name_btn.child = name_box;
-            name_btn.tooltip_text = "Raise app window";
+            name_btn.tooltip_text = _("Raise app window");
             name_btn.clicked.connect (() => { Webxdc.present_app (msg_id); });
             box.append (name_btn);
 
             var minimize = bar_button ("window-minimize-symbolic",
-                                       "Minimize or restore app window");
+                                       _("Minimize or restore app window"));
             minimize.clicked.connect (() => {
                 Webxdc.minimize_app (msg_id);
             });
             box.append (minimize);
 
             var stop = bar_button ("media-playback-stop-symbolic",
-                                   "Stop app");
+                                   _("Stop app"));
             stop.clicked.connect (() => {
                 Webxdc.stop_app (msg_id);
             });
@@ -168,23 +168,23 @@ namespace Dc {
             var popover = popover_menu (parent, x, y, out vbox);
 
             var view_btn = new PopoverButton (popover,
-                                              "View in conversation");
+                                              _("View in conversation"));
             view_btn.selected.connect (() => { scroll_requested (msg_id); });
             vbox.append (view_btn);
 
-            var forward_btn = new PopoverButton (popover, "Forward…");
+            var forward_btn = new PopoverButton (popover, _("Forward…"));
             forward_btn.selected.connect (() => {
                 forward_requested (msg_id);
             });
             vbox.append (forward_btn);
 
-            var save_btn = new PopoverButton (popover, "Save to disk…");
+            var save_btn = new PopoverButton (popover, _("Save to disk…"));
             save_btn.selected.connect (() => { save_requested (msg_id); });
             vbox.append (save_btn);
 
             if (pinned != null) {
                 var pin_btn = new PopoverButton (popover,
-                    pinned.is_pinned (msg_id) ? "Unpin" : "Pin");
+                    pinned.is_pinned (msg_id) ? _("Unpin") : _("Pin"));
                 pin_btn.selected.connect (() => {
                     pinned.toggle_pin.begin (msg_id);
                 });
@@ -193,7 +193,7 @@ namespace Dc {
 
             vbox.append (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
 
-            var stop_btn = new PopoverButton (popover, "Stop app", true);
+            var stop_btn = new PopoverButton (popover, _("Stop app"), true);
             stop_btn.selected.connect (() => { Webxdc.stop_app (msg_id); });
             vbox.append (stop_btn);
 

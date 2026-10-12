@@ -433,7 +433,7 @@ namespace Dc {
                 li.activatable = false;
                 li.focusable = true;
 #if A11Y
-                li.accessible_label = (unread_start ? "Unread messages. " : "")
+                li.accessible_label = (unread_start ? _("Unread messages. ") : "")
                     + MessageRow.accessible_summary (msg);
 #endif
                 flush_pending_seen ();

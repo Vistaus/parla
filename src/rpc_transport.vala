@@ -99,7 +99,7 @@ namespace Dc {
                 err_pipe = process.get_stderr_pipe ();
 #endif
             } catch (Error e) {
-                finish_generation (generation, "RPC server failed to start", false);
+                finish_generation (generation, _("RPC server failed to start"), false);
                 throw e;
             }
 
@@ -108,8 +108,8 @@ namespace Dc {
             var connection_err = err_pipe;
             if (connection_reader == null || connection_writer == null ||
                 connection_err == null) {
-                finish_generation (generation, "RPC server pipes are unavailable", false);
-                throw new IOError.NOT_CONNECTED ("RPC server pipes are unavailable");
+                finish_generation (generation, _("RPC server pipes are unavailable"), false);
+                throw new IOError.NOT_CONNECTED (_("RPC server pipes are unavailable"));
             }
             connection_reader.set_newline_type (DataStreamNewlineType.LF);
 
@@ -123,7 +123,7 @@ namespace Dc {
                 if (!generation_is_active (generation)) return false;
                 timed_out = true;
                 finish_generation (
-                    generation, "RPC server is not responding", false);
+                    generation, _("RPC server is not responding"), false);
                 return false;
             });
             try {
@@ -131,12 +131,12 @@ namespace Dc {
                 if (!timed_out) Source.remove (handshake_timeout);
                 if (!generation_is_active (generation)) {
                     throw new IOError.NOT_CONNECTED (
-                        "RPC connection changed during startup");
+                        _("RPC connection changed during startup"));
                 }
             } catch (Error e) {
                 if (!timed_out) Source.remove (handshake_timeout);
                 if (generation_is_active (generation)) {
-                    finish_generation (generation, "RPC server failed to start", false);
+                    finish_generation (generation, _("RPC server failed to start"), false);
                 }
                 yield nap (200);
                 if (last_stderr.length > 0) {
@@ -157,7 +157,7 @@ namespace Dc {
 
         public void stop () {
             finish_generation (
-                connection_generation, "RPC client stopped", false);
+                connection_generation, _("RPC client stopped"), false);
         }
 
         private void finish_generation (uint generation, string reason,
@@ -199,7 +199,7 @@ namespace Dc {
             var cancellable = io_cancellable;
             if (connection_writer == null || reader == null ||
                 cancellable == null || !generation_is_active (generation)) {
-                throw new IOError.NOT_CONNECTED ("RPC client not connected");
+                throw new IOError.NOT_CONNECTED (_("RPC client not connected"));
             }
 
             int id = next_id++;
@@ -237,7 +237,7 @@ namespace Dc {
 
         private async void read_loop (uint generation, DataInputStream stream,
                                       Cancellable cancellable) {
-            string reason = "RPC server closed";
+            string reason = _("RPC server closed");
             try {
                 while (generation_is_active (generation)) {
                     size_t len;
@@ -265,7 +265,7 @@ namespace Dc {
                         var err = obj.get_object_member ("error");
                         pc.error_msg = err.has_member ("message")
                             ? err.get_string_member ("message")
-                            : "Unknown RPC error";
+                            : _("Unknown RPC error");
                     } else if (obj.has_member ("result")) {
                         var result_member = obj.get_member ("result");
                         pc.result = (result_member != null) ? result_member.copy () : null;
@@ -277,7 +277,7 @@ namespace Dc {
                 if (!generation_is_active (generation) ||
                     e is IOError.CANCELLED) return;
                 warning ("RPC read loop error: %s", e.message);
-                reason = "RPC read failed: " + e.message;
+                reason = _("RPC read failed: ") + e.message;
             }
 
             if (generation_is_active (generation)) {
@@ -305,7 +305,7 @@ namespace Dc {
             var request = new PendingWrite (
                 this, pc, stream, cancellable, line);
             if (write_pool == null) {
-                fail_write (request, "RPC writer is unavailable");
+                fail_write (request, _("RPC writer is unavailable"));
                 return;
             }
 
@@ -323,25 +323,25 @@ namespace Dc {
                 write_pool.add (request);
             } catch (Error e) {
                 request.discard_completion ();
-                fail_write (request, "RPC writer failed: " + e.message);
+                fail_write (request, _("RPC writer failed: ") + e.message);
             }
         }
 
         private static void perform_write (owned PendingWrite request) {
             request.acquire_in_worker ();
             if (request.cancellable.is_cancelled ()) {
-                request.error_msg = "RPC connection changed";
+                request.error_msg = _("RPC connection changed");
             } else {
                 try {
                     size_t written;
                     bool complete = request.stream.write_all (
                         request.line.data, out written, request.cancellable);
                     if (!complete || written != request.line.length) {
-                        throw new IOError.FAILED ("Incomplete RPC request write");
+                        throw new IOError.FAILED (_("Incomplete RPC request write"));
                     }
                     request.stream.flush (request.cancellable);
                 } catch (Error e) {
-                    request.error_msg = "RPC write failed: " + e.message;
+                    request.error_msg = _("RPC write failed: ") + e.message;
                 }
             }
 
@@ -357,7 +357,7 @@ namespace Dc {
                 finish_generation (request.pending.generation,
                                    request.error_msg, true);
             } else {
-                fail_write (request, "RPC connection changed");
+                fail_write (request, _("RPC connection changed"));
             }
         }
 

@@ -441,7 +441,7 @@ namespace Dc {
         chooser.title = title;
         var filter = new Gtk.FileFilter ();
         filter.add_mime_type ("image/*");
-        filter.name = "Images";
+        filter.name = _("Images");
         var filters = new ListStore (typeof (Gtk.FileFilter));
         filters.append (filter);
         chooser.filters = filters;

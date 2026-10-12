@@ -78,7 +78,7 @@ namespace Dc {
                 return;
             }
             if (rpc == null) {
-                operation_failed ("Failed to update pin: RPC is not connected");
+                operation_failed (_("Failed to update pin: RPC is not connected"));
                 return;
             }
 
@@ -103,7 +103,7 @@ namespace Dc {
                     toggle_local_pin (msg_id);
                     yield update_bar ();
                 } else {
-                    operation_failed ("Failed to update pin: " + e.message);
+                    operation_failed (_("Failed to update pin: ") + e.message);
                 }
             }
         }
@@ -130,7 +130,7 @@ namespace Dc {
                 var m = find_message (message_store, pin_id);
                 if (m != null) {
                     text = m.text;
-                    sender = m.is_outgoing ? "You" : (m.sender_name ?? "");
+                    sender = m.is_outgoing ? _("You") : (m.sender_name ?? "");
                 }
 
                 /* Fetch from RPC if not in the loaded batch */
@@ -139,7 +139,7 @@ namespace Dc {
                         var fetched = yield rpc.fetch_message (pin_id);
                         if (fetched != null) {
                             text = fetched.text;
-                            sender = fetched.is_outgoing ? "You" : (fetched.sender_name ?? "");
+                            sender = fetched.is_outgoing ? _("You") : (fetched.sender_name ?? "");
                         }
                     } catch (Error e) { /* skip on error */ }
                 }
@@ -166,7 +166,7 @@ namespace Dc {
                     text_box.append (sender_lbl);
                 }
 
-                var text_lbl = new Gtk.Label (text ?? "(attachment)");
+                var text_lbl = new Gtk.Label (text ?? _("(attachment)"));
                 text_lbl.halign = Gtk.Align.START;
                 text_lbl.ellipsize = Pango.EllipsizeMode.END;
                 text_lbl.max_width_chars = 50;
@@ -190,7 +190,7 @@ namespace Dc {
                 unpin_btn.add_css_class ("flat");
                 unpin_btn.add_css_class ("circular");
                 unpin_btn.valign = Gtk.Align.CENTER;
-                unpin_btn.tooltip_text = "Unpin";
+                unpin_btn.tooltip_text = _("Unpin");
                 unpin_btn.clicked.connect (() => {
                     toggle_pin.begin (captured_id);
                 });

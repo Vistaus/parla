@@ -92,8 +92,7 @@ namespace Dc {
             public MediaFilter filter;
             public string empty_title;
             public string empty_description;
-            /* "…" is substituted with the item kind in save-all texts. */
-            public string kind_plural;
+            public string save_all_tooltip;
             /* Overflow tabs live in the "More" menu. */
             public bool overflow;
             public GLib.ListStore store = new GLib.ListStore (typeof (Message));
@@ -114,7 +113,7 @@ namespace Dc {
             this.rpc = rpc;
             this.chat_id = chat_id;
 
-            title = "Apps and Media";
+            title = _("Apps and Media");
             content_width = 860;
             content_height = 600;
             /* Do not force the dialog beyond small window bounds. */
@@ -137,65 +136,65 @@ namespace Dc {
 
             tabs = {
                 new GalleryTab () {
-                    key = "images", title = "Images",
+                    key = "images", title = _("Images"),
                     icon_name = "image-x-generic-symbolic",
                     types = { "Gif", "Image" },
                     filter = MediaFilter.NO_STICKERS,
-                    empty_title = "No Images",
-                    empty_description = "Images shared in this chat will appear here",
-                    kind_plural = "images"
+                    empty_title = _("No Images"),
+                    empty_description = _("Images shared in this chat will appear here"),
+                    save_all_tooltip = _("Save all images to a folder…")
                 },
                 new GalleryTab () {
-                    key = "stickers", title = "Stickers",
+                    key = "stickers", title = _("Stickers"),
                     icon_name = "sticker-symbolic",
                     types = { "Sticker" },
                     filter = MediaFilter.STICKERS_ONLY,
-                    empty_title = "No Stickers",
-                    empty_description = "Stickers shared in this chat will appear here",
-                    kind_plural = "stickers",
+                    empty_title = _("No Stickers"),
+                    empty_description = _("Stickers shared in this chat will appear here"),
+                    save_all_tooltip = _("Save all stickers to a folder…"),
                     overflow = true
                 },
                 new GalleryTab () {
-                    key = "video", title = "Video",
+                    key = "video", title = _("Video"),
                     icon_name = "video-x-generic-symbolic",
                     types = { "Video" },
-                    empty_title = "No Videos",
-                    empty_description = "Videos shared in this chat will appear here",
-                    kind_plural = "videos"
+                    empty_title = _("No Videos"),
+                    empty_description = _("Videos shared in this chat will appear here"),
+                    save_all_tooltip = _("Save all videos to a folder…")
                 },
                 new GalleryTab () {
-                    key = "audio", title = "Audio",
+                    key = "audio", title = _("Audio"),
                     icon_name = "audio-x-generic-symbolic",
                     types = { "Audio", "Voice" },
-                    empty_title = "No Audio",
-                    empty_description = "Audio files and voice messages will appear here",
-                    kind_plural = "audio files"
+                    empty_title = _("No Audio"),
+                    empty_description = _("Audio files and voice messages will appear here"),
+                    save_all_tooltip = _("Save all audio files to a folder…")
                 },
                 new GalleryTab () {
-                    key = "files", title = "Files",
+                    key = "files", title = _("Files"),
                     icon_name = "text-x-generic-symbolic",
                     types = { "File" },
-                    empty_title = "No Files",
-                    empty_description = "Documents and other files shared in this chat will appear here",
-                    kind_plural = "files",
+                    empty_title = _("No Files"),
+                    empty_description = _("Documents and other files shared in this chat will appear here"),
+                    save_all_tooltip = _("Save all files to a folder…"),
                     overflow = true
                 },
                 new GalleryTab () {
-                    key = "links", title = "Links",
+                    key = "links", title = _("Links"),
                     icon_name = "web-browser-symbolic",
                     types = {},
-                    empty_title = "No Links",
-                    empty_description = "Links shared in this chat will appear here",
-                    kind_plural = "links",
+                    empty_title = _("No Links"),
+                    empty_description = _("Links shared in this chat will appear here"),
+                    save_all_tooltip = _("Save all to a folder…"),
                     overflow = true
                 },
                 new GalleryTab () {
-                    key = "apps", title = "Apps",
+                    key = "apps", title = _("Apps"),
                     icon_name = "application-x-executable-symbolic",
                     types = { "Webxdc" },
-                    empty_title = "No Apps",
-                    empty_description = "Delta Chat apps shared in this chat will appear here",
-                    kind_plural = "apps",
+                    empty_title = _("No Apps"),
+                    empty_description = _("Delta Chat apps shared in this chat will appear here"),
+                    save_all_tooltip = _("Save all apps to a folder…"),
                     overflow = true
                 },
             };
@@ -214,7 +213,7 @@ namespace Dc {
             }
 
             var header = new Adw.HeaderBar ();
-            header.title_widget = new Adw.WindowTitle ("Apps and Media",
+            header.title_widget = new Adw.WindowTitle (_("Apps and Media"),
                 chat_name ?? "");
 
             save_all_btn = new Gtk.Button.from_icon_name ("document-save-symbolic");
@@ -248,7 +247,7 @@ namespace Dc {
             more_popover.child = more_list;
 
             var more_icon = new Gtk.Image.from_icon_name ("view-more-symbolic");
-            var more_label = new Gtk.Label ("More");
+            var more_label = new Gtk.Label (_("More"));
             more_label.add_css_class ("caption");
             var more_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 3);
             more_box.valign = Gtk.Align.CENTER;
@@ -274,7 +273,7 @@ namespace Dc {
 
             /* Two rows so the bar fits the narrow dialog floor: Cancel and
                the count on top, the actions sharing the width below. */
-            var cancel_selection = new Gtk.Button.with_label ("Cancel");
+            var cancel_selection = new Gtk.Button.with_label (_("Cancel"));
             cancel_selection.clicked.connect (() => { exit_selection_mode (); });
 
             selection_label = new Gtk.Label ("");
@@ -283,15 +282,15 @@ namespace Dc {
             selection_top.start_widget = cancel_selection;
             selection_top.center_widget = selection_label;
 
-            forward_sel_btn = new Gtk.Button.with_label ("Forward…");
+            forward_sel_btn = new Gtk.Button.with_label (_("Forward…"));
             forward_sel_btn.add_css_class ("suggested-action");
             forward_sel_btn.clicked.connect (() => { forward_selection (); });
 
-            save_sel_btn = new Gtk.Button.with_label ("Save…");
+            save_sel_btn = new Gtk.Button.with_label (_("Save…"));
             save_sel_btn.clicked.connect (() => { save_selection (); });
 
-            delete_sel_btn = new Gtk.Button.with_label ("Delete…");
-            delete_sel_btn.tooltip_text = "Delete selected messages and their attachments";
+            delete_sel_btn = new Gtk.Button.with_label (_("Delete…"));
+            delete_sel_btn.tooltip_text = _("Delete selected messages and their attachments");
             delete_sel_btn.add_css_class ("destructive-action");
             delete_sel_btn.clicked.connect (() => { delete_selection (); });
 
@@ -506,7 +505,8 @@ namespace Dc {
             if (selection_mode) selection_bar.visible = true;
             switcher_bar.visible = !selection_mode;
             selection_revealer.reveal_child = selection_mode;
-            selection_label.label = "%u selected".printf (count);
+            selection_label.label = ngettext ("%u message selected",
+                "%u messages selected", count).printf (count);
             forward_sel_btn.sensitive = count > 0;
             save_sel_btn.sensitive = count > 0;
             delete_sel_btn.sensitive = count > 0;
@@ -666,7 +666,7 @@ namespace Dc {
                 }
             } catch (Error e) {
                 if (!is_open) return;
-                toast ("Could not load media: " + e.message);
+                toast (_("Could not load media: ") + e.message);
             }
             if (tab.store.get_n_items () == 0)
                 tab.stack.visible_child_name = "empty";
@@ -916,7 +916,7 @@ namespace Dc {
         /** False (with a toast) when the attachment is not downloaded. */
         private bool ensure_local_file (Message m) {
             if (m.has_local_file) return true;
-            toast ("File not available");
+            toast (_("File not available"));
             return false;
         }
 
@@ -1047,7 +1047,7 @@ namespace Dc {
                     play_btn.add_css_class ("circular");
                     play_btn.add_css_class ("flat");
                     play_btn.valign = Gtk.Align.CENTER;
-                    play_btn.tooltip_text = "Play";
+                    play_btn.tooltip_text = _("Play");
                     play_btn.clicked.connect (() => {
                         if (msg != null) dialog.toggle_audio (msg);
                     });
@@ -1065,7 +1065,7 @@ namespace Dc {
                 generation++;
                 update_selection_visuals ();
 
-                string sender = m.is_outgoing ? "You"
+                string sender = m.is_outgoing ? _("You")
                     : (m.override_sender_name ?? m.sender_name ?? "");
                 string when = format_date_time (m.timestamp);
                 string meta = sender.length > 0
@@ -1079,7 +1079,7 @@ namespace Dc {
                         ? "audio-input-microphone-symbolic"
                         : "audio-x-generic-symbolic";
                     title_label.label = voice
-                        ? "Voice message" : m.display_file_name ("Audio");
+                        ? _("Voice message") : m.display_file_name (_("Audio"));
                     subtitle_label.label = meta;
                     var playback = AudioPlayback.shared ();
                     playing_handler = playback.notify["playing"].connect (
@@ -1098,7 +1098,7 @@ namespace Dc {
                     var links = LinkCleaner.find_urls (m.text ?? "");
                     string link = links.length > 0 ? links[0] : "";
                     title_label.label = links.length > 1
-                        ? "%s (+%d more)".printf (link, links.length - 1)
+                        ? _("%s (+%d more)").printf (link, links.length - 1)
                         : link;
                     tooltip_text = link;
                     subtitle_label.label = meta;
@@ -1154,7 +1154,7 @@ namespace Dc {
                 play_btn.icon_name = this_playing
                     ? "media-playback-pause-symbolic"
                     : "media-playback-start-symbolic";
-                play_btn.tooltip_text = this_playing ? "Pause" : "Play";
+                play_btn.tooltip_text = this_playing ? _("Pause") : _("Play");
             }
 
             private static GLib.Icon file_type_icon (Message m) {
@@ -1171,7 +1171,7 @@ namespace Dc {
             }
 
             private static string app_display_name (Message m) {
-                string name = m.display_file_name ("App");
+                string name = m.display_file_name (_("App"));
                 if (name.down ().has_suffix (".xdc")) {
                     name = name[0 : name.length - 4];
                 }
@@ -1208,7 +1208,7 @@ namespace Dc {
                     launcher.launch.end (res);
                 } catch (Error e) {
                     if (!is_dialog_dismissal (e))
-                        toast ("Could not open link: " + e.message);
+                        toast (_("Could not open link: ") + e.message);
                 }
             });
         }
@@ -1233,7 +1233,7 @@ namespace Dc {
                     launcher.launch.end (res);
                 } catch (Error e) {
                     if (!is_dialog_dismissal (e))
-                        toast ("Could not open file: " + e.message);
+                        toast (_("Could not open file: ") + e.message);
                 }
             });
         }
@@ -1300,13 +1300,13 @@ namespace Dc {
                 var links = LinkCleaner.find_urls (m.text ?? "");
                 if (links.length > 0) {
                     string link0 = links[0];
-                    var open_btn = new PopoverButton (popover, "Open Link");
+                    var open_btn = new PopoverButton (popover, _("Open Link"));
                     open_btn.selected.connect (() => open_link (link0));
                     vbox.append (open_btn);
-                    var copy_btn = new PopoverButton (popover, "Copy Link");
+                    var copy_btn = new PopoverButton (popover, _("Copy Link"));
                     copy_btn.selected.connect (() => {
                         get_clipboard ().set_text (link0);
-                        toast ("Link copied");
+                        toast (_("Link copied"));
                     });
                     vbox.append (copy_btn);
                 }
@@ -1315,25 +1315,25 @@ namespace Dc {
             if (m.has_local_file) {
                 string fpath = m.file_path;
                 string? fname = m.file_name;
-                var save_btn = new PopoverButton (popover, "Save As…");
+                var save_btn = new PopoverButton (popover, _("Save As…"));
                 save_btn.selected.connect (() =>
                     app_window.save_attachment.begin (fpath, fname));
                 vbox.append (save_btn);
             }
 
             int msg_id = m.id;
-            var forward_btn = new PopoverButton (popover, "Forward…");
+            var forward_btn = new PopoverButton (popover, _("Forward…"));
             forward_btn.selected.connect (() =>
                 MessageActions.forward_with_picker (
                     app_window, rpc, new int[] { msg_id }));
             vbox.append (forward_btn);
 
-            var select_btn = new PopoverButton (popover, "Select…");
+            var select_btn = new PopoverButton (popover, _("Select…"));
             select_btn.selected.connect (() => enter_selection_mode (msg_id));
             vbox.append (select_btn);
 
             var view_btn = new PopoverButton (
-                popover, "View in Conversation");
+                popover, _("View in Conversation"));
             view_btn.selected.connect (() => {
                 /* Each closing dialog restores the window focus it saved
                    when presented, and such a focus shift can scroll the
@@ -1361,7 +1361,7 @@ namespace Dc {
             /* Collect sticker attachments into a local pack */
             if (m.is_sticker_file () && m.has_local_file) {
                 string spath = m.file_path;
-                var sticker_btn = new PopoverButton (popover, "Add Sticker…");
+                var sticker_btn = new PopoverButton (popover, _("Add Sticker…"));
                 sticker_btn.selected.connect (() =>
                     StickerManagerDialog.prompt_add_sticker (app_window, spath));
                 vbox.append (sticker_btn);
@@ -1369,7 +1369,7 @@ namespace Dc {
 
             vbox.append (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
 
-            var delete_btn = new PopoverButton (popover, "Delete Message…", true);
+            var delete_btn = new PopoverButton (popover, _("Delete Message…"), true);
             delete_btn.selected.connect (() =>
                 confirm_delete_ids.begin ({ msg_id }));
             vbox.append (delete_btn);
@@ -1401,10 +1401,10 @@ namespace Dc {
                         tab.stack.visible_child_name = "empty";
                 }
                 app_window.request_chat_messages_reload (chat_id);
-                toast (ids.length == 1 ? "Message deleted"
-                       : "%d messages deleted".printf (ids.length));
+                toast (ngettext ("%d message deleted", "%d messages deleted",
+                    ids.length).printf (ids.length));
             } catch (Error e) {
-                toast ("Delete failed: " + e.message);
+                toast (_("Delete failed: ") + e.message);
             }
             if (selection_mode && selected_ids.size () == 0)
                 exit_selection_mode ();
@@ -1423,8 +1423,8 @@ namespace Dc {
                 && tab.store.get_n_items () > 0;
             save_all_btn.sensitive = has_items;
             save_all_btn.tooltip_text = tab != null
-                ? "Save all %s to a folder…".printf (tab.kind_plural)
-                : "Save all to a folder…";
+                ? tab.save_all_tooltip
+                : _("Save all to a folder…");
         }
 
         private void on_save_all_clicked () {
@@ -1450,11 +1450,11 @@ namespace Dc {
                 else skipped++;
             }
             if (items.length == 0) {
-                toast ("No downloaded files to save");
+                toast (_("No downloaded files to save"));
                 return;
             }
             var chooser = new Gtk.FileDialog ();
-            chooser.title = "Select Folder";
+            chooser.title = _("Select Folder");
             chooser.select_folder.begin (app_window, null, (o, res) => {
                 try {
                     var folder = chooser.select_folder.end (res);
@@ -1463,7 +1463,7 @@ namespace Dc {
                     save_files_to_folder.begin (items, skipped, folder);
                 } catch (Error e) {
                     if (!is_dialog_dismissal (e))
-                        toast ("Folder selection failed: " + e.message);
+                        toast (_("Folder selection failed: ") + e.message);
                 }
             });
         }
@@ -1482,9 +1482,9 @@ namespace Dc {
             pbox.append (progress);
             pbox.append (file_label);
 
-            var alert = new Adw.AlertDialog ("Saving Files", null);
+            var alert = new Adw.AlertDialog (_("Saving Files"), null);
             alert.extra_child = pbox;
-            alert.add_response ("cancel", "Cancel");
+            alert.add_response ("cancel", _("Cancel"));
             alert.close_response = "cancel";
 
             var cancellable = new Cancellable ();
@@ -1502,7 +1502,7 @@ namespace Dc {
                 string name = m.display_file_name (
                     Path.get_basename (m.file_path));
                 progress.fraction = (double) i / items.length;
-                progress.text = "%d of %d".printf (i + 1, items.length);
+                progress.text = _("%d of %d").printf (i + 1, items.length);
                 progress.show_text = true;
                 file_label.label = name;
                 try {
@@ -1523,13 +1523,13 @@ namespace Dc {
 
             string summary;
             if (cancellable.is_cancelled ()) {
-                summary = "Saving cancelled — %d file%s saved".printf (
-                    saved, saved == 1 ? "" : "s");
+                summary = ngettext ("Saving cancelled — %d file saved",
+                    "Saving cancelled — %d files saved", saved).printf (saved);
             } else {
-                summary = "Saved %d file%s".printf (saved,
-                    saved == 1 ? "" : "s");
-                if (failed > 0) summary += ", %d failed".printf (failed);
-                if (skipped > 0) summary += ", %d not downloaded".printf (skipped);
+                summary = ngettext ("Saved %d file", "Saved %d files",
+                    saved).printf (saved);
+                if (failed > 0) summary += _(", %d failed").printf (failed);
+                if (skipped > 0) summary += _(", %d not downloaded").printf (skipped);
             }
             toast (summary);
         }

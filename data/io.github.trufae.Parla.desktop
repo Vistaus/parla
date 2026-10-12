@@ -1,7 +1,9 @@
 [Desktop Entry]
 Name=Parla
 GenericName=Messaging
+GenericName[ca]=Missatgeria
 Comment=A Delta Chat client for GNOME
+Comment[ca]=Un client del Delta Chat per al GNOME
 Comment[nl]=Een Delta Chat-client voor GNOME
 Exec=parla %u
 Icon=io.github.trufae.Parla
@@ -10,6 +12,7 @@ Type=Application
 StartupWMClass=Parla
 Categories=Network;Chat;InstantMessaging;GTK;
 Keywords=chat;messaging;email;deltachat;parla;
+Keywords[ca]=xat;missatgeria;correu;deltachat;parla;
 MimeType=x-scheme-handler/openpgp4fpr;
 StartupNotify=true
 DBusActivatable=true

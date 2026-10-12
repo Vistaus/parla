@@ -5,9 +5,12 @@
   <project_license>GPL-3.0</project_license>
   <name>Parla</name>
   <summary>A Delta Chat client for GNOME</summary>
+  <summary xml:lang="ca">Un client del Delta Chat per al GNOME</summary>
   <description>
     <p>Parla is a Delta Chat client for GNOME.</p>
+    <p xml:lang="ca">El Parla és un client del Delta Chat per al GNOME.</p>
     <p>Chat over email, decentralized and encrypted.</p>
+    <p xml:lang="ca">Xateja per correu electrònic, de manera descentralitzada i xifrada.</p>
   </description>
   <launchable type="desktop-id">io.github.trufae.Parla.desktop</launchable>
   <supports>
@@ -23,10 +26,12 @@
     <screenshot type="default">
       <image>https://raw.githubusercontent.com/trufae/parla/main/data/screenshots/welcome.png</image>
       <caption>Welcome</caption>
+      <caption xml:lang="ca">Benvinguda</caption>
     </screenshot>
     <screenshot>
       <image>https://raw.githubusercontent.com/trufae/parla/main/data/screenshots/welcome-dark.png</image>
       <caption>Dark Theme</caption>
+      <caption xml:lang="ca">Tema fosc</caption>
     </screenshot>
   </screenshots>
 

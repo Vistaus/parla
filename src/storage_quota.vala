@@ -60,8 +60,8 @@ namespace Dc {
         }
 
         public string summary_text () {
-            if (!has_limit ()) return "Server quota has not been reported yet.";
-            return "%s used · %s left of %s".printf (
+            if (!has_limit ()) return _("Server quota has not been reported yet.");
+            return _("%s used · %s left of %s").printf (
                 format_mb (used_bytes),
                 format_mb (left_bytes ()),
                 format_mb (limit_bytes));

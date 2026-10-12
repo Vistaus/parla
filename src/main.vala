@@ -19,7 +19,7 @@ int main (string[] args) {
        picked from the usual envvars (LANG, LC_ALL, ...); see docs/locales.md
        for how to override it per-launch. */
     GLib.Intl.setlocale (LocaleCategory.ALL, "");
-    GLib.Intl.bindtextdomain (Parla.GETTEXT_PACKAGE, Parla.LOCALEDIR);
+    GLib.Intl.bindtextdomain (Parla.GETTEXT_PACKAGE, Dc.Platform.get_locale_dir ());
     GLib.Intl.bind_textdomain_codeset (Parla.GETTEXT_PACKAGE, "UTF-8");
     GLib.Intl.textdomain (Parla.GETTEXT_PACKAGE);
 

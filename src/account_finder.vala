@@ -162,9 +162,9 @@ namespace Dc {
                         return chosen;
                     }
                 }
-                description = "No profiles configured.";
+                description = _("No profiles configured.");
             } catch (Error e) {
-                toast_msg = "Account setup error: " + e.message;
+                toast_msg = _("Account setup error: ") + e.message;
             }
             return 0;
         }

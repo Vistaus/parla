@@ -48,7 +48,7 @@ namespace Dc {
         public ClassicEmailDialog (RpcClient rpc, EventHandler events) {
             this.rpc = rpc;
             this.events = events;
-            setup ("Use Classic Email Address");
+            setup (_("Use Classic Email Address"));
         }
 
         public ClassicEmailDialog.for_edit (RpcClient rpc, EventHandler events,
@@ -58,7 +58,7 @@ namespace Dc {
             this.events = events;
             this.edit_account_id = account_id;
             this.initial = current;
-            setup ("Edit Transport");
+            setup (_("Edit Transport"));
         }
 
         private void setup (string title) {
@@ -70,24 +70,24 @@ namespace Dc {
         private Gtk.Widget build_input_page () {
             var content = account_setup_content ();
             content.append (account_setup_intro (edit_account_id > 0
-                ? "Change the login and server settings for this transport. " +
-                  "Fields left on “Automatic” are configured automatically."
-                : "Sign in with an existing email account. For most providers " +
+                ? _("Change the login and server settings for this transport. " +
+                  "Fields left on “Automatic” are configured automatically.")
+                : _("Sign in with an existing email account. For most providers " +
                   "the address and password are enough — servers are " +
                   "configured automatically. If your provider needs custom " +
-                  "IMAP/SMTP servers, set them under Advanced Settings."));
+                  "IMAP/SMTP servers, set them under Advanced Settings.")));
 
             email_entry = account_setup_entry ("user@example.com", true,
                 Gtk.InputPurpose.EMAIL);
             content.append (email_entry);
 
             pass_entry = new Gtk.PasswordEntry ();
-            pass_entry.placeholder_text = "Password";
+            pass_entry.placeholder_text = _("Password");
             pass_entry.show_peek_icon = true;
             pass_entry.activates_default = true;
             content.append (pass_entry);
 
-            advanced_expander = new Gtk.Expander ("Advanced Settings");
+            advanced_expander = new Gtk.Expander (_("Advanced Settings"));
             advanced_expander.child = build_advanced_grid ();
             /* The dialog does not re-measure on its own once mapped, so ask
                for more room while the advanced section is open (clamped to
@@ -98,8 +98,8 @@ namespace Dc {
             content.append (advanced_expander);
 
             var hint = new Gtk.Label (
-                "Sometimes IMAP needs to be enabled in the web interface of " +
-                "your provider first.");
+                _("Sometimes IMAP needs to be enabled in the web interface of " +
+                "your provider first."));
             hint.wrap = true;
             hint.xalign = 0;
             hint.add_css_class ("dim-label");
@@ -107,7 +107,7 @@ namespace Dc {
             content.append (hint);
 
             submit_btn = account_setup_action (content,
-                edit_account_id > 0 ? "Save & Reconnect" : "Sign In", false);
+                edit_account_id > 0 ? _("Save & Reconnect") : _("Sign In"), false);
             submit_btn.clicked.connect (() => { do_configure.begin (); });
             this.default_widget = submit_btn;
 
@@ -128,34 +128,34 @@ namespace Dc {
             adv_grid.margin_top = 8;
             adv_grid.margin_start = 6;
 
-            adv_heading ("Inbox (IMAP)");
-            imap_user_entry = adv_entry ("Automatic");
-            adv_field ("Login name", imap_user_entry);
-            imap_server_entry = adv_entry ("Automatic");
-            adv_field ("Server", imap_server_entry);
+            adv_heading (_("Inbox (IMAP)"));
+            imap_user_entry = adv_entry (_("Automatic"));
+            adv_field (_("Login name"), imap_user_entry);
+            imap_server_entry = adv_entry (_("Automatic"));
+            adv_field (_("Server"), imap_server_entry);
             imap_port_entry = adv_port_entry ();
-            adv_field ("Port", imap_port_entry);
+            adv_field (_("Port"), imap_port_entry);
             imap_security_dd = security_dropdown ();
-            adv_field ("Security", imap_security_dd);
+            adv_field (_("Security"), imap_security_dd);
 
-            adv_heading ("Outbox (SMTP)");
-            smtp_user_entry = adv_entry ("Same as IMAP");
-            adv_field ("Login name", smtp_user_entry);
+            adv_heading (_("Outbox (SMTP)"));
+            smtp_user_entry = adv_entry (_("Same as IMAP"));
+            adv_field (_("Login name"), smtp_user_entry);
             smtp_pass_entry = new Gtk.PasswordEntry ();
-            smtp_pass_entry.placeholder_text = "Same as IMAP";
+            smtp_pass_entry.placeholder_text = _("Same as IMAP");
             smtp_pass_entry.show_peek_icon = true;
-            adv_field ("Password", smtp_pass_entry);
-            smtp_server_entry = adv_entry ("Automatic");
-            adv_field ("Server", smtp_server_entry);
+            adv_field (_("Password"), smtp_pass_entry);
+            smtp_server_entry = adv_entry (_("Automatic"));
+            adv_field (_("Server"), smtp_server_entry);
             smtp_port_entry = adv_port_entry ();
-            adv_field ("Port", smtp_port_entry);
+            adv_field (_("Port"), smtp_port_entry);
             smtp_security_dd = security_dropdown ();
-            adv_field ("Security", smtp_security_dd);
+            adv_field (_("Security"), smtp_security_dd);
 
-            adv_heading ("Certificates");
+            adv_heading (_("Certificates"));
             cert_checks_dd = new Gtk.DropDown.from_strings ({
-                "Automatic", "Strict", "Accept invalid certificates" });
-            adv_field ("Validation", cert_checks_dd);
+                _("Automatic"), _("Strict"), _("Accept invalid certificates") });
+            adv_field (_("Validation"), cert_checks_dd);
 
             return adv_grid;
         }
@@ -180,7 +180,7 @@ namespace Dc {
         }
 
         private static Gtk.Entry adv_port_entry () {
-            var entry = account_setup_entry ("Automatic", true,
+            var entry = account_setup_entry (_("Automatic"), true,
                 Gtk.InputPurpose.DIGITS);
             entry.max_length = 5;
             return entry;
@@ -188,7 +188,7 @@ namespace Dc {
 
         private static Gtk.DropDown security_dropdown () {
             return new Gtk.DropDown.from_strings ({
-                "Automatic", "SSL/TLS", "STARTTLS", "Plain (no encryption)" });
+                _("Automatic"), "SSL/TLS", "STARTTLS", _("Plain (no encryption)") });
         }
 
         private static string? security_value (Gtk.DropDown dd) {
@@ -263,11 +263,11 @@ namespace Dc {
             p.addr = email_entry.text.strip ();
             p.password = pass_entry.text;
             if (p.addr.length == 0 || !p.addr.contains ("@")) {
-                show_error (this, "Please enter a valid email address.");
+                show_error (this, _("Please enter a valid email address."));
                 return null;
             }
             if (p.password.length == 0) {
-                show_error (this, "Please enter your password.");
+                show_error (this, _("Please enter your password."));
                 return null;
             }
             p.imap_user = opt_text (imap_user_entry);
@@ -281,7 +281,7 @@ namespace Dc {
             p.smtp_port = port_value (smtp_port_entry);
             p.smtp_security = security_value (smtp_security_dd);
             if (p.imap_port < 0 || p.smtp_port < 0) {
-                show_error (this, "Ports must be numbers between 1 and 65535.");
+                show_error (this, _("Ports must be numbers between 1 and 65535."));
                 return null;
             }
             switch (cert_checks_dd.selected) {
@@ -293,7 +293,7 @@ namespace Dc {
         }
 
         private Gtk.Widget build_progress_page () {
-            progress_page = new AccountProgressPage ("Connecting…", true);
+            progress_page = new AccountProgressPage (_("Connecting…"), true);
             progress_page.cancel_requested.connect (cancel_configure);
             return progress_page;
         }
@@ -306,7 +306,7 @@ namespace Dc {
 
             configure_running = true;
             stack.visible_child_name = "progress";
-            progress_page.set_status ("Configuring %s…".printf (params.addr));
+            progress_page.set_status (_("Configuring %s…").printf (params.addr));
 
             progress_handler_id = events.configure_progress.connect (
                 on_configure_progress);
@@ -320,7 +320,7 @@ namespace Dc {
                     cleanup_signal ();
                     configure_running = false;
                     if (!cancelled) {
-                        show_error (this, "Failed to create account: " + e.message);
+                        show_error (this, _("Failed to create account: ") + e.message);
                         stack.visible_child_name = "input";
                     }
                     return;
@@ -347,7 +347,7 @@ namespace Dc {
                 }
                 /* Keep the dialog open so the entered settings survive a
                    failed attempt (wrong password, typo in a server, …). */
-                show_error (this, "Configuration failed: " + e.message);
+                show_error (this, _("Configuration failed: ") + e.message);
                 stack.visible_child_name = "input";
                 return;
             }
@@ -369,7 +369,7 @@ namespace Dc {
         private void on_configure_progress (int ctx, int progress,
                                               string? comment) {
             if (ctx != target_account_id) return;
-            progress_page.set_permille (progress, comment, "Configuring…");
+            progress_page.set_permille (progress, comment, _("Configuring…"));
         }
 
         private void cleanup_signal () {
