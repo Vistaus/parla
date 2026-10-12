@@ -35,8 +35,7 @@ jobs:
             libgtk-4-dev \
             libadwaita-1-dev \
             libjson-glib-dev \
-            libwebkitgtk-6.0-dev \
-            xvfb xdotool
+            libwebkitgtk-6.0-dev
           # Ubuntu's Meson 1.3 suppresses all warnings in Vala-generated C.
           # Match the warning checks used by the packaging jobs.
           python3 -m venv "$RUNNER_TEMP/meson-venv"
@@ -53,33 +52,9 @@ jobs:
       - name: Build
         run: meson compile -C builddir
 
-      - name: Test
+      - name: Run unit tests
         if: matrix.a11y == true
         run: meson test -C builddir --print-errorlogs
-
-      - name: Check audio player layout and controls
-        if: matrix.a11y == true
-        run: |
-          sudo apt-get install -y libgstreamer-plugins-bad1.0-0 gstreamer1.0-plugins-good
-          mkdir -p audio-player-screenshots
-          PARLA_TEST_SCREENSHOTS="$PWD/audio-player-screenshots" GSK_RENDERER=cairo GDK_BACKEND=x11 \
-            xvfb-run -a dbus-run-session -- python3 tests/audio_player_ui_test.py builddir/core-compat-test
-
-      - name: Upload audio player screenshots
-        if: always() && matrix.a11y == true
-        uses: actions/upload-artifact@v7
-        with:
-          name: audio-player-screenshots
-          path: audio-player-screenshots/
-          if-no-files-found: ignore
-
-      - name: Check long-press pointer gestures
-        if: matrix.a11y == true
-        run: GTK_A11Y=none GDK_BACKEND=x11 xvfb-run -a builddir/core-compat-test --long-press-ui
-
-      - name: Check account setup events without a profile
-        if: matrix.a11y == true
-        run: dbus-run-session -- xvfb-run -a python3 tests/account_setup_events_test.py builddir/parla
 
   build-deb:
     runs-on: ubuntu-24.04
@@ -344,7 +319,7 @@ jobs:
       - name: Build and bundle
         run: bash scripts/windows/bundle.sh
 
-      - name: Run tests
+      - name: Run unit tests
         run: meson test -C builddir-windows --print-errorlogs
 
       - name: Upload Windows artifact

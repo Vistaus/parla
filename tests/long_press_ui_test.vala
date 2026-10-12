@@ -24,6 +24,15 @@ private async void check_long_press_ui (Gtk.Window window, Gtk.Button button,
     var gtk_settings = Gtk.Settings.get_default ();
     gtk_settings.gtk_long_press_time = 100;
 
+    // X11 can report the window as visible before GTK has painted its
+    // children. Sending the first press then can miss the button on CI.
+    var frame_clock = window.get_frame_clock ();
+    bool painted = false;
+    ulong paint_handler = frame_clock.after_paint.connect (() => { painted = true; });
+    for (int i = 0; i < 200 && !painted; i++) yield nap (25);
+    SignalHandler.disconnect (frame_clock, paint_handler);
+    assert (painted);
+
     // xdotool coordinates below are local to this fixed-size fixture.
     string prefix = "xdotool search --onlyvisible --sync --name parla-long-press-fixture ";
     string[] actions = {
